@@ -17,3 +17,8 @@ lerna-debug.log*
 
 # Deps.
 node_modules/
+
+# Dotenv stuff.
+.env
+.env.development.local
+.env.test
