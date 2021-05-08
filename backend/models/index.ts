@@ -7,8 +7,14 @@ interface List extends Document {
 }
 
 const ListSchema = new Schema<List>({
-  text: String,
-  is_checked: Boolean
+  text: {
+    type: String,
+    required: true
+  },
+  is_checked: {
+    type: Boolean,
+    default: false
+  }
 });
 
 // ListRoom.
@@ -21,12 +27,18 @@ interface ListRoom extends Document {
 }
 
 const ListRoomSchema = new Schema<ListRoom>({
-  name: String,
-  password: String,
+  name: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
   created_at: Date,
   updated_at: Date,
   list: [ListSchema]
 });
 
 export const ListModel = model<List>('List', ListSchema);
-export const ListRoomModel = model('ListRoom', ListRoomSchema);
+export const ListRoomModel = model<ListRoom>('ListRoom', ListRoomSchema);
