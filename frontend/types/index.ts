@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export interface ApiResponse {
-  data?: any;
+export interface ApiResponse<T> {
+  data?: T;
   errors?: ErrorObject[];
 }
 

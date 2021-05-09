@@ -1,3 +1,4 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
 import getConfig from 'next/config';
 
@@ -15,7 +16,10 @@ const {
 const URI = `mongodb+srv://${MONGODB_ADMIN}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER_URL}/${MONGODB_DB_NAME}?retryWrites=true&w=majority`;
 
 // Source: https://dev.to/raphaelchaula/adding-mongodb-mongoose-to-next-js-apis-3af.
-export const connectDB = (handler: NextHandler) => async (req, res) => {
+export const connectDB = (handler: NextHandler) => async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
   if (mongoose.connections[0].readyState) {
     // Use current db connection.
     return handler(req, res);
