@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { connectDB } from '../../../../middlewares';
+import { withDB } from '../../../../middlewares';
 import { RoomDocument, RoomModel } from '../../../../models';
 import { ApiResponse } from '../../../../types';
 
@@ -38,4 +38,4 @@ const roomAccessHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.json(response);
 };
 
-export default connectDB(roomAccessHandler);
+export default withDB(roomAccessHandler);

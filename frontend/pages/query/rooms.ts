@@ -25,6 +25,10 @@ export async function accessRoom({
   });
 }
 
+export async function getCurrentRoom(): Promise<ApiResponse<Room>> {
+  return axios.get(`/api/current-room`);
+}
+
 // Todos.
 export interface TodoParameters {
   name: string;

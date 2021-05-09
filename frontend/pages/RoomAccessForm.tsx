@@ -8,10 +8,11 @@ const FORM_DEFAULT_VALUES: CreateRoomParameters = {
 };
 
 interface Props {
-  onSuccessfulAccess: (room: Room) => void;
+  onSuccessfulAccess: () => void;
+  request: typeof createRoom;
 }
 
-export default function AccessRoom({ onSuccessfulAccess }: Props) {
+export function RoomAccessForm({ onSuccessfulAccess, request }: Props) {
   const {
     register,
     handleSubmit,
@@ -22,10 +23,10 @@ export default function AccessRoom({ onSuccessfulAccess }: Props) {
 
   async function onSubmit(formData: CreateRoomParameters) {
     try {
-      const { data, errors } = await createRoom(formData);
+      const { data, errors } = await request(formData);
       if (!data) throw new Error(errors?.join(', '));
 
-      onSuccessfulAccess(data);
+      onSuccessfulAccess();
     } catch (err) {
       console.error(err);
     }

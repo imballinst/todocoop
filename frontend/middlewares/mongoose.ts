@@ -25,7 +25,7 @@ const URI = `mongodb+srv://${MONGODB_ADMIN}:${MONGODB_PASSWORD}@${MONGODB_CLUSTE
 
 // Source: https://dev.to/raphaelchaula/adding-mongodb-mongoose-to-next-js-apis-3af.
 // With some modificaiton.
-export const connectDB = (handler: NextHandler) => async (
+export const withDB = (handler: NextHandler) => async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {

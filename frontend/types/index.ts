@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { Session } from 'next-iron-session';
 
 export interface ApiResponse<T> {
   data?: T;
@@ -14,4 +15,11 @@ export interface Dictionary<T> {
   [index: string]: T;
 }
 
-export type NextHandler = (req: NextApiRequest, res: NextApiResponse) => void;
+interface ExtendedNextApiRequest extends NextApiRequest {
+  session: Session;
+}
+
+export type NextHandler = (
+  req: ExtendedNextApiRequest,
+  res: NextApiResponse
+) => void;
