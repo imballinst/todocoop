@@ -1,8 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
 import { RoomDocument, RoomModel } from '../../../models';
-import { ApiResponse } from '../../../types';
+import { ApiResponse, ExtendedNextApiRequest } from '../../../types';
 
-const createRoomHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const createRoomHandler = async (
+  req: ExtendedNextApiRequest,
+  res: NextApiResponse
+) => {
   let response: ApiResponse<RoomDocument> = {};
 
   try {
@@ -13,6 +16,7 @@ const createRoomHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const room = new RoomModel(req.body);
     const object = await room.save();
 
+    req.session.set('room', object);
     res.status(200);
     response.data = object;
   } catch (err) {

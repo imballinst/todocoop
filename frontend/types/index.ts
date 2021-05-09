@@ -15,7 +15,7 @@ export interface Dictionary<T> {
   [index: string]: T;
 }
 
-interface ExtendedNextApiRequest extends NextApiRequest {
+export interface ExtendedNextApiRequest extends NextApiRequest {
   session: Session;
 }
 

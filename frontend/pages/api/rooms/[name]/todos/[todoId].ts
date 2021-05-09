@@ -1,11 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
+import { withDB, withSession } from '../../../../../middlewares';
 import { RoomModel, Todo } from '../../../../../models';
-import { ApiResponse } from '../../../../../types';
+import { ApiResponse, ExtendedNextApiRequest } from '../../../../../types';
 
-const updateAndDeleteTodoHandler = async (
-  req: NextApiRequest,
+async function updateAndDeleteTodoHandler(
+  req: ExtendedNextApiRequest,
   res: NextApiResponse
-) => {
+) {
   let response: ApiResponse<Todo> = {};
 
   try {
@@ -39,9 +40,9 @@ const updateAndDeleteTodoHandler = async (
   }
 
   res.json(response);
-};
+}
 
-export default updateAndDeleteTodoHandler;
+export default withSession(withDB(updateAndDeleteTodoHandler));
 
 // Child method routes.
 async function updateTodo({

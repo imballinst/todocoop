@@ -1,10 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-
+import { NextApiResponse } from 'next';
 import { withDB } from '../../../../middlewares';
 import { RoomDocument, RoomModel } from '../../../../models';
-import { ApiResponse } from '../../../../types';
+import { ApiResponse, ExtendedNextApiRequest } from '../../../../types';
 
-const roomAccessHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+async function roomAccessHandler(
+  req: ExtendedNextApiRequest,
+  res: NextApiResponse
+) {
   let response: ApiResponse<RoomDocument> = {};
 
   try {
@@ -22,6 +24,7 @@ const roomAccessHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       throw new Error('Invalid room information.');
     }
 
+    req.session.set('room', object);
     res.status(200);
     response.data = object;
   } catch (err) {
@@ -36,6 +39,6 @@ const roomAccessHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   res.json(response);
-};
+}
 
 export default withDB(roomAccessHandler);

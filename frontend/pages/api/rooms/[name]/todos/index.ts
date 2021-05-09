@@ -1,8 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
+import { withDB, withSession } from '../../../../../middlewares';
 import { RoomModel, TodoDocument, TodoModel } from '../../../../../models';
-import { ApiResponse } from '../../../../../types';
+import { ApiResponse, ExtendedNextApiRequest } from '../../../../../types';
 
-const createTodoHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+async function createTodoHandler(
+  req: ExtendedNextApiRequest,
+  res: NextApiResponse
+) {
   let response: ApiResponse<TodoDocument> = {};
 
   try {
@@ -38,6 +42,6 @@ const createTodoHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   res.json(response);
-};
+}
 
-export default createTodoHandler;
+export default withSession(withDB(createTodoHandler));
