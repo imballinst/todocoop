@@ -19,6 +19,7 @@ node_modules/
 
 # Dotenv stuff.
 .env
+.env.local
 .env.development.local
 .env.test
 

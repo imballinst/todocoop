@@ -60,7 +60,6 @@ roomsRouter.post('/rooms/:name/todos', async (req, res) => {
   let response: ApiResponse = {};
 
   try {
-    const todo = new TodoModel(req.body);
     const roomQuery = RoomModel.findOne({
       name: req.params.name
     });
@@ -70,11 +69,7 @@ roomsRouter.post('/rooms/:name/todos', async (req, res) => {
       throw new Error('Invalid room information.');
     }
 
-    const isExists = roomObject.todos.find((item) => item.title === todo.title);
-
-    if (isExists) {
-      throw new Error('Todo title must be unique.');
-    }
+    const todo = new TodoModel(req.body);
 
     roomObject.todos = [...roomObject.todos, todo];
     const object = await roomObject.save();

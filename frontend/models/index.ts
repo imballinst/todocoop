@@ -1,12 +1,13 @@
 import { model, Schema, Document, Model } from 'mongoose';
 
 // Todo.
-export interface Todo extends Document {
+export interface Todo {
   title: string;
   is_checked: boolean;
 }
+export interface TodoDocument extends Todo, Document {}
 
-const TodoSchema = new Schema<Todo>({
+const TodoSchema = new Schema<TodoDocument>({
   title: {
     type: String,
     unique: true,
@@ -19,13 +20,14 @@ const TodoSchema = new Schema<Todo>({
 });
 
 // Room.
-export interface Room extends Document {
+export interface Room {
   name: string;
   password: string;
-  todos: Todo[];
+  todos: TodoDocument[];
 }
+export interface RoomDocument extends Room, Document {}
 
-const RoomSchema = new Schema<Room>({
+const RoomSchema = new Schema<RoomDocument>({
   name: {
     type: String,
     unique: true,
@@ -39,7 +41,7 @@ const RoomSchema = new Schema<Room>({
   todos: [TodoSchema]
 });
 
-export const TodoModel: Model<Todo, {}> =
-  model('Todo') || model<Todo>('Todo', TodoSchema);
-export const RoomModel: Model<Room, {}> =
-  model('Room') || model<Room>('Room', RoomSchema);
+export const TodoModel: Model<TodoDocument, {}> =
+  model('Todo') || model<TodoDocument>('Todo', TodoSchema);
+export const RoomModel: Model<RoomDocument, {}> =
+  model('Room') || model<RoomDocument>('Room', RoomSchema);
