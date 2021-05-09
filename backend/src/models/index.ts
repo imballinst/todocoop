@@ -9,6 +9,7 @@ export interface Todo extends Document {
 const TodoSchema = new Schema<Todo>({
   title: {
     type: String,
+    unique: true,
     required: true
   },
   is_checked: {
@@ -21,22 +22,20 @@ const TodoSchema = new Schema<Todo>({
 export interface Room extends Document {
   name: string;
   password: string;
-  created_at: Date;
-  updated_at: Date;
   todos: Todo[];
 }
 
 const RoomSchema = new Schema<Room>({
   name: {
     type: String,
+    unique: true,
+    index: true,
     required: true
   },
   password: {
     type: String,
     required: true
   },
-  created_at: Date,
-  updated_at: Date,
   todos: [TodoSchema]
 });
 
