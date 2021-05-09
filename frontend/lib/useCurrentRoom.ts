@@ -22,7 +22,8 @@ export function useCurrentRoom({
       return json.data;
     },
     {
-      refetchInterval: false
+      retry: false,
+      retryOnMount: false
     }
   );
 

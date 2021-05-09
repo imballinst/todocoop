@@ -1,8 +1,14 @@
+import { NextApiResponse } from 'next';
+
 import { withSession } from '../../middlewares';
+import { ExtendedNextApiRequest } from '../../types';
 
-export default withSession(async (req, res) => {
+async function getCurrentRoomHandler(
+  req: ExtendedNextApiRequest,
+  res: NextApiResponse
+) {
   const room = req.session.get('room');
-
+  console.log('getCurrentRoomHandler', room);
   if (room) {
     // in a real world application you might read the room id from the session and then do a database request
     // to get more information on the room if needed
@@ -10,4 +16,6 @@ export default withSession(async (req, res) => {
   }
 
   res.status(401).end();
-});
+}
+
+export default withSession(getCurrentRoomHandler);

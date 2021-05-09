@@ -1,11 +1,12 @@
 import { NextApiResponse } from 'next';
+import { withDB, withSession } from '../../../middlewares';
 import { RoomDocument, RoomModel } from '../../../models';
 import { ApiResponse, ExtendedNextApiRequest } from '../../../types';
 
-const createRoomHandler = async (
+async function createRoomHandler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse
-) => {
+) {
   let response: ApiResponse<RoomDocument> = {};
 
   try {
@@ -15,8 +16,9 @@ const createRoomHandler = async (
 
     const room = new RoomModel(req.body);
     const object = await room.save();
-
+    console.log('createRoomHandler', object);
     req.session.set('room', object);
+    console.log('createRoomHandler get', req.session.get('room'));
     res.status(200);
     response.data = object;
   } catch (err) {
@@ -31,6 +33,6 @@ const createRoomHandler = async (
   }
 
   res.json(response);
-};
+}
 
-export default createRoomHandler;
+export default withSession(withDB(createRoomHandler));

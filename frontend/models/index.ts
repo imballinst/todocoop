@@ -10,7 +10,6 @@ export interface TodoDocument extends Todo, Document {}
 const TodoSchema = new Schema<TodoDocument>({
   title: {
     type: String,
-    unique: true,
     required: true
   },
   is_checked: {
@@ -38,7 +37,10 @@ const RoomSchema = new Schema<RoomDocument>({
     type: String,
     required: true
   },
-  todos: [TodoSchema]
+  todos: {
+    type: [TodoSchema],
+    default: []
+  }
 });
 
 export const TodoModel: Model<TodoDocument, {}> =
