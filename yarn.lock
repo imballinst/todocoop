@@ -1800,6 +1800,7 @@ __metadata:
     next: ^10.2.0
     react: ^17.0.2
     react-dom: ^17.0.2
+    react-hook-form: ^7.5.0
     react-query: ^3.16.0
     typescript: ^4.2.4
   languageName: unknown
@@ -3718,6 +3719,15 @@ fsevents@~2.3.1:
   peerDependencies:
     react: 17.0.2
   checksum: 960a74ff6670766846a73097a599115963df1574833c59ca0c2fd909758ebe7a6214cd14f5e6aa63ce846d8f39fde7f3b80474ccfcfadc45dd7f3246364718c6
+  languageName: node
+  linkType: hard
+
+"react-hook-form@npm:^7.5.0":
+  version: 7.5.0
+  resolution: "react-hook-form@npm:7.5.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17
+  checksum: 78c2fce203af09297562a853f5136d67c3207eeaaa5db1d6832c0752937ef6ce7e36c4dfffd2cf9495b3a5c1b52520c62b8c8aa1c3419ce248bc2db000f6888f
   languageName: node
   linkType: hard
 

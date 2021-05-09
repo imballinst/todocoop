@@ -1,31 +1,18 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider
-} from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import Link from 'next/link';
-import { useEffect } from 'react';
-import { accessRoom } from './query/rooms';
+import { useState } from 'react';
+import { Room } from '../models';
+import AccessRoom from './AccessRoom';
 
 function IndexPage() {
-  const query = useQuery('todos', () => {
-    return accessRoom({
-      name: 'test-room',
-      password: '123456'
-    });
-  });
+  const [room, setRoom] = useState<Room | undefined>(undefined);
 
   return (
     <>
       <h1>Hello Next.js 👋</h1>
-      <p>
-        <Link href="/about">
-          <a>About</a>
-        </Link>
-      </p>
+
+      {room === undefined ? <AccessRoom onSuccessfulAccess={setRoom} /> : null}
     </>
   );
 }

@@ -3,32 +3,30 @@ import axios from 'axios';
 import { ApiResponse } from '../../types';
 import { Room, Todo } from '../../models';
 
-interface RoomParameters {
+export interface CreateRoomParameters {
   name: string;
   password: string;
 }
 
 export async function createRoom(
-  params: RoomParameters
+  params: CreateRoomParameters
 ): Promise<ApiResponse<Room>> {
-  return axios.post(`/api/rooms`, {
-    json: params
-  });
+  return axios.post(`/api/rooms`, params);
 }
+
+export interface AccessRoomParameters extends CreateRoomParameters {}
 
 export async function accessRoom({
   name,
   password
-}: RoomParameters): Promise<ApiResponse<Room>> {
+}: AccessRoomParameters): Promise<ApiResponse<Room>> {
   return axios.post(`/api/rooms/${name}/access`, {
-    json: {
-      password
-    }
+    password
   });
 }
 
 // Todos.
-interface TodoParameters {
+export interface TodoParameters {
   name: string;
   todo: Todo;
 }
@@ -37,12 +35,10 @@ export async function createTodo({
   name,
   todo
 }: TodoParameters): Promise<ApiResponse<Todo>> {
-  return axios.post(`/api/rooms/${name}/todos`, {
-    json: todo
-  });
+  return axios.post(`/api/rooms/${name}/todos`, todo);
 }
 
-interface UpdateTodoParameters {
+export interface UpdateTodoParameters {
   name: string;
   todoId: string;
   todo: Todo;
@@ -53,12 +49,10 @@ export async function updateTodo({
   todoId,
   todo
 }: UpdateTodoParameters): Promise<ApiResponse<Todo>> {
-  return axios.put(`/api/rooms/${name}/todos/${todoId}`, {
-    json: todo
-  });
+  return axios.put(`/api/rooms/${name}/todos/${todoId}`, todo);
 }
 
-interface DeleteTodoParameters {
+export interface DeleteTodoParameters {
   name: string;
   todoId: string;
 }

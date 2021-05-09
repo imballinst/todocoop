@@ -1,4 +1,4 @@
-import { model, Schema, Document, Model } from 'mongoose';
+import { model, Schema, Document, Model, models } from 'mongoose';
 
 // Todo.
 export interface Todo {
@@ -42,6 +42,6 @@ const RoomSchema = new Schema<RoomDocument>({
 });
 
 export const TodoModel: Model<TodoDocument, {}> =
-  model('Todo') || model<TodoDocument>('Todo', TodoSchema);
+  models.Todo || model<TodoDocument>('Todo', TodoSchema);
 export const RoomModel: Model<RoomDocument, {}> =
-  model('Room') || model<RoomDocument>('Room', RoomSchema);
+  models.Room || model<RoomDocument>('Room', RoomSchema);
