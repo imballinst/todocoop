@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { RoomModel, Todo, TodoModel } from '../models';
+import { RoomModel, TodoModel } from '../models';
 import { ApiResponse } from '../types';
 
 export const roomsRouter = Router();
@@ -72,9 +72,9 @@ roomsRouter.post('/rooms/:name/todos', async (req, res) => {
     const todo = new TodoModel(req.body);
 
     roomObject.todos = [...roomObject.todos, todo];
-    const object = await roomObject.save();
+    await roomObject.save();
 
-    response.data = object;
+    response.data = todo;
   } catch (err) {
     console.error(err);
     response.errors = [
@@ -145,7 +145,6 @@ roomsRouter.delete('/rooms/:name/todos/:todoId', async (req, res) => {
     }
 
     res.statusCode = 204;
-    response.data = object;
   } catch (err) {
     console.error(err);
     response.errors = [

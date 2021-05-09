@@ -1,24 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { connectDB } from '../../../../middlewares';
-import { Room, RoomModel } from '../../../../models';
+import { RoomDocument, RoomModel } from '../../../../models';
 import { ApiResponse } from '../../../../types';
 
 const roomAccessHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  let response: ApiResponse<Room> = {};
-
-  if (req.method !== 'POST') {
-    response.errors = [
-      {
-        code: '10000',
-        message: 'Bad request'
-      }
-    ];
-
-    return res.status(400).json(response);
-  }
+  let response: ApiResponse<RoomDocument> = {};
 
   try {
+    if (req.method !== 'POST') {
+      throw new Error('Bad request');
+    }
+
     const roomQuery = RoomModel.findOne({
       name: req.query.name as string,
       password: req.body.json.password

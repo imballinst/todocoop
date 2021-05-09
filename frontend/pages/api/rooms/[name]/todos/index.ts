@@ -1,11 +1,43 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { RoomModel, TodoDocument, TodoModel } from '../../../../../models';
+import { ApiResponse } from '../../../../../types';
 
-const handler = (_req: NextApiRequest, res: NextApiResponse) => {
+const createTodoHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+  let response: ApiResponse<TodoDocument> = {};
+
   try {
-    res.status(200).json([]);
+    if (req.method !== 'POST') {
+      throw new Error('Bad request');
+    }
+
+    const roomQuery = RoomModel.findOne({
+      name: req.query.name as string
+    });
+    const roomObject = await roomQuery.exec();
+
+    if (roomObject === null) {
+      throw new Error('Invalid room information.');
+    }
+
+    const todo = new TodoModel(req.body);
+
+    roomObject.todos = [...roomObject.todos, todo];
+    await roomObject.save();
+
+    res.status(200);
+    response.data = todo;
   } catch (err) {
-    res.status(500).json({ statusCode: 500, message: err.message });
+    console.error(err);
+    res.status(400);
+    response.errors = [
+      {
+        code: '10000',
+        message: err.message
+      }
+    ];
   }
+
+  res.json(response);
 };
 
-export default handler;
+export default createTodoHandler;
