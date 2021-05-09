@@ -22,7 +22,7 @@ const TodoSchema = new Schema<TodoDocument>({
 export interface Room {
   name: string;
   password: string;
-  todos: TodoDocument[];
+  todos: Todo[];
 }
 export interface RoomDocument extends Room, Document {}
 

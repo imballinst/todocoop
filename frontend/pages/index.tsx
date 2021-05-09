@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { RoomForm } from './RoomForm';
 import { createRoom } from './query/rooms';
 import { useCurrentRoom } from '../lib/useCurrentRoom';
-import { Room } from './Room';
+import { RoomDetail } from './Room';
 
 function IndexPage() {
   const { room, refetchRoom } = useCurrentRoom();
@@ -13,7 +13,7 @@ function IndexPage() {
       {room === undefined ? (
         <RoomForm request={createRoom} onSuccessfulAccess={refetchRoom} />
       ) : (
-        <Room room={room} />
+        <RoomDetail room={room} />
       )}
     </>
   );
