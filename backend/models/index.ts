@@ -1,13 +1,13 @@
 import { model, Schema, Document } from 'mongoose';
 
-// List.
-interface List extends Document {
-  text: string;
+// Todo.
+export interface Todo extends Document {
+  title: string;
   is_checked: boolean;
 }
 
-const ListSchema = new Schema<List>({
-  text: {
+const TodoSchema = new Schema<Todo>({
+  title: {
     type: String,
     required: true
   },
@@ -17,16 +17,16 @@ const ListSchema = new Schema<List>({
   }
 });
 
-// ListRoom.
-interface ListRoom extends Document {
+// Room.
+export interface Room extends Document {
   name: string;
   password: string;
   created_at: Date;
   updated_at: Date;
-  list: List[];
+  todos: Todo[];
 }
 
-const ListRoomSchema = new Schema<ListRoom>({
+const RoomSchema = new Schema<Room>({
   name: {
     type: String,
     required: true
@@ -37,8 +37,8 @@ const ListRoomSchema = new Schema<ListRoom>({
   },
   created_at: Date,
   updated_at: Date,
-  list: [ListSchema]
+  todos: [TodoSchema]
 });
 
-export const ListModel = model<List>('List', ListSchema);
-export const ListRoomModel = model<ListRoom>('ListRoom', ListRoomSchema);
+export const TodoModel = model<Todo>('Todo', TodoSchema);
+export const RoomModel = model<Room>('Room', RoomSchema);

@@ -491,9 +491,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"just-do-it@workspace:.":
+"tasky@workspace:.":
   version: 0.0.0-use.local
-  resolution: "just-do-it@workspace:."
+  resolution: "tasky@workspace:."
   languageName: unknown
   linkType: soft
 

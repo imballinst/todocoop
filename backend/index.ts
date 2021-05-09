@@ -4,7 +4,7 @@ import cors from 'cors';
 
 import { connect, disconnect } from 'mongoose';
 
-import { ListModel, ListRoomModel } from './models';
+import { RoomModel } from './models';
 
 import {
   MONGODB_ADMIN,
@@ -33,7 +33,7 @@ app.listen(PORT, async () => {
     useUnifiedTopology: true
   });
 
-  const listRoomWatcher = ListRoomModel.watch();
+  const listRoomWatcher = RoomModel.watch();
   listRoomWatcher.on('change', (json) => {
     console.log(json);
   });
@@ -45,7 +45,7 @@ app.listen(PORT, async () => {
 });
 
 async function run() {
-  const listRoom = new ListRoomModel({
+  const listRoom = new RoomModel({
     name: 'test123',
     password: 'test',
     created_at: new Date(),
@@ -63,11 +63,11 @@ async function run() {
 }
 
 async function update() {
-  const listQuery = ListRoomModel.find();
+  const listQuery = RoomModel.find();
   const list = await listQuery.exec();
   console.log(list);
 
-  const listRoomQuery = ListRoomModel.updateOne(
+  const listRoomQuery = RoomModel.updateOne(
     {
       name: 'test'
     },
