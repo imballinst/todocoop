@@ -22,7 +22,7 @@ app.use(roomsRouter);
 
 // Replace the URI string with your MongoDB deployment's connection string.
 const URI = `mongodb+srv://${MONGODB_ADMIN}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER_URL}/${MONGODB_DB_NAME}?retryWrites=true&w=majority`;
-const PORT = 3000;
+const PORT = 4000;
 
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`);

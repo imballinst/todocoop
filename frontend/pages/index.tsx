@@ -13,8 +13,8 @@ import { accessRoom } from './query/rooms';
 function IndexPage() {
   const query = useQuery('todos', () => {
     return accessRoom({
-      name: 'test',
-      password: 'test'
+      name: 'test-room',
+      password: '123456'
     });
   });
 

@@ -14,7 +14,7 @@ export async function accessRoom({
 }: AccessRoomParams): Promise<ApiResponse<Room>> {
   return axios.post(`/api/rooms/${name}/access`, {
     json: {
-      password: password
+      password
     }
   });
 }
