@@ -9,7 +9,7 @@ import {
   MONGODB_CLUSTER_URL,
   MONGODB_PASSWORD,
   MONGODB_DB_NAME
-} from '../constants';
+} from './constants';
 import { roomsRouter } from './routes';
 
 // Initialize the express app.
