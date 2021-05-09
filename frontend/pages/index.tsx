@@ -1,19 +1,20 @@
 import { QueryClient, QueryClientProvider } from 'react-query';
 
-import { RoomAccessForm } from './RoomAccessForm';
+import { RoomForm } from './RoomForm';
 import { createRoom } from './query/rooms';
 import { useCurrentRoom } from '../lib/useCurrentRoom';
+import { Room } from './Room';
 
 function IndexPage() {
   const { room, refetchRoom } = useCurrentRoom();
 
   return (
     <>
-      <h1>Hello Next.js 👋</h1>
-
       {room === undefined ? (
-        <RoomAccessForm request={createRoom} onSuccessfulAccess={refetchRoom} />
-      ) : null}
+        <RoomForm request={createRoom} onSuccessfulAccess={refetchRoom} />
+      ) : (
+        <Room room={room} />
+      )}
     </>
   );
 }

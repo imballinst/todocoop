@@ -12,7 +12,7 @@ interface Props {
   request: typeof createRoom;
 }
 
-export function RoomAccessForm({ onSuccessfulAccess, request }: Props) {
+export function RoomForm({ onSuccessfulAccess, request }: Props) {
   const {
     register,
     handleSubmit,

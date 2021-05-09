@@ -25,6 +25,14 @@ export async function accessRoom({
   });
 }
 
+export async function leaveRoom({
+  name
+}: {
+  name: string;
+}): Promise<ApiResponse<undefined>> {
+  return axios.post(`/api/rooms/${name}/leave`);
+}
+
 export async function getCurrentRoom(): Promise<ApiResponse<Room>> {
   return axios.get(`/api/current-room`);
 }

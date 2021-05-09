@@ -1,6 +1,12 @@
 import { Room } from '../models';
 
-export function Room({ name, todos }: Room) {
+interface RoomProps {
+  room: Room;
+}
+
+export function Room({ room }: RoomProps) {
+  const { name, todos } = room;
+
   return (
     <div>
       <h1>{name}</h1>
