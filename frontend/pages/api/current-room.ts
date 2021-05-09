@@ -8,7 +8,7 @@ async function getCurrentRoomHandler(
   res: NextApiResponse
 ) {
   const room = req.session.get('room');
-  console.log('getCurrentRoomHandler', room);
+
   if (room) {
     // in a real world application you might read the room id from the session and then do a database request
     // to get more information on the room if needed

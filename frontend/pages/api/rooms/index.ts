@@ -16,9 +16,10 @@ async function createRoomHandler(
 
     const room = new RoomModel(req.body);
     const object = await room.save();
-    console.log('createRoomHandler', object);
+
     req.session.set('room', object);
-    console.log('createRoomHandler get', req.session.get('room'));
+    await req.session.save();
+
     res.status(200);
     response.data = object;
   } catch (err) {
