@@ -1,21 +1,31 @@
+import { useEffect, useRef } from 'react';
 import {
+  Control,
+  FieldArrayMethodProps,
   FormState,
   useFieldArray,
   useForm,
-  UseFormRegister
+  UseFormRegister,
+  useWatch
 } from 'react-hook-form';
 import {
   MutationFunction,
   useMutation,
   UseMutationResult,
-  useQuery,
   useQueryClient
 } from 'react-query';
 import { useCurrentRoom } from '../lib/useCurrentRoom';
 import { generateHash, replaceArrayElementAtIndex } from '../lib/utils';
 import { ApiResponse } from '../types';
 import { BaseTodo, BaseRoom } from '../types/models';
-import { createTodo, deleteTodo, updateTodo } from './query/rooms';
+import {
+  createTodo,
+  deleteTodo,
+  DeleteTodoParameters,
+  TodoParameters,
+  updateTodo,
+  UpdateTodoParameters
+} from './query/rooms';
 
 interface RoomProps {
   room: BaseRoom;
@@ -35,10 +45,33 @@ export function RoomDetail({ room }: RoomProps) {
     }
   });
 
+  const {
+    control,
+    register,
+    formState: { errors },
+    reset
+  } = useForm({
+    defaultValues: {
+      todos: todos.map((todo) => ({
+        _id: generateHash(),
+        ...todo
+      }))
+    } as RoomFormState
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'todos',
+    keyName: 'key'
+  });
+
+  useEffect(() => {
+    reset(roomData);
+  }, [roomData]);
+
   // Source: https://react-query.tanstack.com/examples/optimistic-updates-typescript.
   const addTodoMutation = useMutateRoom(
-    (newTodo) => createTodo({ name, todo: newTodo }),
-    async (newTodo: BaseTodo) => {
+    createTodo,
+    async ({ todo: newTodo }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('room');
 
@@ -47,10 +80,17 @@ export function RoomDetail({ room }: RoomProps) {
 
       // Optimistically update to the new value.
       if (previousRoom) {
+        const newPersistedTodo = {
+          isPersisted: true,
+          is_checked: newTodo.is_checked,
+          title: newTodo.title
+        };
+
         queryClient.setQueryData<BaseRoom>('room', {
           ...previousRoom,
-          todos: [...previousRoom.todos, newTodo]
+          todos: [...previousRoom.todos, newPersistedTodo]
         });
+        append(newPersistedTodo);
       }
 
       return { previousRoom };
@@ -58,12 +98,8 @@ export function RoomDetail({ room }: RoomProps) {
   );
 
   const updateTodoMutation = useMutateRoom(
-    (updatedTodo) =>
-      updateTodo({
-        name,
-        todo: updatedTodo
-      }),
-    async (updatedTodo: BaseTodo) => {
+    updateTodo,
+    async ({ todo: updatedTodo }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('room');
 
@@ -90,56 +126,26 @@ export function RoomDetail({ room }: RoomProps) {
     }
   );
 
-  const deleteTodoMutation = useMutateRoom(
-    (deletedTodo) => deleteTodo({ name, todoId: deletedTodo._id }),
-    async (deletedTodo: BaseTodo) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
-      await queryClient.cancelQueries('room');
+  const deleteTodoMutation = useMutateRoom(deleteTodo, async ({ todoId }) => {
+    // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
+    await queryClient.cancelQueries('room');
 
-      // Snapshot the previous value.
-      const previousRoom = queryClient.getQueryData<BaseRoom>('room');
+    // Snapshot the previous value.
+    const previousRoom = queryClient.getQueryData<BaseRoom>('room');
 
-      // Optimistically update to the new value.
-      if (previousRoom) {
-        const idx = previousRoom.todos.findIndex(
-          (el) => el._id === deletedTodo._id
-        );
+    // Optimistically update to the new value.
+    if (previousRoom) {
+      const idx = previousRoom.todos.findIndex((el) => el._id === todoId);
 
-        queryClient.setQueryData<BaseRoom>('room', {
-          ...previousRoom,
-          todos: replaceArrayElementAtIndex(previousRoom.todos, idx, undefined)
-        });
-      }
-
-      return { previousRoom };
+      queryClient.setQueryData<BaseRoom>('room', {
+        ...previousRoom,
+        todos: replaceArrayElementAtIndex(previousRoom.todos, idx, undefined)
+      });
+      remove(idx);
     }
-  );
 
-  const {
-    control,
-    register,
-    formState: { errors },
-    getValues,
-    reset
-  } = useForm({
-    defaultValues: {
-      todos: todos.map((todo) => ({
-        _id: generateHash(),
-        ...todo
-      }))
-    } as RoomFormState
+    return { previousRoom };
   });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'todos',
-    keyName: 'todos'
-  });
-
-  function onTodoCreated(title: string) {}
-
-  function onTodoUpdated() {}
-
-  function onTodoDeleted() {}
 
   return (
     <form onSubmit={(e) => e.preventDefault()}>
@@ -152,9 +158,11 @@ export function RoomDetail({ room }: RoomProps) {
                 roomName={name}
                 errors={errors}
                 index={index}
+                isLast={index === fields.length}
                 register={register}
-                remove={remove}
                 todo={todo}
+                append={append}
+                control={control}
                 addTodoMutation={addTodoMutation}
                 updateTodoMutation={updateTodoMutation}
                 deleteTodoMutation={deleteTodoMutation}
@@ -164,13 +172,12 @@ export function RoomDetail({ room }: RoomProps) {
 
           <li>
             <button
-            // onClick={() =>
-            //   append({
-            //     __id: generateHash(),
-            //     is_checked: false,
-            //     title: ''
-            //   })
-            // }
+              onClick={() =>
+                append({
+                  is_checked: false,
+                  title: ''
+                })
+              }
             >
               Add
             </button>
@@ -181,64 +188,102 @@ export function RoomDetail({ room }: RoomProps) {
   );
 }
 
+type UseMutationType<R, T> = UseMutationResult<
+  ApiResponse<R>,
+  unknown,
+  T,
+  MutateContext
+>;
+
 // Helper functions/components.
 function TodoForm({
   roomName,
   todo,
   errors,
   register,
-  remove,
-  index
+  append,
+  control,
+  index,
+  isLast,
+  addTodoMutation,
+  updateTodoMutation,
+  deleteTodoMutation
 }: {
   roomName: string;
   todo: BaseTodo;
   errors: FormState<RoomFormState>['errors'];
   register: UseFormRegister<RoomFormState>;
-  remove: (index: number) => void;
+  append: (
+    value: Partial<BaseTodo> | Partial<BaseTodo>[],
+    options?: FieldArrayMethodProps
+  ) => void;
+  control: Control<RoomFormState>;
   index: number;
+  isLast: boolean;
   // Mutate handlers.
-  addTodoMutation: UseMutationResult<
-    ApiResponse<BaseTodo>,
-    unknown,
-    BaseTodo,
-    MutateContext
-  >;
-  updateTodoMutation: UseMutationResult<
-    ApiResponse<BaseTodo>,
-    unknown,
-    BaseTodo,
-    MutateContext
-  >;
-  deleteTodoMutation: UseMutationResult<
-    ApiResponse<object>,
-    unknown,
-    BaseTodo,
-    MutateContext
-  >;
+  addTodoMutation: UseMutationType<BaseTodo, TodoParameters>;
+  updateTodoMutation: UseMutationType<BaseTodo, UpdateTodoParameters>;
+  deleteTodoMutation: UseMutationType<object, DeleteTodoParameters>;
 }) {
-  async function onCreateTodo() {
-    const response = await createTodo({
-      name: roomName,
-      todo: {
-        title: todo.title,
-        is_checked: todo.is_checked
-      }
-    });
+  const isChecked = useWatch({
+    control,
+    name: `todos.${index}.is_checked` as const
+  });
+  const title = useWatch({
+    control,
+    name: `todos.${index}.title` as const
+  });
+  const { isPersisted, _id: todoId } = todo;
+
+  function onBlur() {
+    // Finish save happens when the text field is blurred, or when
+    // the checkbox tick is changed.
+    if (!isPersisted) {
+      addTodoMutation.mutate({
+        name: roomName,
+        todo: {
+          title,
+          is_checked: isChecked
+        }
+      });
+    } else {
+      updateTodoMutation.mutate({
+        name: roomName,
+        todo: {
+          _id: todoId,
+          isPersisted: true,
+          title,
+          is_checked: isChecked
+        }
+      });
+    }
+  }
+
+  function onDelete() {
+    deleteTodoMutation.mutate({ name: roomName, todoId: todo._id });
   }
 
   return (
     <>
-      <label htmlFor="title">{todo.title}</label>
       <input
-        id="title"
-        aria-invalid={errors[index].title !== undefined}
+        id="is_checked"
+        type="checkbox"
+        aria-invalid={errors[index]?.is_checked !== undefined}
         {...register(`todos.${index}.is_checked` as const, {
           minLength: 1
         })}
       />
-      {errors[index].title && <span role="alert">{errors[index].title}</span>}
 
-      <button onClick={() => remove(index)}>Remove</button>
+      <input
+        id="title"
+        aria-invalid={errors[index]?.title !== undefined}
+        {...register(`todos.${index}.title` as const, {
+          minLength: 1
+        })}
+      />
+      {errors[index]?.title && <span role="alert">{errors[index]?.title}</span>}
+
+      <button onClick={onDelete}>Remove</button>
     </>
   );
 }

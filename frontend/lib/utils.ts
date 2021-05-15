@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 export function generateHash(length = 5) {
   const timestampHash = Date.now().toString(36);
   const randomHash = Math.random().toString().slice(0, length);
@@ -19,4 +21,11 @@ export function replaceArrayElementAtIndex<T>(
 
   newArray.splice(idx, 1, newElement);
   return newArray;
+}
+
+export function useDebugEffect<T>(name: string, val: T) {
+  useEffect(() => {
+    console.debug('-----');
+    console.debug(`${name} changed: ${val}`);
+  }, [val]);
 }
