@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { ApiResponse } from '../../types';
-import { Room, Todo } from '../../models';
+import { BaseRoom, BaseTodo } from '../../types/models';
 
 export interface CreateRoomParameters {
   name: string;
@@ -10,7 +10,7 @@ export interface CreateRoomParameters {
 
 export async function createRoom(
   params: CreateRoomParameters
-): Promise<ApiResponse<Room>> {
+): Promise<ApiResponse<BaseRoom>> {
   return axios.post(`/api/rooms`, params);
 }
 
@@ -19,7 +19,7 @@ export interface AccessRoomParameters extends CreateRoomParameters {}
 export async function accessRoom({
   name,
   password
-}: AccessRoomParameters): Promise<ApiResponse<Room>> {
+}: AccessRoomParameters): Promise<ApiResponse<BaseRoom>> {
   return axios.post(`/api/rooms/${name}/access`, {
     password
   });
@@ -29,39 +29,37 @@ export async function leaveRoom({
   name
 }: {
   name: string;
-}): Promise<ApiResponse<undefined>> {
+}): Promise<ApiResponse<object>> {
   return axios.post(`/api/rooms/${name}/leave`);
 }
 
-export async function getCurrentRoom(): Promise<ApiResponse<Room>> {
+export async function getCurrentRoom(): Promise<ApiResponse<BaseRoom>> {
   return axios.get(`/api/current-room`);
 }
 
 // Todos.
 export interface TodoParameters {
   name: string;
-  todo: Todo;
+  todo: Partial<BaseTodo>;
 }
 
 export async function createTodo({
   name,
   todo
-}: TodoParameters): Promise<ApiResponse<Todo>> {
+}: TodoParameters): Promise<ApiResponse<BaseTodo>> {
   return axios.post(`/api/rooms/${name}/todos`, todo);
 }
 
 export interface UpdateTodoParameters {
   name: string;
-  todoId: string;
-  todo: Todo;
+  todo: BaseTodo;
 }
 
 export async function updateTodo({
   name,
-  todoId,
   todo
-}: UpdateTodoParameters): Promise<ApiResponse<Todo>> {
-  return axios.put(`/api/rooms/${name}/todos/${todoId}`, todo);
+}: UpdateTodoParameters): Promise<ApiResponse<BaseTodo>> {
+  return axios.put(`/api/rooms/${name}/todos/${todo._id}`, todo);
 }
 
 export interface DeleteTodoParameters {
@@ -72,6 +70,6 @@ export interface DeleteTodoParameters {
 export async function deleteTodo({
   name,
   todoId
-}: DeleteTodoParameters): Promise<ApiResponse<Todo>> {
+}: DeleteTodoParameters): Promise<ApiResponse<object>> {
   return axios.delete(`/api/rooms/${name}/todos/${todoId}`);
 }
