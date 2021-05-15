@@ -1,4 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { Checkbox } from '@chakra-ui/checkbox';
+import { FormHelperText } from '@chakra-ui/form-control';
+import { FormControl } from '@chakra-ui/form-control';
+import { Input } from '@chakra-ui/input';
+import { HStack } from '@chakra-ui/layout';
+import { useEffect, useRef, useState } from 'react';
 import {
   Control,
   FieldArrayMethodProps,
@@ -225,6 +230,8 @@ function TodoForm({
   updateTodoMutation: UseMutationType<BaseTodo, UpdateTodoParameters>;
   deleteTodoMutation: UseMutationType<object, DeleteTodoParameters>;
 }) {
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const isChecked = useWatch({
     control,
     name: `todos.${index}.is_checked` as const
@@ -265,25 +272,26 @@ function TodoForm({
 
   return (
     <>
-      <input
-        id="is_checked"
-        type="checkbox"
-        aria-invalid={errors[index]?.is_checked !== undefined}
-        {...register(`todos.${index}.is_checked` as const, {
-          minLength: 1
-        })}
-      />
+      {isUpdating ? (
+        <HStack spacing={2}>
+          <Checkbox
+            defaultIsChecked
+            {...register(`todos.${index}.is_checked` as const)}
+          />
 
-      <input
-        id="title"
-        aria-invalid={errors[index]?.title !== undefined}
-        {...register(`todos.${index}.title` as const, {
-          minLength: 1
-        })}
-      />
-      {errors[index]?.title && <span role="alert">{errors[index]?.title}</span>}
-
-      <button onClick={onDelete}>Remove</button>
+          <FormControl id={`todo-${todo.key}`}>
+            <Input type={`todo-${todo.key}`} />
+            {errors[index]?.title && (
+              <FormHelperText>{errors[index]?.title}</FormHelperText>
+            )}
+          </FormControl>
+        </HStack>
+      ) : (
+        <>
+          <Checkbox defaultIsChecked>{todo.title}</Checkbox>
+          <button onClick={() => setIsUpdating(true)}>Edit</button>
+        </>
+      )}
     </>
   );
 }

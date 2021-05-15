@@ -4,6 +4,8 @@ type MongoToObjectFields = Pick<Document, '_id' | '__v'>;
 
 // Todo.
 export interface BaseTodo extends MongoToObjectFields {
+  // This `key` is from `useFieldArray`.
+  key?: string;
   isPersisted: boolean;
   title: string;
   is_checked: boolean;
