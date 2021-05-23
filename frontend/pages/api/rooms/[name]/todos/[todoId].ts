@@ -1,4 +1,5 @@
 import { NextApiResponse } from 'next';
+
 import { replaceArrayElementAtIndex } from '../../../../../lib/utils';
 import { withDB, withSession } from '../../../../../middlewares';
 import { RoomModel, Todo } from '../../../../../models';
@@ -22,7 +23,7 @@ async function updateAndDeleteTodoHandler(
         todo: req.body
       });
     } else {
-      deleteTodo({
+      await deleteTodo({
         name: req.query.name as string,
         todoId: req.query.todoId as string
       });
@@ -56,33 +57,31 @@ async function updateTodo({
   todo: Todo;
 }) {
   const object = await RoomModel.findOne({
-    name,
-    'todos._id': todoId
+    name
   });
 
   if (object === null) {
     throw new Error('Invalid room or todo information.');
   }
 
-  const idx = object.todos.findIndex((item) => item._id === todoId);
+  const idx = object.todos.findIndex((item) => item._id.equals(todoId));
 
   object.todos = replaceArrayElementAtIndex(object.todos, idx, todo);
-  const x = await object.save();
+  await object.save();
 
   return todo;
 }
 
 async function deleteTodo({ name, todoId }: { name: string; todoId: string }) {
   const object = await RoomModel.findOne({
-    name,
-    'todos._id': todoId
+    name
   });
 
   if (object === null) {
     throw new Error('Invalid room or todo information.');
   }
 
-  const idx = object.todos.findIndex((item) => item._id === todoId);
+  const idx = object.todos.findIndex((item) => item._id.equals(todoId));
 
   object.todos = replaceArrayElementAtIndex(object.todos, idx, undefined);
   await object.save();

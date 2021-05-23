@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { ChakraProvider } from '@chakra-ui/react';
+import { Box, ChakraProvider, extendTheme } from '@chakra-ui/react';
 
 import { RoomForm } from './RoomForm';
 import { createRoom } from './query/rooms';
@@ -14,21 +14,22 @@ function IndexPage() {
   });
 
   return (
-    <>
+    <Box>
       {room === undefined ? (
         <RoomForm request={createRoom} onSuccessfulAccess={refetchRoom} />
       ) : (
         <RoomDetail room={room} />
       )}
-    </>
+    </Box>
   );
 }
 
 const queryClient = new QueryClient();
+const theme = extendTheme();
 
 export default function App() {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <IndexPage />
       </QueryClientProvider>

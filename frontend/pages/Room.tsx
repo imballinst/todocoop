@@ -2,11 +2,12 @@ import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@chakra-ui/checkbox';
 import { FormHelperText, FormControl } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
-import { HStack, List, ListItem } from '@chakra-ui/layout';
-import { CheckIcon, EditIcon } from '@chakra-ui/icons';
+import { Box, Heading, HStack, List, ListItem } from '@chakra-ui/layout';
+import { CheckIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { Button, IconButton } from '@chakra-ui/button';
 import {
   Control,
+  Controller,
   FormState,
   useForm,
   UseFormRegister,
@@ -47,10 +48,10 @@ export function RoomDetail({ room }: RoomProps) {
 
   const {
     control,
-    register,
     formState: { errors },
     reset,
-    setValue
+    setValue,
+    watch
   } = useForm({
     defaultValues: {
       todos: resolveExistingTodos(todos)
@@ -59,7 +60,7 @@ export function RoomDetail({ room }: RoomProps) {
   const [currentlyUpdatedIndex, setCurrentlyUpdatedIndex] =
     useState<number | undefined>();
 
-  const todosWatch = useWatch({ control, name: 'todos' });
+  const todosWatch = watch('todos');
   const previousRoom = useRef(room);
 
   useEffect(() => {
@@ -147,45 +148,49 @@ export function RoomDetail({ room }: RoomProps) {
 
     return { previousRoom };
   });
-
+  console.log(todosWatch);
   return (
     <form onSubmit={(e) => e.preventDefault()}>
-      <div>
-        <h1>{name}</h1>
-        <List spacing={2} listStyleType="none">
-          {todosWatch.map((todo, index) => (
-            <ListItem>
-              <TodoForm
-                roomName={name}
-                errors={errors}
-                index={index}
-                register={register}
-                todo={todo}
-                control={control}
-                setValue={setValue}
-                addTodoMutation={addTodoMutation}
-                updateTodoMutation={updateTodoMutation}
-                deleteTodoMutation={deleteTodoMutation}
-              />
-            </ListItem>
-          ))}
-        </List>
-        <Button
-          colorScheme="teal"
-          onClick={() => {
-            setValue(
-              'todos',
-              todosWatch.concat({
-                isPersisted: false,
-                is_checked: false,
-                title: ''
-              })
-            );
-          }}
-        >
-          Add
-        </Button>
-      </div>
+      <Box>
+        <Heading as="h1" size="xl" p={4} background="teal" color="white">
+          {name}
+        </Heading>
+        <Box p={4}>
+          <List spacing={2} listStyleType="none">
+            {todosWatch.map((todo, index) => (
+              <ListItem>
+                <TodoForm
+                  roomName={name}
+                  errors={errors}
+                  index={index}
+                  todo={todo}
+                  control={control}
+                  setValue={setValue}
+                  addTodoMutation={addTodoMutation}
+                  updateTodoMutation={updateTodoMutation}
+                  deleteTodoMutation={deleteTodoMutation}
+                />
+              </ListItem>
+            ))}
+          </List>
+          <Button
+            mt={4}
+            colorScheme="teal"
+            onClick={() => {
+              setValue(
+                'todos',
+                todosWatch.concat({
+                  isPersisted: false,
+                  is_checked: false,
+                  title: ''
+                })
+              );
+            }}
+          >
+            Add
+          </Button>
+        </Box>
+      </Box>
     </form>
   );
 }
@@ -203,7 +208,6 @@ const TodoForm = memo(
     roomName,
     todo,
     errors,
-    register,
     control,
     index,
     addTodoMutation,
@@ -213,7 +217,6 @@ const TodoForm = memo(
     roomName: string;
     todo: BaseTodo;
     errors: FormState<RoomFormState>['errors'];
-    register: UseFormRegister<RoomFormState>;
     control: Control<RoomFormState>;
     index: number;
     setValue: UseFormSetValue<RoomFormState>;
@@ -225,15 +228,7 @@ const TodoForm = memo(
     const [isEditing, setIsEditing] = useState(false);
     const previousValue = useRef<BaseTodo>(todo);
 
-    const isChecked = useWatch({
-      control,
-      name: `todos.${index}.is_checked` as const
-    });
-    const title = useWatch({
-      control,
-      name: `todos.${index}.title` as const
-    });
-    const { isPersisted, _id: todoId } = todo;
+    const { isPersisted, _id: todoId, title, is_checked: isChecked } = todo;
 
     function onSave() {
       // Finish save happens when the text field is blurred, or when
@@ -281,15 +276,19 @@ const TodoForm = memo(
 
     return (
       <HStack spacing={2}>
-        {isEditing || !isPersisted ? (
+        {isEditing ? (
           <>
-            <Checkbox {...register(`todos.${index}.is_checked` as const)} />
+            <Controller
+              render={({ field }) => <Checkbox {...field} />}
+              name={`todos.${index}.is_checked` as const}
+              control={control}
+            />
 
             <FormControl>
-              <Input
-                type="text"
-                {...register(`todos.${index}.title` as const)}
-                value={title}
+              <Controller
+                render={({ field }) => <Input {...field} />}
+                name={`todos.${index}.title` as const}
+                control={control}
               />
 
               {errors[index]?.title && (
@@ -298,6 +297,8 @@ const TodoForm = memo(
             </FormControl>
 
             <IconButton
+              minWidth="var(--chakra-sizes-6)"
+              height="var(--chakra-sizes-6)"
               colorScheme="teal"
               onClick={onSave}
               aria-label="Save"
@@ -306,15 +307,31 @@ const TodoForm = memo(
           </>
         ) : (
           <>
-            <Checkbox onChange={onChangeTick} isChecked={isChecked}>
-              {todo.title}
-            </Checkbox>
+            <Controller
+              render={({ field }) => (
+                <Checkbox {...field} onChange={onChangeTick}>
+                  {todo.title}
+                </Checkbox>
+              )}
+              name={`todos.${index}.is_checked` as const}
+              control={control}
+            />
 
             <IconButton
+              minWidth="var(--chakra-sizes-6)"
+              height="var(--chakra-sizes-6)"
               colorScheme="teal"
               onClick={() => setIsEditing(true)}
               aria-label="Edit"
               icon={<EditIcon />}
+            />
+            <IconButton
+              minWidth="var(--chakra-sizes-6)"
+              height="var(--chakra-sizes-6)"
+              colorScheme="teal"
+              onClick={onDelete}
+              aria-label="Edit"
+              icon={<DeleteIcon />}
             />
           </>
         )}
