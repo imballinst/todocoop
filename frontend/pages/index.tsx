@@ -3,7 +3,7 @@ import { Box, ChakraProvider, extendTheme } from '@chakra-ui/react';
 
 import { RoomForm } from './RoomForm';
 import { createRoom } from './query/rooms';
-import { useCurrentRoom } from '../lib/useCurrentRoom';
+import { useCurrentRoom } from '../lib/hooks';
 import { RoomDetail } from './Room';
 
 function IndexPage() {
