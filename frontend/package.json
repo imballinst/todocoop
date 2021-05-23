@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^1.0.13",
     "@chakra-ui/react": "^1.6.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
@@ -16,7 +17,6 @@
     "dotenv": "^9.0.1",
     "framer-motion": "^4",
     "mongoose": "^5.12.7",
-    "mongoose-update-versioning": "^0.1.1",
     "next": "^10.2.0",
     "next-iron-session": "^4.1.13",
     "react": "^17.0.2",

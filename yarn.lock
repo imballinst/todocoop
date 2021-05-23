@@ -344,6 +344,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@chakra-ui/icons@npm:^1.0.13":
+  version: 1.0.13
+  resolution: "@chakra-ui/icons@npm:1.0.13"
+  dependencies:
+    "@chakra-ui/icon": 1.1.9
+    "@types/react": ^17.0.0
+  peerDependencies:
+    "@chakra-ui/system": ">=1.0.0"
+    react: ">=16.8.6"
+  checksum: 58618624470a96991e56908cc70abbd941388f159658e45f59df59f7bb5799c4f947dfd394cc6d011b4665cc7896d589d378ee79e6f0916a829d3205b969342c
+  languageName: node
+  linkType: hard
+
 "@chakra-ui/image@npm:1.0.15":
   version: 1.0.15
   resolution: "@chakra-ui/image@npm:1.0.15"
@@ -1418,6 +1431,17 @@ __metadata:
   version: 1.2.3
   resolution: "@types/range-parser@npm:1.2.3"
   checksum: 092fabae0ecbd728d3e4debc938cd043e97cb9f210cfec1c56ff6065c6e91666f376eb586591825d6757a058fd1a1dc4831d34e04ecfbb0800f35b8d86d38635
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^17.0.0":
+  version: 17.0.6
+  resolution: "@types/react@npm:17.0.6"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: dcd8e559f758de7c856bd24136d9005e2b6fbae3d6d81704ba33c6a8ba787874f738b7aae8cfffd89ee35f05658800c43d7fdb9493b79c06a3bcdc1e37ea4635
   languageName: node
   linkType: hard
 
@@ -3077,6 +3101,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "frontend@workspace:frontend"
   dependencies:
+    "@chakra-ui/icons": ^1.0.13
     "@chakra-ui/react": ^1.6.1
     "@emotion/react": ^11
     "@emotion/styled": ^11
@@ -3087,7 +3112,6 @@ __metadata:
     dotenv: ^9.0.1
     framer-motion: ^4
     mongoose: ^5.12.7
-    mongoose-update-versioning: ^0.1.1
     next: ^10.2.0
     next-iron-session: ^4.1.13
     react: ^17.0.2
@@ -4296,15 +4320,6 @@ fsevents@~2.3.1:
   peerDependencies:
     mongoose: "*"
   checksum: a1f86450b3540a1883cfb093001846806d14cd3a8b80f6681fdac13afcfd4a1f57875fb79009aceacf2e80e3ffd2d5ab7e289ba873c586958ce536eff270dc0a
-  languageName: node
-  linkType: hard
-
-"mongoose-update-versioning@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "mongoose-update-versioning@npm:0.1.1"
-  peerDependencies:
-    mongoose: 5.x
-  checksum: fa9650ed507e3a6e89119655075c8b0f18c827de603365072209ec644d8aadd7d4922b62eaba6fb2badbad966c39cc39a0c60b3c02a1fcc7fcaad70ca503f33c
   languageName: node
   linkType: hard
 

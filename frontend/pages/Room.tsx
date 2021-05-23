@@ -2,11 +2,12 @@ import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@chakra-ui/checkbox';
 import { FormHelperText, FormControl } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
-import { HStack } from '@chakra-ui/layout';
+import { HStack, List, ListItem } from '@chakra-ui/layout';
+import { CheckIcon, EditIcon } from '@chakra-ui/icons';
+import { Button, IconButton } from '@chakra-ui/button';
 import {
   Control,
   FormState,
-  useFieldArray,
   useForm,
   UseFormRegister,
   UseFormSetValue,
@@ -18,6 +19,7 @@ import {
   UseMutationResult,
   useQueryClient
 } from 'react-query';
+
 import { generateHash, replaceArrayElementAtIndex } from '../lib/utils';
 import { ApiResponse } from '../types';
 import { BaseTodo, BaseRoom } from '../types/models';
@@ -54,6 +56,8 @@ export function RoomDetail({ room }: RoomProps) {
       todos: resolveExistingTodos(todos)
     } as RoomFormState
   });
+  const [currentlyUpdatedIndex, setCurrentlyUpdatedIndex] =
+    useState<number | undefined>();
 
   const todosWatch = useWatch({ control, name: 'todos' });
   const previousRoom = useRef(room);
@@ -148,9 +152,9 @@ export function RoomDetail({ room }: RoomProps) {
     <form onSubmit={(e) => e.preventDefault()}>
       <div>
         <h1>{name}</h1>
-        <ol>
+        <List spacing={2} listStyleType="none">
           {todosWatch.map((todo, index) => (
-            <li>
+            <ListItem>
               <TodoForm
                 roomName={name}
                 errors={errors}
@@ -163,10 +167,11 @@ export function RoomDetail({ room }: RoomProps) {
                 updateTodoMutation={updateTodoMutation}
                 deleteTodoMutation={deleteTodoMutation}
               />
-            </li>
+            </ListItem>
           ))}
-        </ol>
-        <button
+        </List>
+        <Button
+          colorScheme="teal"
           onClick={() => {
             setValue(
               'todos',
@@ -179,7 +184,7 @@ export function RoomDetail({ room }: RoomProps) {
           }}
         >
           Add
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -275,9 +280,9 @@ const TodoForm = memo(
     }
 
     return (
-      <>
+      <HStack spacing={2}>
         {isEditing || !isPersisted ? (
-          <HStack spacing={2}>
+          <>
             <Checkbox {...register(`todos.${index}.is_checked` as const)} />
 
             <FormControl>
@@ -291,17 +296,29 @@ const TodoForm = memo(
                 <FormHelperText>{errors[index]?.title}</FormHelperText>
               )}
             </FormControl>
-            <button onClick={onSave}>Save</button>
-          </HStack>
+
+            <IconButton
+              colorScheme="teal"
+              onClick={onSave}
+              aria-label="Save"
+              icon={<CheckIcon />}
+            />
+          </>
         ) : (
           <>
             <Checkbox onChange={onChangeTick} isChecked={isChecked}>
               {todo.title}
             </Checkbox>
-            <button onClick={() => setIsEditing(true)}>Edit</button>
+
+            <IconButton
+              colorScheme="teal"
+              onClick={() => setIsEditing(true)}
+              aria-label="Edit"
+              icon={<EditIcon />}
+            />
           </>
         )}
-      </>
+      </HStack>
     );
   }
 );

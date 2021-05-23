@@ -1,5 +1,4 @@
 import { model, Schema, Document, Model, models } from 'mongoose';
-import updateVersionPlugin from 'mongoose-update-versioning';
 
 import { BaseRoom, BaseTodo } from '../types/models';
 
@@ -38,8 +37,6 @@ const RoomSchema = new Schema<Room>({
     default: []
   }
 });
-
-RoomSchema.plugin(updateVersionPlugin);
 
 export const TodoModel: Model<Todo, {}> =
   models.Todo || model<Todo>('Todo', TodoSchema);
