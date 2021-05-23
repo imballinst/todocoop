@@ -7,7 +7,11 @@ import { useCurrentRoom } from '../lib/useCurrentRoom';
 import { RoomDetail } from './Room';
 
 function IndexPage() {
-  const { room, refetchRoom } = useCurrentRoom();
+  const { room, refetchRoom } = useCurrentRoom({
+    queryOptions: {
+      refetchInterval: 10000
+    }
+  });
 
   return (
     <>

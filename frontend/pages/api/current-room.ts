@@ -1,6 +1,7 @@
 import { NextApiResponse } from 'next';
 
-import { withSession } from '../../middlewares';
+import { withDB, withSession } from '../../middlewares';
+import { RoomModel } from '../../models';
 import { ExtendedNextApiRequest } from '../../types';
 
 async function getCurrentRoomHandler(
@@ -10,12 +11,17 @@ async function getCurrentRoomHandler(
   const room = req.session.get('room');
 
   if (room) {
-    // in a real world application you might read the room id from the session and then do a database request
-    // to get more information on the room if needed
-    return res.status(200).json(room);
+    const roomQuery = RoomModel.findOne({
+      _id: room._id
+    });
+    const roomFromDb = await roomQuery.exec();
+
+    if (roomFromDb) {
+      return res.status(200).json(roomFromDb);
+    }
   }
 
   res.status(401).end();
 }
 
-export default withSession(getCurrentRoomHandler);
+export default withSession(withDB(getCurrentRoomHandler));

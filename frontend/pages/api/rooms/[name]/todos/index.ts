@@ -1,13 +1,13 @@
 import { NextApiResponse } from 'next';
 import { withDB, withSession } from '../../../../../middlewares';
-import { RoomModel, TodoDocument, TodoModel } from '../../../../../models';
+import { RoomModel, Todo, TodoModel } from '../../../../../models';
 import { ApiResponse, ExtendedNextApiRequest } from '../../../../../types';
 
 async function createTodoHandler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse
 ) {
-  let response: ApiResponse<TodoDocument> = {};
+  let response: ApiResponse<Todo> = {};
 
   try {
     if (req.method !== 'POST') {

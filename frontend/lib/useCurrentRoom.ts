@@ -31,6 +31,7 @@ export function useCurrentRoom({
 
       return {
         _id: data._id,
+        __v: data.__v,
         name: data.name,
         password: data.password,
         todos: data.todos.map((todo) => ({

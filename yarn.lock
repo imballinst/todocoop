@@ -3087,6 +3087,7 @@ __metadata:
     dotenv: ^9.0.1
     framer-motion: ^4
     mongoose: ^5.12.7
+    mongoose-update-versioning: ^0.1.1
     next: ^10.2.0
     next-iron-session: ^4.1.13
     react: ^17.0.2
@@ -4295,6 +4296,15 @@ fsevents@~2.3.1:
   peerDependencies:
     mongoose: "*"
   checksum: a1f86450b3540a1883cfb093001846806d14cd3a8b80f6681fdac13afcfd4a1f57875fb79009aceacf2e80e3ffd2d5ab7e289ba873c586958ce536eff270dc0a
+  languageName: node
+  linkType: hard
+
+"mongoose-update-versioning@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "mongoose-update-versioning@npm:0.1.1"
+  peerDependencies:
+    mongoose: 5.x
+  checksum: fa9650ed507e3a6e89119655075c8b0f18c827de603365072209ec644d8aadd7d4922b62eaba6fb2badbad966c39cc39a0c60b3c02a1fcc7fcaad70ca503f33c
   languageName: node
   linkType: hard
 

@@ -1,16 +1,15 @@
+import { ChangeEvent, memo, useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@chakra-ui/checkbox';
-import { FormHelperText } from '@chakra-ui/form-control';
-import { FormControl } from '@chakra-ui/form-control';
+import { FormHelperText, FormControl } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
 import { HStack } from '@chakra-ui/layout';
-import { useEffect, useRef, useState } from 'react';
 import {
   Control,
-  FieldArrayMethodProps,
   FormState,
   useFieldArray,
   useForm,
   UseFormRegister,
+  UseFormSetValue,
   useWatch
 } from 'react-hook-form';
 import {
@@ -19,7 +18,6 @@ import {
   UseMutationResult,
   useQueryClient
 } from 'react-query';
-import { useCurrentRoom } from '../lib/useCurrentRoom';
 import { generateHash, replaceArrayElementAtIndex } from '../lib/utils';
 import { ApiResponse } from '../types';
 import { BaseTodo, BaseRoom } from '../types/models';
@@ -44,34 +42,30 @@ export function RoomDetail({ room }: RoomProps) {
   const { name, todos } = room;
 
   const queryClient = useQueryClient();
-  const { room: roomData } = useCurrentRoom({
-    queryOptions: {
-      refetchInterval: 10000
-    }
-  });
 
   const {
     control,
     register,
     formState: { errors },
-    reset
+    reset,
+    setValue
   } = useForm({
     defaultValues: {
-      todos: todos.map((todo) => ({
-        _id: generateHash(),
-        ...todo
-      }))
+      todos: resolveExistingTodos(todos)
     } as RoomFormState
   });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'todos',
-    keyName: 'key'
-  });
+
+  const todosWatch = useWatch({ control, name: 'todos' });
+  const previousRoom = useRef(room);
 
   useEffect(() => {
-    reset(roomData);
-  }, [roomData]);
+    if (previousRoom.current.__v !== room.__v) {
+      reset({
+        todos: resolveExistingTodos(room.todos)
+      });
+      previousRoom.current = room;
+    }
+  }, [room]);
 
   // Source: https://react-query.tanstack.com/examples/optimistic-updates-typescript.
   const addTodoMutation = useMutateRoom(
@@ -95,7 +89,6 @@ export function RoomDetail({ room }: RoomProps) {
           ...previousRoom,
           todos: [...previousRoom.todos, newPersistedTodo]
         });
-        append(newPersistedTodo);
       }
 
       return { previousRoom };
@@ -146,7 +139,6 @@ export function RoomDetail({ room }: RoomProps) {
         ...previousRoom,
         todos: replaceArrayElementAtIndex(previousRoom.todos, idx, undefined)
       });
-      remove(idx);
     }
 
     return { previousRoom };
@@ -157,37 +149,37 @@ export function RoomDetail({ room }: RoomProps) {
       <div>
         <h1>{name}</h1>
         <ol>
-          {fields.map((todo, index) => (
+          {todosWatch.map((todo, index) => (
             <li>
               <TodoForm
                 roomName={name}
                 errors={errors}
                 index={index}
-                isLast={index === fields.length}
                 register={register}
                 todo={todo}
-                append={append}
                 control={control}
+                setValue={setValue}
                 addTodoMutation={addTodoMutation}
                 updateTodoMutation={updateTodoMutation}
                 deleteTodoMutation={deleteTodoMutation}
               />
             </li>
           ))}
-
-          <li>
-            <button
-              onClick={() =>
-                append({
-                  is_checked: false,
-                  title: ''
-                })
-              }
-            >
-              Add
-            </button>
-          </li>
         </ol>
+        <button
+          onClick={() => {
+            setValue(
+              'todos',
+              todosWatch.concat({
+                isPersisted: false,
+                is_checked: false,
+                title: ''
+              })
+            );
+          }}
+        >
+          Add
+        </button>
       </div>
     </form>
   );
@@ -201,100 +193,118 @@ type UseMutationType<R, T> = UseMutationResult<
 >;
 
 // Helper functions/components.
-function TodoForm({
-  roomName,
-  todo,
-  errors,
-  register,
-  append,
-  control,
-  index,
-  isLast,
-  addTodoMutation,
-  updateTodoMutation,
-  deleteTodoMutation
-}: {
-  roomName: string;
-  todo: BaseTodo;
-  errors: FormState<RoomFormState>['errors'];
-  register: UseFormRegister<RoomFormState>;
-  append: (
-    value: Partial<BaseTodo> | Partial<BaseTodo>[],
-    options?: FieldArrayMethodProps
-  ) => void;
-  control: Control<RoomFormState>;
-  index: number;
-  isLast: boolean;
-  // Mutate handlers.
-  addTodoMutation: UseMutationType<BaseTodo, TodoParameters>;
-  updateTodoMutation: UseMutationType<BaseTodo, UpdateTodoParameters>;
-  deleteTodoMutation: UseMutationType<object, DeleteTodoParameters>;
-}) {
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const isChecked = useWatch({
+const TodoForm = memo(
+  ({
+    roomName,
+    todo,
+    errors,
+    register,
     control,
-    name: `todos.${index}.is_checked` as const
-  });
-  const title = useWatch({
-    control,
-    name: `todos.${index}.title` as const
-  });
-  const { isPersisted, _id: todoId } = todo;
+    index,
+    addTodoMutation,
+    updateTodoMutation,
+    deleteTodoMutation
+  }: {
+    roomName: string;
+    todo: BaseTodo;
+    errors: FormState<RoomFormState>['errors'];
+    register: UseFormRegister<RoomFormState>;
+    control: Control<RoomFormState>;
+    index: number;
+    setValue: UseFormSetValue<RoomFormState>;
+    // Mutate handlers.
+    addTodoMutation: UseMutationType<BaseTodo, TodoParameters>;
+    updateTodoMutation: UseMutationType<BaseTodo, UpdateTodoParameters>;
+    deleteTodoMutation: UseMutationType<object, DeleteTodoParameters>;
+  }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const previousValue = useRef<BaseTodo>(todo);
 
-  function onBlur() {
-    // Finish save happens when the text field is blurred, or when
-    // the checkbox tick is changed.
-    if (!isPersisted) {
-      addTodoMutation.mutate({
-        name: roomName,
-        todo: {
-          title,
-          is_checked: isChecked
-        }
-      });
-    } else {
+    const isChecked = useWatch({
+      control,
+      name: `todos.${index}.is_checked` as const
+    });
+    const title = useWatch({
+      control,
+      name: `todos.${index}.title` as const
+    });
+    const { isPersisted, _id: todoId } = todo;
+
+    function onSave() {
+      // Finish save happens when the text field is blurred, or when
+      // the checkbox tick is changed.
+      if (!isPersisted) {
+        addTodoMutation.mutate({
+          name: roomName,
+          todo: {
+            title,
+            is_checked: isChecked
+          }
+        });
+      } else {
+        updateTodoMutation.mutate({
+          name: roomName,
+          todo: {
+            _id: todoId,
+            isPersisted: true,
+            title,
+            is_checked: isChecked
+          }
+        });
+      }
+
+      previousValue.current = todo;
+      setIsEditing(false);
+    }
+
+    function onChangeTick(e: ChangeEvent<HTMLInputElement>) {
+      previousValue.current = todo;
       updateTodoMutation.mutate({
         name: roomName,
         todo: {
           _id: todoId,
           isPersisted: true,
           title,
-          is_checked: isChecked
+          is_checked: e.target.checked
         }
       });
     }
+
+    function onDelete() {
+      deleteTodoMutation.mutate({ name: roomName, todoId: todo._id });
+    }
+
+    return (
+      <>
+        {isEditing || !isPersisted ? (
+          <HStack spacing={2}>
+            <Checkbox {...register(`todos.${index}.is_checked` as const)} />
+
+            <FormControl>
+              <Input
+                type="text"
+                {...register(`todos.${index}.title` as const)}
+                value={title}
+              />
+
+              {errors[index]?.title && (
+                <FormHelperText>{errors[index]?.title}</FormHelperText>
+              )}
+            </FormControl>
+            <button onClick={onSave}>Save</button>
+          </HStack>
+        ) : (
+          <>
+            <Checkbox onChange={onChangeTick} isChecked={isChecked}>
+              {todo.title}
+            </Checkbox>
+            <button onClick={() => setIsEditing(true)}>Edit</button>
+          </>
+        )}
+      </>
+    );
   }
-
-  function onDelete() {
-    deleteTodoMutation.mutate({ name: roomName, todoId: todo._id });
-  }
-
-  return (
-    <>
-      {isUpdating ? (
-        <HStack spacing={2}>
-          <Checkbox
-            defaultIsChecked
-            {...register(`todos.${index}.is_checked` as const)}
-          />
-
-          <FormControl id={`todo-${todo.key}`}>
-            <Input type={`todo-${todo.key}`} />
-            {errors[index]?.title && (
-              <FormHelperText>{errors[index]?.title}</FormHelperText>
-            )}
-          </FormControl>
-        </HStack>
-      ) : (
-        <>
-          <Checkbox defaultIsChecked>{todo.title}</Checkbox>
-          <button onClick={() => setIsUpdating(true)}>Edit</button>
-        </>
-      )}
-    </>
-  );
-}
+);
 
 interface MutateContext {
   previousRoom: BaseRoom;
@@ -321,4 +331,12 @@ function useMutateRoom<R, T>(
       queryClient.invalidateQueries('room');
     }
   });
+}
+
+function resolveExistingTodos(todos: BaseTodo[]): BaseTodo[] {
+  return todos.map((todo) => ({
+    _id: generateHash(),
+    isPersisted: true,
+    ...todo
+  }));
 }

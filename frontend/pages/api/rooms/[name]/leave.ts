@@ -1,13 +1,13 @@
 import { NextApiResponse } from 'next';
 import { withDB } from '../../../../middlewares';
-import { RoomDocument, RoomModel } from '../../../../models';
+import { Room } from '../../../../models';
 import { ApiResponse, ExtendedNextApiRequest } from '../../../../types';
 
 async function roomLeaveHandler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse
 ) {
-  let response: ApiResponse<RoomDocument> = {};
+  let response: ApiResponse<Room> = {};
 
   try {
     if (req.method !== 'POST') {

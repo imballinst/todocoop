@@ -1,13 +1,13 @@
 import { NextApiResponse } from 'next';
 import { withDB, withSession } from '../../../middlewares';
-import { RoomDocument, RoomModel } from '../../../models';
+import { Room, RoomModel } from '../../../models';
 import { ApiResponse, ExtendedNextApiRequest } from '../../../types';
 
 async function createRoomHandler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse
 ) {
-  let response: ApiResponse<RoomDocument> = {};
+  let response: ApiResponse<Room> = {};
 
   try {
     if (req.method !== 'POST') {
