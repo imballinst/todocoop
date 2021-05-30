@@ -27,6 +27,8 @@ interface Params {
   queryOptions?: UseQueryOptions<Room, unknown, Room, 'room'>;
 }
 
+export type UseCurrentRoomType = ReturnType<typeof useCurrentRoom>;
+
 const DEFAULT_QUERY_OPTIONS = {
   retry: false,
   retryOnMount: false
