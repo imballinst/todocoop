@@ -18,6 +18,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { generateHash } from '../lib/utils';
 import { useRoomMutations } from '../lib/hooks';
 import { BaseTodo, BaseRoom } from '../types/models';
+import { leaveRoom } from './query/rooms';
 
 interface RoomProps {
   room: BaseRoom;
@@ -36,11 +37,21 @@ export function RoomDetail({ room }: RoomProps) {
     }
   }, [room]);
 
+  async function onLeaveRoom() {
+    try {
+      await leaveRoom({ name });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   return (
     <form onSubmit={(e) => e.preventDefault()}>
       <Box>
-        <Heading as="h1" size="xl" p={4} background="teal" color="white">
+        <Heading as="h1" size="xl" p={4}>
           {name}
+
+          <Button onClick={onLeaveRoom}>Leave room</Button>
         </Heading>
         <Box p={4}>
           <Table variant="simple" width="unset">

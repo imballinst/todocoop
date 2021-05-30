@@ -1,5 +1,5 @@
 import { NextApiResponse } from 'next';
-import { withDB } from '../../../../middlewares';
+import { withDB, withSession } from '../../../../middlewares';
 import { Room } from '../../../../models';
 import { ApiResponse, ExtendedNextApiRequest } from '../../../../types';
 
@@ -30,4 +30,4 @@ async function roomLeaveHandler(
   res.json(response);
 }
 
-export default withDB(roomLeaveHandler);
+export default withSession(withDB(roomLeaveHandler));
