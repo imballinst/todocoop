@@ -9,8 +9,12 @@ interface CreateRoomProps {
 
 export default function CreateRoom({ refetchRoom }: CreateRoomProps) {
   return (
-    <Layout title="Create room">
-      <RoomForm request={createRoom} onSuccessfulAccess={refetchRoom} />
+    <Layout title="Create Room">
+      <RoomForm
+        request={createRoom}
+        onSuccessfulAccess={refetchRoom}
+        submitButtonTitle="Create room"
+      />
     </Layout>
   );
 }

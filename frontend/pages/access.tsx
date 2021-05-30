@@ -9,8 +9,12 @@ interface AccessRoomProps {
 
 export default function AccessRoom({ refetchRoom }: AccessRoomProps) {
   return (
-    <Layout title="Access room">
-      <RoomForm request={accessRoom} onSuccessfulAccess={refetchRoom} />
+    <Layout title="Access Room">
+      <RoomForm
+        request={accessRoom}
+        onSuccessfulAccess={refetchRoom}
+        submitButtonTitle="Access room"
+      />
     </Layout>
   );
 }

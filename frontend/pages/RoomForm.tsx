@@ -6,7 +6,7 @@ import {
   FormLabel
 } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
-import { Box, Flex, Spacer, VStack } from '@chakra-ui/layout';
+import { Box, Flex, Heading, Spacer, VStack } from '@chakra-ui/layout';
 import { Controller, useForm } from 'react-hook-form';
 import { Room } from '../models';
 import { createRoom, CreateRoomParameters } from './query/rooms';
@@ -19,13 +19,18 @@ const FORM_DEFAULT_VALUES: CreateRoomParameters = {
 interface Props {
   onSuccessfulAccess: () => void;
   request: typeof createRoom;
+  submitButtonTitle: string;
 }
 
-export function RoomForm({ onSuccessfulAccess, request }: Props) {
+export function RoomForm({
+  onSuccessfulAccess,
+  request,
+  submitButtonTitle
+}: Props) {
   const {
     control,
     handleSubmit,
-    formState: { errors, dirtyFields }
+    formState: { errors }
   } = useForm({
     defaultValues: FORM_DEFAULT_VALUES
   });
@@ -50,7 +55,7 @@ export function RoomForm({ onSuccessfulAccess, request }: Props) {
     >
       <Box
         width={320}
-        height={280}
+        height={344}
         p={4}
         as="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -59,6 +64,10 @@ export function RoomForm({ onSuccessfulAccess, request }: Props) {
         justifyContent="space-between"
         autoComplete="off"
       >
+        <Heading as="h1" size="lg">
+          Create a Room
+        </Heading>
+
         <VStack spacing={2}>
           <FormControl isInvalid={errors.name !== undefined}>
             <FormLabel htmlFor="name">Room name</FormLabel>
@@ -92,8 +101,8 @@ export function RoomForm({ onSuccessfulAccess, request }: Props) {
           </FormControl>
         </VStack>
 
-        <Button mt={4} isFullWidth type="submit" colorScheme="blue">
-          Go to Room
+        <Button mt={2} isFullWidth type="submit" colorScheme="blue">
+          {submitButtonTitle}
         </Button>
       </Box>
     </Flex>
