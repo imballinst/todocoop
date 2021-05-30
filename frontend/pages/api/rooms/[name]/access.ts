@@ -1,5 +1,5 @@
 import { NextApiResponse } from 'next';
-import { withDB } from '../../../../middlewares';
+import { withDB, withSession } from '../../../../middlewares';
 import { Room, RoomModel } from '../../../../models';
 import { ApiResponse, ExtendedNextApiRequest } from '../../../../types';
 
@@ -16,7 +16,7 @@ async function roomAccessHandler(
 
     const roomQuery = RoomModel.findOne({
       name: req.query.name as string,
-      password: req.body.json.password
+      password: req.body.password
     });
     const object = await roomQuery.exec();
 
@@ -25,6 +25,8 @@ async function roomAccessHandler(
     }
 
     req.session.set('room', object);
+    await req.session.save();
+
     res.status(200);
     response.data = object;
   } catch (err) {
@@ -41,4 +43,4 @@ async function roomAccessHandler(
   res.json(response);
 }
 
-export default withDB(roomAccessHandler);
+export default withSession(withDB(roomAccessHandler));

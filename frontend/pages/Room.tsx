@@ -9,7 +9,15 @@ import {
 import { Checkbox } from '@chakra-ui/checkbox';
 import { FormHelperText, FormControl } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
-import { Box, Heading, HStack, List, ListItem } from '@chakra-ui/layout';
+import {
+  Box,
+  Code,
+  Flex,
+  Heading,
+  HStack,
+  List,
+  ListItem
+} from '@chakra-ui/layout';
 import { CheckIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { Button, IconButton } from '@chakra-ui/button';
 import { Table, TableCellProps, Tbody, Td, Tr } from '@chakra-ui/table';
@@ -19,6 +27,16 @@ import { generateHash } from '../lib/utils';
 import { useRoomMutations } from '../lib/hooks';
 import { BaseTodo, BaseRoom } from '../types/models';
 import { leaveRoom } from './query/rooms';
+import { useDisclosure } from '@chakra-ui/hooks';
+import {
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay
+} from '@chakra-ui/modal';
 
 interface RoomProps {
   room: BaseRoom;
@@ -26,6 +44,8 @@ interface RoomProps {
 
 export function RoomDetail({ room }: RoomProps) {
   const { name, todos } = room;
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [currentTodos, setCurrentTodos] = useState(resolveExistingTodos(todos));
   const previousRoom = useRef(room);
@@ -46,42 +66,63 @@ export function RoomDetail({ room }: RoomProps) {
   }
 
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <Box>
-        <Heading as="h1" size="xl" p={4}>
-          {name}
+    <>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <Box>
+          <Flex flexDirection="row" justifyContent="space-between">
+            <Heading as="h1" size="md" p={3}>
+              {name}
+            </Heading>
+            <HStack p={3} spacing={2}>
+              <Button onClick={onOpen} size="md">
+                Room information
+              </Button>
+              <Button onClick={onLeaveRoom} size="md">
+                Leave room
+              </Button>
+            </HStack>
+          </Flex>
+          <Box p={3}>
+            <Table variant="simple" width="unset">
+              <Tbody>
+                {currentTodos.map((todo, index) => (
+                  <Tr>
+                    <TodoForm roomName={name} index={index} todo={todo} />
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
 
-          <Button onClick={onLeaveRoom}>Leave room</Button>
-        </Heading>
-        <Box p={4}>
-          <Table variant="simple" width="unset">
-            <Tbody>
-              {currentTodos.map((todo, index) => (
-                <Tr>
-                  <TodoForm roomName={name} index={index} todo={todo} />
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-
-          <Button
-            mt={4}
-            colorScheme="teal"
-            onClick={() =>
-              setCurrentTodos((oldTodos) =>
-                oldTodos.concat({
-                  isPersisted: false,
-                  is_checked: false,
-                  title: ''
-                })
-              )
-            }
-          >
-            Add
-          </Button>
+            <Button
+              mt={4}
+              colorScheme="teal"
+              onClick={() =>
+                setCurrentTodos((oldTodos) =>
+                  oldTodos.concat({
+                    isPersisted: false,
+                    is_checked: false,
+                    title: ''
+                  })
+                )
+              }
+            >
+              Add
+            </Button>
+          </Box>
         </Box>
-      </Box>
-    </form>
+      </form>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Room Information</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody py={4} px={6}>
+            <Code>{room.password}</Code>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 

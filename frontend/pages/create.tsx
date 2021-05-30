@@ -13,7 +13,7 @@ export default function CreateRoom({ refetchRoom }: CreateRoomProps) {
       <RoomForm
         request={createRoom}
         onSuccessfulAccess={refetchRoom}
-        submitButtonTitle="Create room"
+        title="Create room"
       />
     </Layout>
   );

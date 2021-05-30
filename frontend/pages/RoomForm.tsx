@@ -2,13 +2,11 @@ import { Button } from '@chakra-ui/button';
 import {
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel
 } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
-import { Box, Flex, Heading, Spacer, VStack } from '@chakra-ui/layout';
+import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
 import { Controller, useForm } from 'react-hook-form';
-import { Room } from '../models';
 import { createRoom, CreateRoomParameters } from './query/rooms';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
@@ -19,14 +17,10 @@ const FORM_DEFAULT_VALUES: CreateRoomParameters = {
 interface Props {
   onSuccessfulAccess: () => void;
   request: typeof createRoom;
-  submitButtonTitle: string;
+  title: string;
 }
 
-export function RoomForm({
-  onSuccessfulAccess,
-  request,
-  submitButtonTitle
-}: Props) {
+export function RoomForm({ onSuccessfulAccess, request, title }: Props) {
   const {
     control,
     handleSubmit,
@@ -65,7 +59,7 @@ export function RoomForm({
         autoComplete="off"
       >
         <Heading as="h1" size="lg">
-          Create a Room
+          {title}
         </Heading>
 
         <VStack spacing={2}>
@@ -102,7 +96,7 @@ export function RoomForm({
         </VStack>
 
         <Button mt={2} isFullWidth type="submit" colorScheme="blue">
-          {submitButtonTitle}
+          {title}
         </Button>
       </Box>
     </Flex>
