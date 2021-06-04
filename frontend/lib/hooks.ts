@@ -15,7 +15,7 @@ import {
   deleteTodo,
   getCurrentRoom,
   updateTodo
-} from '../pages/query/rooms';
+} from '../query/rooms';
 import { Room } from '../models';
 import { ApiResponse } from '../types';
 import { BaseRoom } from '../types/models';

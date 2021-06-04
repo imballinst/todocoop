@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-import { ApiResponse } from '../../types';
-import { BaseRoom, BaseTodo } from '../../types/models';
+import { ApiResponse } from '../types';
+import { BaseRoom, BaseTodo } from '../types/models';
 
 export interface CreateRoomParameters {
   name: string;

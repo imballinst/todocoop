@@ -7,7 +7,7 @@ import {
 import { Input } from '@chakra-ui/input';
 import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
 import { Controller, useForm } from 'react-hook-form';
-import { createRoom, CreateRoomParameters } from './query/rooms';
+import { createRoom, CreateRoomParameters } from '../query/rooms';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
   name: '',
