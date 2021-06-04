@@ -26,7 +26,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { generateHash } from '../lib/utils';
 import { useRoomMutations } from '../lib/hooks';
 import { BaseTodo, BaseRoom } from '../types/models';
-import { leaveRoom } from './query/rooms';
+import { leaveRoom } from '../query/rooms';
 import { useDisclosure } from '@chakra-ui/hooks';
 import {
   Modal,

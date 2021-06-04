@@ -1,6 +1,6 @@
 import { UseCurrentRoomType } from '../lib/hooks';
-import { Layout } from './components/Layout';
-import { accessRoom } from './query/rooms';
+import { Layout } from '../components/Layout';
+import { accessRoom } from '../query/rooms';
 import { RoomForm } from './RoomForm';
 
 interface AccessRoomProps {
