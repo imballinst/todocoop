@@ -25,3 +25,5 @@ node_modules/
 
 # OSX stuff.
 .DS_Store
+
+.next/
