@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 
 import { useCurrentRoom } from '../lib/hooks';
-import { RoomDetail } from './Room';
+import { RoomDetail } from '../components/Room';
 import { TaskyLink } from '../components/TaskyLink';
 import { Layout } from '../components/Layout';
 

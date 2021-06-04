@@ -1,7 +1,7 @@
 import { UseCurrentRoomType } from '../lib/hooks';
 import { Layout } from '../components/Layout';
 import { createRoom } from '../query/rooms';
-import { RoomForm } from './RoomForm';
+import { RoomForm } from '../components/RoomForm';
 
 interface CreateRoomProps {
   refetchRoom: UseCurrentRoomType['refetchRoom'];
