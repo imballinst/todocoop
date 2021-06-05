@@ -1,18 +1,19 @@
 import { useCurrentRoom } from '../lib/hooks';
-import { RoomDetail } from '../components/Room';
+import { RoomDetail } from '../components/RoomDetail';
 import { Layout } from '../components/Layout';
 
-export default function IndexPage() {
+export default function RoomPage() {
   const { room } = useCurrentRoom({
     queryOptions: {
       refetchIntervalInBackground: false,
       refetchOnWindowFocus: false
-    }
+    },
+    redirectToIfOutsideRoom: '/'
   });
 
   return (
-    <Layout title={room.name}>
-      <RoomDetail room={room} />
+    <Layout title={room?.name}>
+      {room ? <RoomDetail room={room} /> : null}
     </Layout>
   );
 }

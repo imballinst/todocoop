@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import Head from 'next/head';
+import { Spinner } from '@chakra-ui/spinner';
 
 import { useColorMode } from '@chakra-ui/color-mode';
 import { IconButton } from '@chakra-ui/button';
@@ -8,7 +9,6 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { TaskyLink } from './TaskyLink';
 import { useCurrentRoom } from '../lib/hooks';
-import { Spinner } from '@chakra-ui/spinner';
 
 interface LayoutProps {
   children: ReactNode;
@@ -17,13 +17,13 @@ interface LayoutProps {
 
 export function Layout({ children, title }: LayoutProps) {
   const { colorMode, toggleColorMode } = useColorMode();
+
   const { room, isFetching } = useCurrentRoom({
     queryOptions: {
       refetchIntervalInBackground: false,
       refetchOnWindowFocus: false
     },
-    redirectToIfInsideRoom: '/room',
-    redirectToIfOutsideRoom: '/'
+    redirectToIfInsideRoom: '/room'
   });
 
   return (

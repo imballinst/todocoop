@@ -27,7 +27,15 @@ interface Params {
   queryOptions?: UseQueryOptions<Room, unknown, Room, 'room'>;
 }
 
-export type UseCurrentRoomType = ReturnType<typeof useCurrentRoom>;
+type PickedUseQueryFields = Pick<
+  ReturnType<typeof useQuery>,
+  'refetch' | 'isFetching'
+>;
+export type UseCurrentRoomType = {
+  room: Room | undefined;
+  refetchRoom: PickedUseQueryFields['refetch'];
+  isFetching: PickedUseQueryFields['isFetching'];
+};
 
 const DEFAULT_QUERY_OPTIONS = {
   retry: false,
@@ -38,7 +46,7 @@ export function useCurrentRoom({
   redirectToIfInsideRoom = '',
   redirectToIfOutsideRoom = '',
   queryOptions
-}: Params = {}) {
+}: Params = {}): UseCurrentRoomType {
   const {
     data: room,
     refetch: refetchRoom,
@@ -67,10 +75,15 @@ export function useCurrentRoom({
   useEffect(() => {
     // If no redirect needed, just return (example: already on /dashboard).
     // If room data not yet there (fetch in progress, logged in or not) then don't do anything yet.
-    if (!redirectToIfOutsideRoom || !room) return;
+    if (!room) {
+      if (!redirectToIfOutsideRoom) return;
+
+      Router.push(redirectToIfOutsideRoom);
+      return;
+    }
 
     // If `redirectIfInsideARoom` is set and the user is inside a room, redirect if the room was found.
-    if (redirectToIfInsideRoom && room) {
+    if (redirectToIfInsideRoom) {
       Router.push(redirectToIfInsideRoom);
     }
   }, [room, redirectToIfOutsideRoom, redirectToIfInsideRoom]);

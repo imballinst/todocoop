@@ -6,37 +6,30 @@ import React, {
   useRef,
   useState
 } from 'react';
+import Router from 'next/router';
 import { Checkbox } from '@chakra-ui/checkbox';
 import { FormHelperText, FormControl } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
-import {
-  Box,
-  Code,
-  Flex,
-  Heading,
-  HStack,
-  List,
-  ListItem
-} from '@chakra-ui/layout';
+import { Box, Code, Flex, Heading, HStack } from '@chakra-ui/layout';
 import { CheckIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import { Button, IconButton } from '@chakra-ui/button';
 import { Table, TableCellProps, Tbody, Td, Tr } from '@chakra-ui/table';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-
-import { generateHash } from '../lib/utils';
-import { useRoomMutations } from '../lib/hooks';
-import { BaseTodo, BaseRoom } from '../types/models';
-import { leaveRoom } from '../query/rooms';
 import { useDisclosure } from '@chakra-ui/hooks';
 import {
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay
 } from '@chakra-ui/modal';
+import { useQueryClient } from 'react-query';
+
+import { generateHash } from '../lib/utils';
+import { useRoomMutations } from '../lib/hooks';
+import { BaseTodo, BaseRoom } from '../types/models';
+import { leaveRoom } from '../query/rooms';
 
 interface RoomProps {
   room: BaseRoom;
@@ -46,6 +39,7 @@ export function RoomDetail({ room }: RoomProps) {
   const { name, todos } = room;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const queryClient = useQueryClient();
 
   const [currentTodos, setCurrentTodos] = useState(resolveExistingTodos(todos));
   const previousRoom = useRef(room);
@@ -60,6 +54,8 @@ export function RoomDetail({ room }: RoomProps) {
   async function onLeaveRoom() {
     try {
       await leaveRoom({ name });
+      queryClient.invalidateQueries('room');
+      Router.push('/');
     } catch (err) {
       console.error(err);
     }
@@ -86,7 +82,7 @@ export function RoomDetail({ room }: RoomProps) {
             <Table variant="simple" width="unset">
               <Tbody>
                 {currentTodos.map((todo, index) => (
-                  <Tr>
+                  <Tr key={todo._id}>
                     <TodoForm roomName={name} index={index} todo={todo} />
                   </Tr>
                 ))}
