@@ -3,26 +3,8 @@ import { Box, Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 import { useCurrentRoom } from '../lib/hooks';
 import { TaskyLink } from '../components/TaskyLink';
 import { Layout } from '../components/Layout';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 
 export default function IndexPage() {
-  const { room } = useCurrentRoom({
-    queryOptions: {
-      refetchIntervalInBackground: false,
-      refetchOnWindowFocus: false
-    }
-  });
-  const router = useRouter();
-
-  useEffect(() => {
-    console.log(room);
-    if (room) {
-      // Redirect to room page if the user is logged into a room.
-      router.push('/room');
-    }
-  }, [router, room]);
-
   return (
     <Layout title="Home">
       <Box height="calc(100vh - 48px)">

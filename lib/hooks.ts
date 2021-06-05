@@ -22,8 +22,8 @@ import { BaseRoom } from '../types/models';
 import { replaceArrayElementAtIndex } from './utils';
 
 interface Params {
-  redirectTo?: string;
-  redirectIfInsideARoom?: boolean;
+  redirectToIfOutsideRoom?: string;
+  redirectToIfInsideRoom?: string;
   queryOptions?: UseQueryOptions<Room, unknown, Room, 'room'>;
 }
 
@@ -35,8 +35,8 @@ const DEFAULT_QUERY_OPTIONS = {
 };
 
 export function useCurrentRoom({
-  redirectTo = '',
-  redirectIfInsideARoom = false,
+  redirectToIfInsideRoom = '',
+  redirectToIfOutsideRoom = '',
   queryOptions
 }: Params = {}) {
   const {
@@ -67,17 +67,13 @@ export function useCurrentRoom({
   useEffect(() => {
     // If no redirect needed, just return (example: already on /dashboard).
     // If room data not yet there (fetch in progress, logged in or not) then don't do anything yet.
-    if (!redirectTo || !room) return;
+    if (!redirectToIfOutsideRoom || !room) return;
 
-    if (
-      // If `redirectTo` is set, redirect if the room was not found.
-      (redirectTo && !redirectIfInsideARoom && !room) ||
-      // If `redirectIfInsideARoom` is also set, redirect if the room was found.
-      (redirectIfInsideARoom && room)
-    ) {
-      Router.push(redirectTo);
+    // If `redirectIfInsideARoom` is set and the user is inside a room, redirect if the room was found.
+    if (redirectToIfInsideRoom && room) {
+      Router.push(redirectToIfInsideRoom);
     }
-  }, [room, redirectIfInsideARoom, redirectTo]);
+  }, [room, redirectToIfOutsideRoom, redirectToIfInsideRoom]);
 
   return { room, refetchRoom, isFetching };
 }
