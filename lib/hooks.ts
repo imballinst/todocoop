@@ -39,7 +39,11 @@ export function useCurrentRoom({
   redirectIfInsideARoom = false,
   queryOptions
 }: Params = {}) {
-  const { data: room, refetch: refetchRoom } = useQuery(
+  const {
+    data: room,
+    refetch: refetchRoom,
+    isFetching
+  } = useQuery(
     'room',
     async () => {
       const json = await getCurrentRoom();
@@ -75,7 +79,7 @@ export function useCurrentRoom({
     }
   }, [room, redirectIfInsideARoom, redirectTo]);
 
-  return { room, refetchRoom };
+  return { room, refetchRoom, isFetching };
 }
 
 // Mutations for react-query.

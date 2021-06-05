@@ -40,7 +40,7 @@ export function Layout({ children, title }: LayoutProps) {
         </Flex>
       </Box>
 
-      {children}
+      <Box height="calc(100vh - 48px)">{children}</Box>
     </div>
   );
 }

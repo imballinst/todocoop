@@ -6,6 +6,7 @@ import {
 } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
 import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { createRoom, CreateRoomParameters } from '../query/rooms';
 
@@ -18,9 +19,15 @@ interface Props {
   onSuccessfulAccess: () => void;
   request: typeof createRoom;
   title: string;
+  loadingButtonTitle: string;
 }
 
-export function RoomForm({ onSuccessfulAccess, request, title }: Props) {
+export function RoomForm({
+  onSuccessfulAccess,
+  request,
+  title,
+  loadingButtonTitle
+}: Props) {
   const {
     control,
     handleSubmit,
@@ -28,15 +35,20 @@ export function RoomForm({ onSuccessfulAccess, request, title }: Props) {
   } = useForm({
     defaultValues: FORM_DEFAULT_VALUES
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function onSubmit(formData: CreateRoomParameters) {
     try {
+      setIsSubmitting(true);
+
       const { data, errors } = await request(formData);
       if (!data) throw new Error(errors?.join(', '));
 
       onSuccessfulAccess();
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -95,8 +107,14 @@ export function RoomForm({ onSuccessfulAccess, request, title }: Props) {
           </FormControl>
         </VStack>
 
-        <Button mt={2} isFullWidth type="submit" colorScheme="blue">
-          {title}
+        <Button
+          mt={2}
+          isFullWidth
+          type="submit"
+          colorScheme="blue"
+          isDisabled={isSubmitting}
+        >
+          {isSubmitting ? loadingButtonTitle : title}
         </Button>
       </Box>
     </Flex>

@@ -1,19 +1,27 @@
-import { UseCurrentRoomType } from '../lib/hooks';
 import { Layout } from '../components/Layout';
 import { createRoom } from '../query/rooms';
 import { RoomForm } from '../components/RoomForm';
+import { useCurrentRoom } from '../lib/hooks';
 
-interface CreateRoomProps {
-  refetchRoom: UseCurrentRoomType['refetchRoom'];
-}
+export default function CreateRoom() {
+  const { refetchRoom, isFetching } = useCurrentRoom({
+    queryOptions: {
+      refetchIntervalInBackground: false,
+      refetchOnWindowFocus: false
+    }
+  });
 
-export default function CreateRoom({ refetchRoom }: CreateRoomProps) {
+  function onSuccessfulAccess() {
+    refetchRoom();
+  }
+
   return (
     <Layout title="Create Room">
       <RoomForm
         request={createRoom}
-        onSuccessfulAccess={refetchRoom}
+        onSuccessfulAccess={onSuccessfulAccess}
         title="Create room"
+        loadingButtonTitle="Creating room..."
       />
     </Layout>
   );
