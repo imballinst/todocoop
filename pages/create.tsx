@@ -4,7 +4,7 @@ import { RoomForm } from '../components/RoomForm';
 import { useCurrentRoom } from '../lib/hooks';
 
 export default function CreateRoom() {
-  const { refetchRoom, isFetching } = useCurrentRoom({
+  const { refetchRoom } = useCurrentRoom({
     queryOptions: {
       refetchIntervalInBackground: false,
       refetchOnWindowFocus: false

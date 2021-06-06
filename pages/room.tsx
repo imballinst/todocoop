@@ -5,8 +5,9 @@ import { Layout } from '../components/Layout';
 export default function RoomPage() {
   const { room } = useCurrentRoom({
     queryOptions: {
-      refetchIntervalInBackground: false,
-      refetchOnWindowFocus: false
+      refetchIntervalInBackground: true,
+      refetchOnWindowFocus: true,
+      refetchInterval: 10000
     },
     redirectToIfOutsideRoom: '/'
   });

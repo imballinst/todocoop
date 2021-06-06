@@ -39,7 +39,9 @@ export type UseCurrentRoomType = {
 
 const DEFAULT_QUERY_OPTIONS = {
   retry: false,
-  retryOnMount: false
+  retryOnMount: false,
+  cacheTime: 10000,
+  staleTime: 10000
 };
 
 export function useCurrentRoom({

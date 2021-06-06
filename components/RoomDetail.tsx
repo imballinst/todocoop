@@ -135,10 +135,16 @@ const TodoForm = memo(
   }) => {
     const {
       control,
-      formState: { errors }
+      formState: { errors },
+      reset
     } = useForm({
       defaultValues: todo
     });
+
+    useEffect(() => {
+      previousValue.current = todo;
+      reset(todo);
+    }, [reset, todo]);
 
     const [isEditing, setIsEditing] = useState(false);
     const previousValue = useRef<BaseTodo>(todo);
@@ -205,7 +211,7 @@ const TodoForm = memo(
                 name={field.name}
                 onBlur={field.onBlur}
                 onChange={field.onChange}
-                checked={field.value}
+                isChecked={field.value}
                 ref={field.ref}
               />
             )}
@@ -247,7 +253,7 @@ const TodoForm = memo(
               <Checkbox
                 name={field.name}
                 onBlur={field.onBlur}
-                checked={field.value}
+                isChecked={field.value}
                 ref={field.ref}
                 onChange={onChangeTick}
               >
