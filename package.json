@@ -1,9 +1,9 @@
 {
-  "name": "tasky",
+  "name": "wejustdid",
   "version": "0.0.1",
   "description": "Create rooms for synchronized to-do list without registration",
   "main": "index.js",
-  "repository": "git@github.com:imballinst/tasky.git",
+  "repository": "git@github.com:imballinst/wejustdid.git",
   "author": "Try Ajitiono <ballinst@gmail.com>",
   "license": "MIT",
   "scripts": {

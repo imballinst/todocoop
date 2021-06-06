@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 
-import { TaskyLink } from '../components/TaskyLink';
+import { AppLink } from '../components/AppLink';
 import { Layout } from '../components/Layout';
 
 export default function IndexPage() {
@@ -15,20 +15,21 @@ export default function IndexPage() {
         <Box height="50%" width={{ base: '100%', md: '50%' }}>
           <Flex flexDirection="column" alignItems="center" mb={8}>
             <Heading as="h1" size="xl">
-              Tasky
+              wejustdid
             </Heading>
             <Text as="p" size="sm">
-              Synchronize tasks with everyone in a room. Choose an action:
+              Synchronize tasks with everyone in a room. No account needed!
+              Choose an action:
             </Text>
           </Flex>
 
           <VStack spacing={4}>
-            <TaskyLink href="/access">
+            <AppLink href="/access">
               <Button colorScheme="blue">Access Room</Button>
-            </TaskyLink>
-            <TaskyLink href="/create">
+            </AppLink>
+            <AppLink href="/create">
               <Button>Create Room</Button>
-            </TaskyLink>
+            </AppLink>
           </VStack>
         </Box>
       </Flex>

@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 import NextLink from 'next/link';
 import { Link, LinkProps } from '@chakra-ui/layout';
 
-export function TaskyLink({
+export function AppLink({
   children,
   href,
   ...rest

@@ -1,6 +1,6 @@
 import { extendTheme } from '@chakra-ui/react';
 
-export const taskyTheme = extendTheme({
+export const appTheme = extendTheme({
   config: {
     initialColorMode: 'light',
     useSystemColorMode: false

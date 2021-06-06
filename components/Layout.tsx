@@ -7,7 +7,7 @@ import { IconButton } from '@chakra-ui/button';
 import { Box, Flex } from '@chakra-ui/layout';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
-import { TaskyLink } from './TaskyLink';
+import { AppLink } from './AppLink';
 import { useCurrentRoom } from '../lib/hooks';
 
 interface LayoutProps {
@@ -29,16 +29,16 @@ export function Layout({ children, title }: LayoutProps) {
   return (
     <div>
       <Head>
-        <title>{title} - Tasky</title>
+        <title>{title} - We Just Did</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Box as="header" boxShadow="sm" p={1}>
         <Flex flexDirection="row" justifyContent="space-between">
           <Flex flexDirection="row">
-            <TaskyLink href="/" p={2} fontWeight={700}>
+            <AppLink href="/" p={2} fontWeight={700}>
               Home
-            </TaskyLink>
+            </AppLink>
           </Flex>
           <IconButton
             aria-label={`Toggle ${colorMode === 'light' ? 'Dark' : 'Light'}`}
