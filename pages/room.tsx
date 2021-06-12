@@ -11,7 +11,7 @@ export default function RoomPage() {
     },
     redirectToIfOutsideRoom: '/'
   });
-
+  console.log(room);
   return (
     <Layout title={room?.name}>
       {room ? <RoomDetail room={room} /> : null}

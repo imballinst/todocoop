@@ -56,7 +56,6 @@ export function RoomDetail({ room }: RoomProps) {
     try {
       await leaveRoom({ name });
       queryClient.invalidateQueries('room');
-      Router.push('/');
     } catch (err) {
       console.error(err);
     }

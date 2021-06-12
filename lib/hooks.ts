@@ -58,20 +58,26 @@ export function useCurrentRoom({
   } = useQuery(
     'room',
     async () => {
-      const json = await getCurrentRoom();
-      const data = json.data;
+      try {
+        const json = await getCurrentRoom();
+        const data = json.data;
 
-      return {
-        _id: data._id,
-        __v: data.__v,
-        name: data.name,
-        password: data.password,
-        todos: data.todos.map((todo) => ({
-          _id: todo._id,
-          is_checked: todo.is_checked,
-          title: todo.title
-        }))
-      } as Room;
+        return {
+          _id: data._id,
+          __v: data.__v,
+          name: data.name,
+          password: data.password,
+          todos: data.todos.map((todo) => ({
+            _id: todo._id,
+            is_checked: todo.is_checked,
+            title: todo.title
+          }))
+        } as Room;
+      } catch (err) {
+        console.error(err);
+
+        return undefined;
+      }
     },
     { ...DEFAULT_QUERY_OPTIONS, ...(queryOptions || {}) }
   );
