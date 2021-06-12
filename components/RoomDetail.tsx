@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import Router from 'next/router';
 import { Checkbox } from '@chakra-ui/checkbox';
+import { Text } from '@chakra-ui/react';
 import { FormHelperText, FormControl } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
 import { Box, Code, Flex, Heading, HStack } from '@chakra-ui/layout';
@@ -64,47 +65,45 @@ export function RoomDetail({ room }: RoomProps) {
   return (
     <>
       <form onSubmit={(e) => e.preventDefault()}>
-        <Box>
-          <Flex flexDirection="row" justifyContent="space-between">
-            <Heading as="h1" size="md" p={3}>
-              {name}
-            </Heading>
-            <HStack p={3} spacing={2}>
-              <Button onClick={onOpen} size="md">
-                Room information
-              </Button>
-              <Button onClick={onLeaveRoom} size="md">
-                Leave room
-              </Button>
-            </HStack>
-          </Flex>
-          <Box p={3}>
-            <Table variant="simple" width="unset">
-              <Tbody>
-                {currentTodos.map((todo, index) => (
-                  <Tr key={todo._id}>
-                    <TodoForm roomName={name} index={index} todo={todo} />
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-
-            <Button
-              mt={4}
-              colorScheme="teal"
-              onClick={() =>
-                setCurrentTodos((oldTodos) =>
-                  oldTodos.concat({
-                    isPersisted: false,
-                    is_checked: false,
-                    title: ''
-                  })
-                )
-              }
-            >
-              Add
+        <Flex px={3} flexDirection="row" justifyContent="space-between">
+          <Heading as="h1" size="md">
+            {name}
+          </Heading>
+          <HStack spacing={2}>
+            <Button onClick={onOpen} size="md">
+              Room information
             </Button>
-          </Box>
+            <Button onClick={onLeaveRoom} size="md">
+              Leave room
+            </Button>
+          </HStack>
+        </Flex>
+        <Box mt={4}>
+          <Table variant="simple" width="100%">
+            <Tbody>
+              {currentTodos.map((todo, index) => (
+                <Tr key={todo._id}>
+                  <TodoForm roomName={name} index={index} todo={todo} />
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+
+          <Button
+            mt={4}
+            colorScheme="teal"
+            onClick={() =>
+              setCurrentTodos((oldTodos) =>
+                oldTodos.concat({
+                  isPersisted: false,
+                  is_checked: false,
+                  title: ''
+                })
+              )
+            }
+          >
+            Add
+          </Button>
         </Box>
       </form>
 
@@ -114,7 +113,18 @@ export function RoomDetail({ room }: RoomProps) {
           <ModalHeader>Room Information</ModalHeader>
           <ModalCloseButton />
           <ModalBody py={4} px={6}>
-            <Code>{room.password}</Code>
+            <Box display="flex">
+              <Text mr={2} fontWeight={700}>
+                Room name:
+              </Text>{' '}
+              {room.name}
+            </Box>
+            <Box display="flex">
+              <Text mr={2} fontWeight={700}>
+                Room password:
+              </Text>{' '}
+              {room.password}
+            </Box>
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -234,15 +244,17 @@ const TodoForm = memo(
           </Box>
         </TableColumn>
 
-        <TableColumn>
-          <IconButton
-            minWidth="var(--chakra-sizes-6)"
-            height="var(--chakra-sizes-6)"
-            colorScheme="teal"
-            onClick={onSave}
-            aria-label="Save"
-            icon={<CheckIcon />}
-          />
+        <TableColumn width={1}>
+          <Flex direction="row" justifyContent="flex-end">
+            <IconButton
+              minWidth="var(--chakra-sizes-6)"
+              height="var(--chakra-sizes-6)"
+              colorScheme="teal"
+              onClick={onSave}
+              aria-label="Save"
+              icon={<CheckIcon />}
+            />
+          </Flex>
         </TableColumn>
       </>
     ) : (
@@ -264,8 +276,8 @@ const TodoForm = memo(
             control={control}
           />
         </TableColumn>
-        <TableColumn>
-          <HStack spacing={2}>
+        <TableColumn width={1}>
+          <HStack spacing={2} direction="row" justifyContent="flex-end">
             <IconButton
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"

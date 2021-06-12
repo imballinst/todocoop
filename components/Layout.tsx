@@ -9,6 +9,7 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { AppLink } from './AppLink';
 import { useCurrentRoom } from '../lib/hooks';
+import { EFFECTIVE_WIDTHS } from '../lib/constants';
 
 interface LayoutProps {
   children: ReactNode;
@@ -33,13 +34,24 @@ export function Layout({ children, title }: LayoutProps) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <Box as="header" boxShadow="sm" p={1}>
-        <Flex flexDirection="row" justifyContent="space-between">
-          <Flex flexDirection="row">
-            <AppLink href="/" p={2} fontWeight={700}>
-              Home
-            </AppLink>
-          </Flex>
+      <Box
+        as="header"
+        boxShadow="sm"
+        display="flex"
+        flexDirection="row"
+        justifyContent="center"
+      >
+        <Flex
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="center"
+          width={EFFECTIVE_WIDTHS}
+          px={3}
+          py={2}
+        >
+          <AppLink href="/" fontWeight={700}>
+            Home
+          </AppLink>
           <IconButton
             aria-label={`Toggle ${colorMode === 'light' ? 'Dark' : 'Light'}`}
             onClick={toggleColorMode}
@@ -50,19 +62,26 @@ export function Layout({ children, title }: LayoutProps) {
         </Flex>
       </Box>
 
-      <Box height="calc(100vh - 48px)">
-        {children}
+      <Box
+        height="calc(100vh - 48px)"
+        display="flex"
+        flexDirection="row"
+        justifyContent="center"
+      >
+        <Box width={EFFECTIVE_WIDTHS}>
+          {children}
 
-        {!room && isFetching ? (
-          <Spinner
-            size="lg"
-            position="absolute"
-            bottom={0}
-            right={0}
-            mr={4}
-            mb={4}
-          />
-        ) : null}
+          {!room && isFetching ? (
+            <Spinner
+              size="lg"
+              position="absolute"
+              bottom={0}
+              right={0}
+              mr={4}
+              mb={4}
+            />
+          ) : null}
+        </Box>
       </Box>
     </div>
   );
