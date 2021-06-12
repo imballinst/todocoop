@@ -31,6 +31,7 @@ type PickedUseQueryFields = Pick<
   ReturnType<typeof useQuery>,
   'refetch' | 'isFetching'
 >;
+
 export type UseCurrentRoomType = {
   room: Room | undefined;
   refetchRoom: PickedUseQueryFields['refetch'];
@@ -52,7 +53,8 @@ export function useCurrentRoom({
   const {
     data: room,
     refetch: refetchRoom,
-    isFetching
+    isFetching,
+    isFetched
   } = useQuery(
     'room',
     async () => {
@@ -77,7 +79,7 @@ export function useCurrentRoom({
   useEffect(() => {
     // If no redirect needed, just return (example: already on /dashboard).
     // If room data not yet there (fetch in progress, logged in or not) then don't do anything yet.
-    if (!room) {
+    if (!room && isFetched) {
       if (!redirectToIfOutsideRoom) return;
 
       Router.push(redirectToIfOutsideRoom);
@@ -88,7 +90,7 @@ export function useCurrentRoom({
     if (redirectToIfInsideRoom) {
       Router.push(redirectToIfInsideRoom);
     }
-  }, [room, redirectToIfOutsideRoom, redirectToIfInsideRoom]);
+  }, [room, isFetched, redirectToIfOutsideRoom, redirectToIfInsideRoom]);
 
   return { room, refetchRoom, isFetching };
 }
