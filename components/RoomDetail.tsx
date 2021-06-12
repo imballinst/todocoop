@@ -146,9 +146,6 @@ const TodoForm = memo(
       reset(todo);
     }, [reset, todo]);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const previousValue = useRef<BaseTodo>(todo);
-
     const {
       isPersisted,
       _id: todoId,
@@ -157,6 +154,9 @@ const TodoForm = memo(
     } = useWatch({ control });
     const { addTodoMutation, updateTodoMutation, deleteTodoMutation } =
       useRoomMutations();
+
+    const [isEditing, setIsEditing] = useState(!isPersisted);
+    const previousValue = useRef<BaseTodo>(todo);
 
     function onSave() {
       // Finish save happens when the text field is blurred, or when
@@ -204,34 +204,34 @@ const TodoForm = memo(
 
     return isEditing ? (
       <>
-        <TableColumn>
-          <Controller
-            render={({ field }) => (
-              <Checkbox
-                name={field.name}
-                onBlur={field.onBlur}
-                onChange={field.onChange}
-                isChecked={field.value}
-                ref={field.ref}
-              />
-            )}
-            name="is_checked"
-            control={control}
-          />
-        </TableColumn>
-
-        <TableColumn>
-          <FormControl>
+        <TableColumn colSpan={2}>
+          <Box display="flex">
             <Controller
-              render={({ field }) => <Input {...field} />}
-              name="title"
+              render={({ field }) => (
+                <Checkbox
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  isChecked={field.value}
+                  ref={field.ref}
+                />
+              )}
+              name="is_checked"
               control={control}
             />
 
-            {errors[index]?.title && (
-              <FormHelperText>{errors[index]?.title}</FormHelperText>
-            )}
-          </FormControl>
+            <FormControl ml={2}>
+              <Controller
+                render={({ field }) => <Input {...field} />}
+                name="title"
+                control={control}
+              />
+
+              {errors[index]?.title && (
+                <FormHelperText>{errors[index]?.title}</FormHelperText>
+              )}
+            </FormControl>
+          </Box>
         </TableColumn>
 
         <TableColumn>
@@ -257,7 +257,7 @@ const TodoForm = memo(
                 ref={field.ref}
                 onChange={onChangeTick}
               >
-                {todo.title}
+                {todo.title || title}
               </Checkbox>
             )}
             name="is_checked"
