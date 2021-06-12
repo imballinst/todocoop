@@ -5,7 +5,7 @@ import { NextHandler } from '../types';
 export function withSession(handler: NextHandler) {
   return withIronSession(handler, {
     password: process.env.SECRET_COOKIE_PASSWORD,
-    cookieName: 'todoroom',
+    cookieName: 'todocoop',
     cookieOptions: {
       // the next line allows to use the session in non-https environments like
       // Next.js dev mode (http://localhost:3000).
