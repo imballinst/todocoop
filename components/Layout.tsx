@@ -57,6 +57,7 @@ export function Layout({ children, title }: LayoutProps) {
           </AppLink>
           <IconButton
             aria-label={`Toggle ${colorMode === 'light' ? 'Dark' : 'Light'}`}
+            variant="ghost"
             onClick={toggleColorMode}
             borderRadius="50%"
           >

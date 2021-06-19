@@ -268,6 +268,7 @@ const TodoForm = memo(
                 isChecked={field.value}
                 ref={field.ref}
                 onChange={onChangeTick}
+                colorScheme="teal"
               >
                 {todo.title || title}
               </Checkbox>
