@@ -101,7 +101,7 @@ export function RoomDetail({ room }: RoomProps) {
               )
             }
           >
-            Add
+            Add New...
           </Button>
         </Box>
       </form>

@@ -15,11 +15,10 @@ export default function IndexPage() {
         <Box height="50%" width={{ base: '100%', md: '50%' }}>
           <Flex flexDirection="column" alignItems="center" mb={8}>
             <Heading as="h1" size="xl">
-              todocoop
+              TodoCoop
             </Heading>
             <Text as="p" size="sm">
-              Synchronize tasks with everyone in a room. No account needed!
-              Choose an action:
+              Synchronize tasks in a room. No account needed!
             </Text>
           </Flex>
 
