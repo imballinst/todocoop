@@ -6,8 +6,10 @@ import {
 } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
 import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
+import { useToast } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { getErrorMessage } from '../lib/utils';
 import { createRoom, CreateRoomParameters } from '../query/rooms';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
@@ -36,6 +38,7 @@ export function RoomForm({
     defaultValues: FORM_DEFAULT_VALUES
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
 
   async function onSubmit(formData: CreateRoomParameters) {
     try {
@@ -47,6 +50,11 @@ export function RoomForm({
       onSuccessfulAccess();
     } catch (err) {
       console.error(err);
+      toast({
+        title: 'Failed to access room.',
+        description: await getErrorMessage(err),
+        status: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }

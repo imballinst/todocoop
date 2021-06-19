@@ -28,7 +28,10 @@ async function createRoomHandler(
     response.errors = [
       {
         code: '10000',
-        message: err.message
+        message:
+          err.code === 11000
+            ? 'Another room with the same name already exists.'
+            : err.message
       }
     ];
   }

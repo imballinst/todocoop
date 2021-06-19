@@ -29,3 +29,15 @@ export function useDebugEffect<T>(name: string, val: T) {
     console.debug(`${name} changed: ${val}`);
   }, [val]);
 }
+
+export async function getErrorMessage(error: any) {
+  if (error?.response) {
+    if (error.response.data.errors) {
+      return error.response.data.errors.map((el) => el.message).join('; ');
+    }
+
+    return error.response.statusText;
+  }
+
+  return 'Unexpected error occurred. Please check your connection and try again.';
+}
