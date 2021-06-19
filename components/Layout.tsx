@@ -40,6 +40,9 @@ export function Layout({ children, title }: LayoutProps) {
         display="flex"
         flexDirection="row"
         justifyContent="center"
+        position="fixed"
+        top={0}
+        width="100%"
       >
         <Flex
           flexDirection="row"
@@ -63,10 +66,12 @@ export function Layout({ children, title }: LayoutProps) {
       </Box>
 
       <Box
-        height="calc(100vh - 48px)"
+        height="calc(100vh - 56px)"
         display="flex"
         flexDirection="row"
         justifyContent="center"
+        mt="56px"
+        pt={2}
       >
         <Box width={EFFECTIVE_WIDTHS}>
           {children}

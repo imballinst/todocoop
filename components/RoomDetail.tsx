@@ -248,6 +248,7 @@ const TodoForm = memo(
             <IconButton
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
+              variant="ghost"
               colorScheme="teal"
               onClick={onSave}
               aria-label="Save"
@@ -280,6 +281,7 @@ const TodoForm = memo(
             <IconButton
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
+              variant="ghost"
               colorScheme="teal"
               onClick={() => setIsEditing(true)}
               aria-label="Edit"
@@ -288,6 +290,7 @@ const TodoForm = memo(
             <IconButton
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
+              variant="ghost"
               colorScheme="teal"
               onClick={onDelete}
               aria-label="Edit"
