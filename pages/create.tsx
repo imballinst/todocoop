@@ -4,11 +4,12 @@ import { RoomForm } from '../components/RoomForm';
 import { useCurrentRoom } from '../lib/hooks';
 
 export default function CreateRoom() {
-  const { refetchRoom } = useCurrentRoom({
+  const { isFetching, room, refetchRoom } = useCurrentRoom({
     queryOptions: {
       refetchIntervalInBackground: false,
       refetchOnWindowFocus: false
-    }
+    },
+    redirectToIfInsideRoom: '/room'
   });
 
   function onSuccessfulAccess() {
@@ -16,7 +17,11 @@ export default function CreateRoom() {
   }
 
   return (
-    <Layout title="Create Room">
+    <Layout
+      isFetching={isFetching}
+      isLoggedInToARoom={room !== undefined}
+      title="Create Room"
+    >
       <RoomForm
         request={createRoom}
         onSuccessfulAccess={onSuccessfulAccess}

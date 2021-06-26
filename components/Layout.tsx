@@ -8,29 +8,28 @@ import { Box, Flex } from '@chakra-ui/layout';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { AppLink } from './AppLink';
-import { useCurrentRoom } from '../lib/hooks';
 import { EFFECTIVE_WIDTHS } from '../lib/constants';
+import { Room } from '../models';
 
 interface LayoutProps {
   children: ReactNode;
-  title: string;
+  isLoggedInToARoom: boolean;
+  title?: string;
+  isFetching: boolean;
 }
 
-export function Layout({ children, title }: LayoutProps) {
+export function Layout({
+  children,
+  isLoggedInToARoom,
+  title,
+  isFetching
+}: LayoutProps) {
   const { colorMode, toggleColorMode } = useColorMode();
-
-  const { room, isFetching } = useCurrentRoom({
-    queryOptions: {
-      refetchIntervalInBackground: false,
-      refetchOnWindowFocus: false
-    },
-    redirectToIfInsideRoom: '/room'
-  });
 
   return (
     <div>
       <Head>
-        <title>{title} - TodoCoop</title>
+        <title>{title ? `${title} - ` : ''}TodoCoop</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
@@ -77,7 +76,7 @@ export function Layout({ children, title }: LayoutProps) {
         <Box width={EFFECTIVE_WIDTHS}>
           {children}
 
-          {!room && isFetching ? (
+          {!isLoggedInToARoom && isFetching ? (
             <Spinner
               size="lg"
               position="absolute"

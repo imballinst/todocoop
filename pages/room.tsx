@@ -3,7 +3,7 @@ import { RoomDetail } from '../components/RoomDetail';
 import { Layout } from '../components/Layout';
 
 export default function RoomPage() {
-  const { room } = useCurrentRoom({
+  const { room, isFetching } = useCurrentRoom({
     queryOptions: {
       refetchIntervalInBackground: true,
       refetchOnWindowFocus: true,
@@ -13,7 +13,11 @@ export default function RoomPage() {
   });
 
   return (
-    <Layout title={room?.name}>
+    <Layout
+      isFetching={isFetching}
+      isLoggedInToARoom={room !== undefined}
+      title={room?.name}
+    >
       {room ? <RoomDetail room={room} /> : null}
     </Layout>
   );

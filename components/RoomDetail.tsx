@@ -46,7 +46,7 @@ import {
 import { useQueryClient } from 'react-query';
 import { MdMoreVert } from 'react-icons/md';
 
-import { generateHash } from '../lib/utils';
+import { generateHash, parseRawTodoText } from '../lib/utils';
 import { useMutateRoom, useRoomMutations } from '../lib/hooks';
 import { BaseTodo, BaseRoom } from '../types/models';
 import { createTodos, leaveRoom } from '../query/rooms';
@@ -110,32 +110,15 @@ export function RoomDetail({ room }: RoomProps) {
   async function onCreateBulk() {
     const bulkTodos = bulkEntries.split('\n');
 
-    await addBulkMutation.mutate({
-      name,
-      todos: bulkTodos.map((str) => {
-        let trimmed = str.trim();
-        let isTicked = true;
-
-        if (trimmed.startsWith('- [ ] ')) {
-          trimmed.slice('- [ ] '.length);
-          isTicked = false;
-        } else if (trimmed.startsWith('- [x] ')) {
-          trimmed.slice('- [x] '.length);
-        } else {
-          const match = trimmed.match(/^[-*\d]\.?\s+/);
-
-          if (match !== null) {
-            trimmed = trimmed.slice(match[0].length);
-            isTicked = false;
-          }
-        }
-
-        return {
-          is_checked: isTicked,
-          title: trimmed
-        };
-      })
-    });
+    try {
+      await addBulkMutation.mutate({
+        name,
+        todos: bulkTodos.map(parseRawTodoText)
+      });
+      setBulkEntries('');
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async function onLeaveRoom() {
@@ -255,7 +238,7 @@ export function RoomDetail({ room }: RoomProps) {
               </FormControl>
 
               <Flex flexDirection="row" justifyContent="flex-end">
-                <Button colorScheme="teal" onClick={onOpenBulkAddModal} mt={4}>
+                <Button colorScheme="teal" onClick={onCreateBulk} mt={4}>
                   Add Bulk List
                 </Button>
               </Flex>

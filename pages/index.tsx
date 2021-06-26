@@ -2,10 +2,19 @@ import { Box, Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 
 import { AppLink } from '../components/AppLink';
 import { Layout } from '../components/Layout';
+import { useCurrentRoom } from '../lib/hooks';
 
 export default function IndexPage() {
+  const { room, isFetching } = useCurrentRoom({
+    queryOptions: {
+      refetchIntervalInBackground: false,
+      refetchOnWindowFocus: false
+    },
+    redirectToIfInsideRoom: '/room'
+  });
+
   return (
-    <Layout title="Home">
+    <Layout isFetching={isFetching} isLoggedInToARoom={room !== undefined}>
       <Flex
         flexDirection="column"
         alignItems="center"
