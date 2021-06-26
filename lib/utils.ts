@@ -41,3 +41,27 @@ export async function getErrorMessage(error: any) {
 
   return 'Unexpected error occurred. Please check your connection and try again.';
 }
+
+export function parseRawTodoText(str: string) {
+  let trimmed = str.trim();
+  let isTicked = true;
+
+  if (trimmed.startsWith('- [ ] ')) {
+    trimmed.slice('- [ ] '.length);
+    isTicked = false;
+  } else if (trimmed.startsWith('- [x] ')) {
+    trimmed.slice('- [x] '.length);
+  } else {
+    const match = trimmed.match(/^[-*\d]\.?\s+/);
+
+    if (match !== null) {
+      trimmed = trimmed.slice(match[0].length);
+      isTicked = false;
+    }
+  }
+
+  return {
+    is_checked: isTicked,
+    title: trimmed
+  };
+}

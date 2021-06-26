@@ -47,9 +47,9 @@ import { useQueryClient } from 'react-query';
 import { MdMoreVert } from 'react-icons/md';
 
 import { generateHash } from '../lib/utils';
-import { useRoomMutations } from '../lib/hooks';
+import { useMutateRoom, useRoomMutations } from '../lib/hooks';
 import { BaseTodo, BaseRoom } from '../types/models';
-import { leaveRoom } from '../query/rooms';
+import { createTodos, leaveRoom } from '../query/rooms';
 
 interface RoomProps {
   room: BaseRoom;
@@ -71,12 +71,72 @@ export function RoomDetail({ room }: RoomProps) {
   const [currentTodos, setCurrentTodos] = useState(resolveExistingTodos(todos));
   const previousRoom = useRef(room);
 
+  const [bulkEntries, setBulkEntries] = useState('');
+
   useEffect(() => {
     if (previousRoom.current.__v !== room.__v) {
       setCurrentTodos(resolveExistingTodos(room.todos));
       previousRoom.current = room;
     }
   }, [room]);
+
+  const addBulkMutation = useMutateRoom(
+    createTodos,
+    async ({ todos: newTodos }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
+      await queryClient.cancelQueries('room');
+
+      // Snapshot the previous value.
+      const previousRoom = queryClient.getQueryData<BaseRoom>('room');
+
+      // Optimistically update to the new value.
+      if (previousRoom) {
+        const newPersistedTodos = newTodos.map((todo) => ({
+          isPersisted: true,
+          is_checked: todo.is_checked,
+          title: todo.title
+        }));
+
+        queryClient.setQueryData<BaseRoom>('room', {
+          ...previousRoom,
+          todos: [...previousRoom.todos, ...newPersistedTodos]
+        });
+      }
+
+      return { previousRoom };
+    }
+  );
+
+  async function onCreateBulk() {
+    const bulkTodos = bulkEntries.split('\n');
+
+    await addBulkMutation.mutate({
+      name,
+      todos: bulkTodos.map((str) => {
+        let trimmed = str.trim();
+        let isTicked = true;
+
+        if (trimmed.startsWith('- [ ] ')) {
+          trimmed.slice('- [ ] '.length);
+          isTicked = false;
+        } else if (trimmed.startsWith('- [x] ')) {
+          trimmed.slice('- [x] '.length);
+        } else {
+          const match = trimmed.match(/^[-*\d]\.?\s+/);
+
+          if (match !== null) {
+            trimmed = trimmed.slice(match[0].length);
+            isTicked = false;
+          }
+        }
+
+        return {
+          is_checked: isTicked,
+          title: trimmed
+        };
+      })
+    });
+  }
 
   async function onLeaveRoom() {
     try {
