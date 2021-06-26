@@ -464,7 +464,7 @@ const TodoForm = memo(
         </TableColumn>
 
         <TableColumn width={1}>
-          <Flex direction="row" justifyContent="flex-end">
+          <HStack spacing={2} direction="row" justifyContent="flex-end">
             <IconButton
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
@@ -496,7 +496,7 @@ const TodoForm = memo(
               aria-label="Save"
               icon={<CheckIcon />}
             />
-          </Flex>
+          </HStack>
         </TableColumn>
       </>
     ) : (

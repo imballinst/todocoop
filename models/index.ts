@@ -25,22 +25,27 @@ export interface Room extends BaseRoom, Document {
   todos: Todo[];
 }
 
-const RoomSchema = new Schema<Room>({
-  name: {
-    type: String,
-    unique: true,
-    index: true,
-    required: true
+const RoomSchema = new Schema<Room>(
+  {
+    name: {
+      type: String,
+      unique: true,
+      index: true,
+      required: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    todos: {
+      type: [TodoSchema],
+      default: []
+    }
   },
-  password: {
-    type: String,
-    required: true
-  },
-  todos: {
-    type: [TodoSchema],
-    default: []
+  {
+    timestamps: true
   }
-});
+);
 
 export const TodoModel: Model<Todo, {}> =
   models.Todo || model<Todo>('Todo', TodoSchema);
