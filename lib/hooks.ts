@@ -106,7 +106,7 @@ interface MutateContext {
   previousRoom: BaseRoom;
 }
 
-function useMutateRoom<R, T>(
+export function useMutateRoom<R, T>(
   mutationFn: MutationFunction<ApiResponse<R>, T>,
   onMutate: (
     variables: T

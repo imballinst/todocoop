@@ -55,6 +55,21 @@ export interface UpdateTodoParameters {
   todo: BaseTodo;
 }
 
+export async function createTodos({
+  name,
+  todos
+}: {
+  name: string;
+  todos: Partial<BaseTodo>[];
+}): Promise<ApiResponse<BaseTodo>> {
+  return axios.post(`/api/rooms/${name}/todos/bulk`, todos);
+}
+
+export interface UpdateTodoParameters {
+  name: string;
+  todo: BaseTodo;
+}
+
 export async function updateTodo({
   name,
   todo
