@@ -43,25 +43,24 @@ export async function getErrorMessage(error: any) {
 }
 
 export function parseRawTodoText(str: string) {
-  let trimmed = str.trim();
-  let isTicked = true;
+  let title = str.trim();
+  let isChecked = false;
 
-  if (trimmed.startsWith('- [ ] ')) {
-    trimmed.slice('- [ ] '.length);
-    isTicked = false;
-  } else if (trimmed.startsWith('- [x] ')) {
-    trimmed.slice('- [x] '.length);
+  if (title.startsWith('- [ ] ')) {
+    title = title.slice('- [ ] '.length).trim();
+  } else if (title.startsWith('- [x] ')) {
+    title = title.slice('- [x] '.length).trim();
+    isChecked = true;
   } else {
-    const match = trimmed.match(/^[-*\d]\.?\s+/);
+    const match = title.match(/^([-*]|(\d+\.))/);
 
     if (match !== null) {
-      trimmed = trimmed.slice(match[0].length);
-      isTicked = false;
+      title = title.slice(match[0].length).trim();
     }
   }
 
   return {
-    is_checked: isTicked,
-    title: trimmed
+    isChecked,
+    title
   };
 }
