@@ -6,13 +6,31 @@ import React, {
   useRef,
   useState
 } from 'react';
-import Router from 'next/router';
 import { Checkbox } from '@chakra-ui/checkbox';
-import { Text } from '@chakra-ui/react';
-import { FormHelperText, FormControl } from '@chakra-ui/form-control';
+import {
+  Text,
+  Textarea,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  useMediaQuery,
+  Link
+} from '@chakra-ui/react';
+import {
+  FormHelperText,
+  FormControl,
+  FormLabel
+} from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
-import { Box, Code, Flex, Heading, HStack } from '@chakra-ui/layout';
-import { CheckIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { Box, Flex, Heading, HStack } from '@chakra-ui/layout';
+import {
+  CheckIcon,
+  DeleteIcon,
+  EditIcon,
+  ChevronDownIcon,
+  ExternalLinkIcon
+} from '@chakra-ui/icons';
 import { Button, IconButton } from '@chakra-ui/button';
 import { Table, TableCellProps, Tbody, Td, Tr } from '@chakra-ui/table';
 import { Controller, useForm, useWatch } from 'react-hook-form';
@@ -26,6 +44,7 @@ import {
   ModalOverlay
 } from '@chakra-ui/modal';
 import { useQueryClient } from 'react-query';
+import { MdMoreVert } from 'react-icons/md';
 
 import { generateHash } from '../lib/utils';
 import { useRoomMutations } from '../lib/hooks';
@@ -40,6 +59,13 @@ export function RoomDetail({ room }: RoomProps) {
   const { name, todos } = room;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isBulkAddModalOpen,
+    onOpen: onOpenBulkAddModal,
+    onClose: onCloseBulkAddModal
+  } = useDisclosure();
+
+  const [isLargerThan768] = useMediaQuery(['(min-width: 768px)']);
   const queryClient = useQueryClient();
 
   const [currentTodos, setCurrentTodos] = useState(resolveExistingTodos(todos));
@@ -68,14 +94,25 @@ export function RoomDetail({ room }: RoomProps) {
           <Heading as="h1" size="md">
             {name}
           </Heading>
-          <HStack spacing={2}>
-            <Button onClick={onOpen} size="md">
-              Room information
-            </Button>
-            <Button onClick={onLeaveRoom} size="md">
-              Leave room
-            </Button>
-          </HStack>
+          <Menu>
+            {isLargerThan768 ? (
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                Actions
+              </MenuButton>
+            ) : (
+              <MenuButton
+                as={IconButton}
+                aria-label="Actions"
+                icon={<MdMoreVert />}
+                variant="ghost"
+              />
+            )}
+            <MenuList>
+              <MenuItem onClick={onOpen}>Room information</MenuItem>
+              <MenuItem>Export list</MenuItem>
+              <MenuItem onClick={onLeaveRoom}>Leave room</MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
         <Box mt={4}>
           <Table variant="simple" width="100%">
@@ -88,21 +125,26 @@ export function RoomDetail({ room }: RoomProps) {
             </Tbody>
           </Table>
 
-          <Button
-            mt={4}
-            colorScheme="teal"
-            onClick={() =>
-              setCurrentTodos((oldTodos) =>
-                oldTodos.concat({
-                  isPersisted: false,
-                  is_checked: false,
-                  title: ''
-                })
-              )
-            }
-          >
-            Add New...
-          </Button>
+          <HStack spacing={2} direction="row" mt={3} ml={3}>
+            <Button
+              colorScheme="teal"
+              onClick={() =>
+                setCurrentTodos((oldTodos) =>
+                  oldTodos.concat({
+                    isPersisted: false,
+                    is_checked: false,
+                    title: ''
+                  })
+                )
+              }
+            >
+              Add New...
+            </Button>
+
+            <Button colorScheme="teal" onClick={onOpenBulkAddModal}>
+              Add Bulk from List...
+            </Button>
+          </HStack>
         </Box>
       </form>
 
@@ -123,6 +165,40 @@ export function RoomDetail({ room }: RoomProps) {
                 Room password:
               </Text>{' '}
               {room.password}
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isBulkAddModalOpen} onClose={onCloseBulkAddModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Bulk from List</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody py={4} px={6}>
+            <Box flex="1">
+              <FormControl>
+                <FormLabel htmlFor="name">Entries to Add</FormLabel>
+                <Textarea placeholder="- [x] Do something" />
+                <FormHelperText>
+                  By default, each line will be added as a new unchecked entry
+                  unless specified as checked. For more information, see the{' '}
+                  <Link
+                    href="https://www.markdownguide.org/basic-syntax/"
+                    isExternal
+                    color="blue.400"
+                  >
+                    Markdown syntax <ExternalLinkIcon mx="2px" />
+                  </Link>
+                  .
+                </FormHelperText>
+              </FormControl>
+
+              <Flex flexDirection="row" justifyContent="flex-end">
+                <Button colorScheme="teal" onClick={onOpenBulkAddModal} mt={4}>
+                  Add Bulk List
+                </Button>
+              </Flex>
             </Box>
           </ModalBody>
         </ModalContent>
