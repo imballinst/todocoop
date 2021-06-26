@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { BaseTodo } from '../types/models';
 
 export function generateHash(length = 5) {
   const timestampHash = Date.now().toString(36);
@@ -42,7 +43,7 @@ export async function getErrorMessage(error: any) {
   return 'Unexpected error occurred. Please check your connection and try again.';
 }
 
-export function parseRawTodoText(str: string) {
+export function parseRawTodoText(str: string): BaseTodo {
   let title = str.trim();
   let isChecked = false;
 
@@ -61,6 +62,11 @@ export function parseRawTodoText(str: string) {
 
   return {
     isChecked,
-    title
+    title,
+    localId: generateHash()
   };
+}
+
+export function deepClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
 }

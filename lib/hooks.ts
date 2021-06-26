@@ -69,7 +69,8 @@ export function useCurrentRoom({
           password: data.password,
           todos: data.todos.map((todo) => ({
             _id: todo._id,
-            is_checked: todo.is_checked,
+            localId: todo.localId,
+            isChecked: todo.isChecked,
             title: todo.title
           }))
         } as Room;
@@ -145,8 +146,10 @@ export function useRoomMutations() {
       // Optimistically update to the new value.
       if (previousRoom) {
         const newPersistedTodo = {
+          _id: newTodo._id,
+          localId: newTodo.localId,
           isPersisted: true,
-          is_checked: newTodo.is_checked,
+          isChecked: newTodo.isChecked,
           title: newTodo.title
         };
 

@@ -4,9 +4,12 @@ type MongoToObjectFields = Pick<Document, '_id' | '__v'>;
 
 // Todo.
 export interface BaseTodo extends MongoToObjectFields {
-  isPersisted: boolean;
+  // Mongo fields.
   title: string;
-  is_checked: boolean;
+  isChecked: boolean;
+  // UI fields.
+  isPersisted?: boolean;
+  localId?: string;
 }
 
 // Room.

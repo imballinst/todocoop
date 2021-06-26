@@ -1,6 +1,8 @@
 import React, {
   ChangeEvent,
+  Dispatch,
   memo,
+  MutableRefObject,
   ReactNode,
   useEffect,
   useRef,
@@ -29,7 +31,8 @@ import {
   DeleteIcon,
   EditIcon,
   ChevronDownIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  SmallCloseIcon
 } from '@chakra-ui/icons';
 import { Button, IconButton } from '@chakra-ui/button';
 import { Table, TableCellProps, Tbody, Td, Tr } from '@chakra-ui/table';
@@ -46,10 +49,17 @@ import {
 import { useQueryClient } from 'react-query';
 import { MdMoreVert } from 'react-icons/md';
 
-import { generateHash, parseRawTodoText } from '../lib/utils';
+import {
+  deepClone,
+  generateHash,
+  parseRawTodoText,
+  replaceArrayElementAtIndex
+} from '../lib/utils';
 import { useMutateRoom, useRoomMutations } from '../lib/hooks';
 import { BaseTodo, BaseRoom } from '../types/models';
 import { createTodos, leaveRoom } from '../query/rooms';
+import { Dictionary } from '../types';
+import { SetStateAction } from 'react';
 
 interface RoomProps {
   room: BaseRoom;
@@ -68,15 +78,31 @@ export function RoomDetail({ room }: RoomProps) {
   const [isLargerThan768] = useMediaQuery(['(min-width: 768px)']);
   const queryClient = useQueryClient();
 
-  const [currentTodos, setCurrentTodos] = useState(resolveExistingTodos(todos));
-  const previousRoom = useRef(room);
+  const [resolvedInitialTodos] = useState(resolveExistingTodos(todos));
+  const [currentTodos, setCurrentTodos] = useState(resolvedInitialTodos.todos);
+
+  const localIdToEditedListElementMap = useRef<Dictionary<BaseTodo>>({});
+  const previousRoomRef = useRef(room);
 
   const [bulkEntries, setBulkEntries] = useState('');
 
   useEffect(() => {
-    if (previousRoom.current.__v !== room.__v) {
-      setCurrentTodos(resolveExistingTodos(room.todos));
-      previousRoom.current = room;
+    if (
+      previousRoomRef.current.__v !== room.__v ||
+      previousRoomRef.current.todos.length !== room.todos.length
+    ) {
+      const cloned = deepClone(localIdToEditedListElementMap.current);
+      const { todos, submittedLocalTodoIds } = resolveExistingTodos(
+        room.todos,
+        cloned
+      );
+
+      setCurrentTodos(todos);
+      previousRoomRef.current = room;
+
+      for (const id of submittedLocalTodoIds) {
+        localIdToEditedListElementMap.current[id] = undefined;
+      }
     }
   }, [room]);
 
@@ -93,7 +119,7 @@ export function RoomDetail({ room }: RoomProps) {
       if (previousRoom) {
         const newPersistedTodos = newTodos.map((todo) => ({
           isPersisted: true,
-          is_checked: todo.is_checked,
+          isChecked: todo.isChecked,
           title: todo.title
         }));
 
@@ -109,7 +135,7 @@ export function RoomDetail({ room }: RoomProps) {
 
   async function onCreateBulk() {
     const bulkTodos = bulkEntries.split('\n');
-
+    console.log(bulkTodos, bulkTodos.map(parseRawTodoText));
     try {
       await addBulkMutation.mutate({
         name,
@@ -161,8 +187,16 @@ export function RoomDetail({ room }: RoomProps) {
           <Table variant="simple" width="100%">
             <Tbody>
               {currentTodos.map((todo, index) => (
-                <Tr key={todo._id}>
-                  <TodoForm roomName={name} index={index} todo={todo} />
+                <Tr key={todo.localId}>
+                  <TodoForm
+                    roomName={name}
+                    index={index}
+                    todo={todo}
+                    localIdToEditedListElementMap={
+                      localIdToEditedListElementMap
+                    }
+                    setCurrentTodos={setCurrentTodos}
+                  />
                 </Tr>
               ))}
             </Tbody>
@@ -174,8 +208,9 @@ export function RoomDetail({ room }: RoomProps) {
               onClick={() =>
                 setCurrentTodos((oldTodos) =>
                   oldTodos.concat({
+                    localId: generateHash(),
                     isPersisted: false,
-                    is_checked: false,
+                    isChecked: false,
                     title: ''
                   })
                 )
@@ -222,7 +257,11 @@ export function RoomDetail({ room }: RoomProps) {
             <Box flex="1">
               <FormControl>
                 <FormLabel htmlFor="name">Entries to Add</FormLabel>
-                <Textarea placeholder="- [x] Do something" />
+                <Textarea
+                  placeholder="- [x] Do something"
+                  onChange={(e) => setBulkEntries(e.target.value)}
+                  value={bulkEntries}
+                />
                 <FormHelperText>
                   By default, each line will be added as a new unchecked entry
                   unless specified as checked. For more information, see the{' '}
@@ -255,11 +294,15 @@ const TodoForm = memo(
   ({
     roomName,
     todo,
-    index
+    index,
+    localIdToEditedListElementMap,
+    setCurrentTodos
   }: {
     roomName: string;
     todo: BaseTodo;
     index: number;
+    localIdToEditedListElementMap: MutableRefObject<Dictionary<BaseTodo>>;
+    setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
   }) => {
     const {
       control,
@@ -269,22 +312,46 @@ const TodoForm = memo(
       defaultValues: todo
     });
 
-    useEffect(() => {
-      previousValue.current = todo;
-      reset(todo);
-    }, [reset, todo]);
-
     const {
       isPersisted,
       _id: todoId,
+      localId,
       title,
-      is_checked: isChecked
+      isChecked
     } = useWatch({ control });
+
     const { addTodoMutation, updateTodoMutation, deleteTodoMutation } =
       useRoomMutations();
 
     const [isEditing, setIsEditing] = useState(!isPersisted);
     const previousValue = useRef<BaseTodo>(todo);
+
+    useEffect(() => {
+      if (!isEditing) {
+        previousValue.current = todo;
+        reset(todo);
+      }
+    }, [isEditing, todo, reset]);
+
+    useEffect(() => {
+      if (isEditing) {
+        localIdToEditedListElementMap.current[localId] = {
+          isPersisted,
+          _id: todoId,
+          localId,
+          title,
+          isChecked
+        };
+      }
+    }, [
+      localIdToEditedListElementMap,
+      localId,
+      isEditing,
+      isPersisted,
+      todoId,
+      isChecked,
+      title
+    ]);
 
     function onSave() {
       // Finish save happens when the text field is blurred, or when
@@ -294,7 +361,9 @@ const TodoForm = memo(
           name: roomName,
           todo: {
             title,
-            is_checked: isChecked
+            localId,
+            isChecked,
+            isPersisted: true
           }
         });
       } else {
@@ -302,9 +371,10 @@ const TodoForm = memo(
           name: roomName,
           todo: {
             _id: todoId,
+            localId,
             isPersisted: true,
             title,
-            is_checked: isChecked
+            isChecked
           }
         });
       }
@@ -321,7 +391,7 @@ const TodoForm = memo(
           _id: todoId,
           isPersisted: true,
           title,
-          is_checked: e.target.checked
+          isChecked: e.target.checked
         }
       });
     }
@@ -344,7 +414,7 @@ const TodoForm = memo(
                   ref={field.ref}
                 />
               )}
-              name="is_checked"
+              name="isChecked"
               control={control}
             />
 
@@ -364,6 +434,28 @@ const TodoForm = memo(
 
         <TableColumn width={1}>
           <Flex direction="row" justifyContent="flex-end">
+            <IconButton
+              minWidth="var(--chakra-sizes-6)"
+              height="var(--chakra-sizes-6)"
+              variant="ghost"
+              colorScheme="teal"
+              onClick={() => {
+                localIdToEditedListElementMap.current[localId] = undefined;
+
+                if (todo.isPersisted) {
+                  setIsEditing(false);
+                } else {
+                  setCurrentTodos((oldState) => {
+                    const idxToDelete = oldState.findIndex(
+                      (el) => el.localId === todo.localId
+                    );
+                    return replaceArrayElementAtIndex(oldState, idxToDelete);
+                  });
+                }
+              }}
+              aria-label="Cancel"
+              icon={<SmallCloseIcon />}
+            />
             <IconButton
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
@@ -392,7 +484,7 @@ const TodoForm = memo(
                 {todo.title || title}
               </Checkbox>
             )}
-            name="is_checked"
+            name="isChecked"
             control={control}
           />
         </TableColumn>
@@ -427,10 +519,37 @@ function TableColumn(props: { children: ReactNode } & TableCellProps) {
   return <Td {...props} paddingInline={3} py={2} />;
 }
 
-function resolveExistingTodos(todos: BaseTodo[]): BaseTodo[] {
-  return todos.map((todo) => ({
-    _id: generateHash(),
-    isPersisted: true,
-    ...todo
+function resolveExistingTodos(
+  apiTodos: BaseTodo[],
+  currentlyEditedTodosDictionary: Dictionary<BaseTodo> = {}
+) {
+  const submittedLocalTodoIds: string[] = [];
+  const resultTodo: BaseTodo[] = apiTodos.map((todo) => ({
+    ...todo,
+    isPersisted: true
   }));
+  const localIds = resultTodo.map((el) => el.localId);
+
+  for (const key in currentlyEditedTodosDictionary) {
+    const todo = currentlyEditedTodosDictionary[key];
+    const existsInApi = localIds.includes(todo.localId);
+
+    if (!existsInApi) {
+      // Exists locally but not in API, because it's not submitted yet.
+      // This is usually the case when we are creating a new todo but not submitted yet,
+      // but the UI already re-fetches from the interval.
+      resultTodo.push(todo);
+    } else {
+      // Covers 3 cases:
+      // 1. Exists locally and in API.
+      // 2. Exists locally and in API, but not yet submitted.
+      // 3. Exists locally but not in API. This is usually because of form errors.
+      submittedLocalTodoIds.push(todo.localId);
+    }
+  }
+
+  return {
+    todos: resultTodo,
+    submittedLocalTodoIds
+  };
 }

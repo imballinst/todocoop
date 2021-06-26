@@ -10,7 +10,11 @@ const TodoSchema = new Schema<Todo>({
     type: String,
     required: true
   },
-  is_checked: {
+  localId: {
+    type: String,
+    required: true
+  },
+  isChecked: {
     type: Boolean,
     default: false
   }
