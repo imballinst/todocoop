@@ -17,7 +17,8 @@ import {
   MenuList,
   MenuItem,
   useMediaQuery,
-  Link
+  Link,
+  useToast
 } from '@chakra-ui/react';
 import {
   FormHelperText,
@@ -50,8 +51,10 @@ import { useQueryClient } from 'react-query';
 import { MdMoreVert } from 'react-icons/md';
 
 import {
+  copyTextToClipboard,
   deepClone,
   generateHash,
+  getErrorMessage,
   parseRawTodoText,
   replaceArrayElementAtIndex
 } from '../lib/utils';
@@ -69,6 +72,7 @@ export function RoomDetail({ room }: RoomProps) {
   const { name, todos } = room;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
   const {
     isOpen: isBulkAddModalOpen,
     onOpen: onOpenBulkAddModal,
@@ -135,7 +139,7 @@ export function RoomDetail({ room }: RoomProps) {
 
   async function onCreateBulk() {
     const bulkTodos = bulkEntries.split('\n');
-    console.log(bulkTodos, bulkTodos.map(parseRawTodoText));
+
     try {
       await addBulkMutation.mutate({
         name,
@@ -144,6 +148,31 @@ export function RoomDetail({ room }: RoomProps) {
       setBulkEntries('');
     } catch (err) {
       console.error(err);
+      toast({
+        title: 'Failed to create bulk todos.',
+        description: await getErrorMessage(err),
+        status: 'error'
+      });
+    }
+  }
+
+  async function onCopyToClipboard() {
+    const currentTodosText = currentTodos
+      .map((todo) => `- [${todo.isChecked ? 'x' : ' '}] ${todo.title}`)
+      .join('\n');
+    try {
+      await copyTextToClipboard(currentTodosText);
+      toast({
+        description: 'Copied all todos to clipboard.',
+        status: 'success'
+      });
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: 'Failed to copy to clipboard.',
+        description: await getErrorMessage(err),
+        status: 'error'
+      });
     }
   }
 
@@ -178,7 +207,9 @@ export function RoomDetail({ room }: RoomProps) {
             )}
             <MenuList>
               <MenuItem onClick={onOpen}>Room information</MenuItem>
-              <MenuItem>Export list</MenuItem>
+              <MenuItem onClick={onCopyToClipboard}>
+                Copy list to clipboard
+              </MenuItem>
               <MenuItem onClick={onLeaveRoom}>Leave room</MenuItem>
             </MenuList>
           </Menu>
