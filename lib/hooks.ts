@@ -94,7 +94,7 @@ export function useCurrentRoom({
     }
 
     // If `redirectIfInsideARoom` is set and the user is inside a room, redirect if the room was found.
-    if (redirectToIfInsideRoom) {
+    if (redirectToIfInsideRoom && room) {
       Router.push(redirectToIfInsideRoom);
     }
   }, [room, isFetched, redirectToIfOutsideRoom, redirectToIfInsideRoom]);
