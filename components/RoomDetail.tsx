@@ -6,7 +6,8 @@ import React, {
   ReactNode,
   useEffect,
   useRef,
-  useState
+  useState,
+  SetStateAction
 } from 'react';
 import { Checkbox } from '@chakra-ui/checkbox';
 import {
@@ -62,7 +63,6 @@ import { useMutateRoom, useRoomMutations } from '../lib/hooks';
 import { BaseTodo, BaseRoom } from '../types/models';
 import { createTodos, leaveRoom } from '../query/rooms';
 import { Dictionary } from '../types';
-import { SetStateAction } from 'react';
 
 interface RoomProps {
   room: BaseRoom;
