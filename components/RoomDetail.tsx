@@ -145,6 +145,7 @@ export function RoomDetail({ room }: RoomProps) {
         name,
         todos: bulkTodos.map(parseRawTodoText)
       });
+      onCloseBulkAddModal();
       setBulkEntries('');
     } catch (err) {
       console.error(err);
