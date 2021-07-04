@@ -10,12 +10,12 @@ jobs:
           # See the configuration reference documentation for more details on using restore_cache and save_cache steps
           # https://circleci.com/docs/2.0/configuration-reference/?section=reference#save_cache
           keys:
-            - node-deps-v1-{{ .Branch }}-{{checksum "yarn-lock.json"}}
+            - node-deps-v1-{{ .Branch }}-{{checksum "yarn-lock"}}
       - run:
           name: install packages
           command: yarn install --frozen-lockfile
       - save_cache:
-          key: node-deps-v1-{{ .Branch }}-{{checksum "yarn-lock.json"}}
+          key: node-deps-v1-{{ .Branch }}-{{checksum "yarn-lock"}}
           paths:
             - ~/.yarn
       - run:
@@ -33,3 +33,11 @@ workflows:
                 - main
     jobs:
       - cleanup
+
+  cleanup:
+    jobs:
+      - cleanup:
+          filters:
+            branches:
+              only:
+                - main
