@@ -52,6 +52,8 @@ export function parseRawTodoText(str: string): BaseTodo {
   } else if (title.startsWith('- [x] ')) {
     title = title.slice('- [x] '.length).trim();
     isChecked = true;
+  } else if (title.startsWith('[ ] ')) {
+    title = title.slice('[ ] '.length).trim();
   } else {
     const match = title.match(/^([-*]|(\d+\.))/);
 

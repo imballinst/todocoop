@@ -421,6 +421,7 @@ const TodoForm = memo(
         name: roomName,
         todo: {
           _id: todoId,
+          localId,
           isPersisted: true,
           title,
           isChecked: e.target.checked
@@ -510,7 +511,10 @@ const TodoForm = memo(
                 onBlur={field.onBlur}
                 isChecked={field.value}
                 ref={field.ref}
-                onChange={onChangeTick}
+                onChange={(e) => {
+                  field.onChange(e);
+                  onChangeTick(e);
+                }}
                 colorScheme="teal"
               >
                 {todo.title || title}
