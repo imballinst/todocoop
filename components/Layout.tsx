@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import Head from 'next/head';
 import { Spinner } from '@chakra-ui/spinner';
+import { useColorModeValue } from '@chakra-ui/react';
 
 import { useColorMode } from '@chakra-ui/color-mode';
 import { IconButton } from '@chakra-ui/button';
@@ -9,7 +10,6 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { AppLink } from './AppLink';
 import { EFFECTIVE_WIDTHS } from '../lib/constants';
-import { Room } from '../models';
 
 interface LayoutProps {
   children: ReactNode;
@@ -25,6 +25,7 @@ export function Layout({
   isFetching
 }: LayoutProps) {
   const { colorMode, toggleColorMode } = useColorMode();
+  const bg = useColorModeValue('white', 'gray.800');
 
   return (
     <div>
@@ -42,6 +43,8 @@ export function Layout({
         position="fixed"
         top={0}
         width="100%"
+        background={bg}
+        zIndex={1}
       >
         <Flex
           flexDirection="row"
