@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import '@fontsource/montserrat/700.css';
 
 import { appTheme } from '../theme';
+import { ClientStateProvider } from '../components/contexts/ClientStateContext';
 
 const queryClient = new QueryClient();
 
@@ -12,7 +13,9 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={appTheme}>
       <QueryClientProvider client={queryClient}>
-        <Component {...pageProps} />
+        <ClientStateProvider>
+          <Component {...pageProps} />
+        </ClientStateProvider>
       </QueryClientProvider>
     </ChakraProvider>
   );

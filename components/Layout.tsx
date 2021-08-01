@@ -10,6 +10,7 @@ import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { AppLink } from './AppLink';
 import { EFFECTIVE_WIDTHS } from '../lib/constants';
+import { useClientState } from './contexts/ClientStateContext';
 
 interface LayoutProps {
   children: ReactNode;
@@ -24,6 +25,7 @@ export function Layout({
   title,
   isFetching
 }: LayoutProps) {
+  const { isAccessingRoom } = useClientState();
   const { colorMode, toggleColorMode } = useColorMode();
   const bg = useColorModeValue('white', 'gray.800');
 
@@ -54,7 +56,7 @@ export function Layout({
           px={3}
           py={2}
         >
-          <AppLink href="/" fontWeight={700}>
+          <AppLink href={isAccessingRoom ? '/room' : '/'} fontWeight={700}>
             Home
           </AppLink>
           <IconButton

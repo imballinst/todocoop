@@ -1,6 +1,8 @@
 import { useCurrentRoom } from '../lib/hooks';
 import { RoomDetail } from '../components/RoomDetail';
 import { Layout } from '../components/Layout';
+import { useClientState } from '../components/contexts/ClientStateContext';
+import { useEffect } from 'react';
 
 export default function RoomPage() {
   const { room, isFetching } = useCurrentRoom({
@@ -11,6 +13,12 @@ export default function RoomPage() {
     },
     redirectToIfOutsideRoom: '/'
   });
+  const { setIsAccessingRoom } = useClientState();
+
+  useEffect(() => {
+    // This will also be fired during the unmount state.
+    setIsAccessingRoom(room !== undefined);
+  }, [room]);
 
   return (
     <Layout
