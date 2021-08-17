@@ -47,10 +47,7 @@ function Wrapper({
 
   return (
     <Box bg={bg}>
-      <FormControl
-        isInvalid={errors.name !== undefined}
-        colorScheme={colorSchemeProp}
-      >
+      <FormControl isInvalid={errors.name !== undefined}>
         <FormLabel htmlFor="name">Room name</FormLabel>
         <Controller
           render={({ field }) => (

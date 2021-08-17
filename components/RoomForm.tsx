@@ -1,20 +1,20 @@
-import { Button } from '@chakra-ui/button';
+import { Button } from "@chakra-ui/button";
 import {
   FormControl,
   FormErrorMessage,
-  FormLabel
-} from '@chakra-ui/form-control';
-import { Input } from '@chakra-ui/input';
-import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
-import { useToast } from '@chakra-ui/react';
-import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { getErrorMessage } from '../lib/utils';
-import { createRoom, CreateRoomParameters } from '../query/rooms';
+  FormLabel,
+} from "@chakra-ui/form-control";
+import { Input } from "@chakra-ui/input";
+import { Box, Flex, Heading, VStack } from "@chakra-ui/layout";
+import { useToast } from "@chakra-ui/react";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { getErrorMessage } from "../lib/utils";
+import { createRoom, CreateRoomParameters } from "../query/rooms";
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
-  name: '',
-  password: ''
+  name: "",
+  password: "",
 };
 
 interface Props {
@@ -28,14 +28,14 @@ export function RoomForm({
   onSuccessfulAccess,
   request,
   title,
-  loadingButtonTitle
+  loadingButtonTitle,
 }: Props) {
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
-    defaultValues: FORM_DEFAULT_VALUES
+    defaultValues: FORM_DEFAULT_VALUES,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
@@ -45,15 +45,15 @@ export function RoomForm({
       setIsSubmitting(true);
 
       const { data, errors } = await request(formData);
-      if (!data) throw new Error(errors?.join(', '));
+      if (!data) throw new Error(errors?.join(", "));
 
       onSuccessfulAccess();
     } catch (err) {
       console.error(err);
       toast({
-        title: 'Failed to access room.',
+        title: "Failed to access room.",
         description: await getErrorMessage(err),
-        status: 'error'
+        status: "error",
       });
     } finally {
       setIsSubmitting(false);
@@ -90,7 +90,7 @@ export function RoomForm({
               name="name"
               control={control}
               rules={{
-                required: 'This field is required.'
+                required: "This field is required.",
               }}
             />
 
@@ -106,7 +106,7 @@ export function RoomForm({
               name="password"
               control={control}
               rules={{
-                required: 'This field is required.'
+                required: "This field is required.",
               }}
             />
             <Box height={21} mt={1}>
@@ -115,13 +115,7 @@ export function RoomForm({
           </FormControl>
         </VStack>
 
-        <Button
-          mt={2}
-          isFullWidth
-          type="submit"
-          colorScheme="blue"
-          isDisabled={isSubmitting}
-        >
+        <Button mt={2} isFullWidth type="submit" isDisabled={isSubmitting}>
           {isSubmitting ? loadingButtonTitle : title}
         </Button>
       </Box>

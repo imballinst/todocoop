@@ -7,14 +7,14 @@ import {
   SetStateAction,
   useEffect,
   useRef,
-  useState
-} from 'react';
+  useState,
+} from "react";
 import {
   CheckIcon,
   DeleteIcon,
   EditIcon,
-  SmallCloseIcon
-} from '@chakra-ui/icons';
+  SmallCloseIcon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Checkbox,
@@ -24,13 +24,13 @@ import {
   IconButton,
   Input,
   TableCellProps,
-  Td
-} from '@chakra-ui/react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useRoomMutations } from '../../lib/hooks';
-import { replaceArrayElementAtIndex } from '../../lib/utils';
-import { Dictionary } from '../../types';
-import { BaseTodo } from '../../types/models';
+  Td,
+} from "@chakra-ui/react";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { useRoomMutations } from "../../lib/hooks";
+import { replaceArrayElementAtIndex } from "../../lib/utils";
+import { Dictionary } from "../../types";
+import { BaseTodo } from "../../types/models";
 
 export const TodoForm = memo(
   ({
@@ -38,7 +38,7 @@ export const TodoForm = memo(
     todo,
     index,
     localIdToEditedListElementMap,
-    setCurrentTodos
+    setCurrentTodos,
   }: {
     roomName: string;
     todo: BaseTodo;
@@ -49,21 +49,20 @@ export const TodoForm = memo(
     const {
       control,
       formState: { errors },
-      reset
+      reset,
     } = useForm({
-      defaultValues: todo
+      defaultValues: todo,
+    });
+
+    const { isPersisted, _id: todoId, localId, title, isChecked } = useWatch({
+      control,
     });
 
     const {
-      isPersisted,
-      _id: todoId,
-      localId,
-      title,
-      isChecked
-    } = useWatch({ control });
-
-    const { addTodoMutation, updateTodoMutation, deleteTodoMutation } =
-      useRoomMutations();
+      addTodoMutation,
+      updateTodoMutation,
+      deleteTodoMutation,
+    } = useRoomMutations();
 
     const [isEditing, setIsEditing] = useState(!isPersisted);
     const previousValue = useRef<BaseTodo>(todo);
@@ -82,7 +81,7 @@ export const TodoForm = memo(
           _id: todoId,
           localId,
           title,
-          isChecked
+          isChecked,
         };
       }
     }, [
@@ -92,7 +91,7 @@ export const TodoForm = memo(
       isPersisted,
       todoId,
       isChecked,
-      title
+      title,
     ]);
 
     function onSave() {
@@ -105,8 +104,8 @@ export const TodoForm = memo(
             title,
             localId,
             isChecked,
-            isPersisted: true
-          }
+            isPersisted: true,
+          },
         });
       } else {
         updateTodoMutation.mutate({
@@ -116,8 +115,8 @@ export const TodoForm = memo(
             localId,
             isPersisted: true,
             title,
-            isChecked
-          }
+            isChecked,
+          },
         });
       }
 
@@ -134,8 +133,8 @@ export const TodoForm = memo(
           localId,
           isPersisted: true,
           title,
-          isChecked: e.target.checked
-        }
+          isChecked: e.target.checked,
+        },
       });
     }
 
@@ -181,7 +180,6 @@ export const TodoForm = memo(
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
               variant="ghost"
-              colorScheme="teal"
               onClick={() => {
                 localIdToEditedListElementMap.current[localId] = undefined;
 
@@ -203,7 +201,6 @@ export const TodoForm = memo(
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
               variant="ghost"
-              colorScheme="teal"
               onClick={onSave}
               aria-label="Save"
               icon={<CheckIcon />}
@@ -225,7 +222,6 @@ export const TodoForm = memo(
                   field.onChange(e);
                   onChangeTick(e);
                 }}
-                colorScheme="teal"
               >
                 {todo.title || title}
               </Checkbox>
@@ -240,7 +236,6 @@ export const TodoForm = memo(
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
               variant="ghost"
-              colorScheme="teal"
               onClick={() => setIsEditing(true)}
               aria-label="Edit"
               icon={<EditIcon />}
@@ -249,7 +244,6 @@ export const TodoForm = memo(
               minWidth="var(--chakra-sizes-6)"
               height="var(--chakra-sizes-6)"
               variant="ghost"
-              colorScheme="teal"
               onClick={onDelete}
               aria-label="Edit"
               icon={<DeleteIcon />}
