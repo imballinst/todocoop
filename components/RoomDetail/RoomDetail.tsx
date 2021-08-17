@@ -1,38 +1,38 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Textarea, Link, useToast } from "@chakra-ui/react";
+import React, { useEffect, useRef, useState } from 'react';
+import { Textarea, Link, useToast } from '@chakra-ui/react';
 import {
   FormHelperText,
   FormControl,
-  FormLabel,
-} from "@chakra-ui/form-control";
-import { Box, Flex, Heading, HStack } from "@chakra-ui/layout";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { Button } from "@chakra-ui/button";
-import { Table, Tbody, Tr } from "@chakra-ui/table";
-import { useDisclosure } from "@chakra-ui/hooks";
+  FormLabel
+} from '@chakra-ui/form-control';
+import { Box, Flex, Heading, HStack } from '@chakra-ui/layout';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { Button } from '@chakra-ui/button';
+import { Table, Tbody, Tr } from '@chakra-ui/table';
+import { useDisclosure } from '@chakra-ui/hooks';
 import {
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
-  ModalOverlay,
-} from "@chakra-ui/modal";
-import { useQueryClient } from "react-query";
+  ModalOverlay
+} from '@chakra-ui/modal';
+import { useQueryClient } from 'react-query';
 
 import {
   deepClone,
   generateHash,
   getErrorMessage,
-  parseRawTodoText,
-} from "../../lib/utils";
-import { useMutateRoom } from "../../lib/hooks";
-import { BaseTodo, BaseRoom } from "../../types/models";
-import { createTodos } from "../../query/rooms";
-import { Dictionary } from "../../types";
-import { TodoForm } from "./TodoForm";
-import { ActionsMenu } from "./ActionsMenu";
-import { HelpMenu } from "./HelpMenu";
+  parseRawTodoText
+} from '../../lib/utils';
+import { useMutateRoom } from '../../lib/hooks';
+import { BaseTodo, BaseRoom } from '../../types/models';
+import { createTodos } from '../../query/rooms';
+import { Dictionary } from '../../types';
+import { TodoForm } from './TodoForm';
+import { ActionsMenu } from './ActionsMenu';
+import { HelpMenu } from './HelpMenu';
 
 interface RoomProps {
   room: BaseRoom;
@@ -44,7 +44,7 @@ export function RoomDetail({ room }: RoomProps) {
   const {
     isOpen: isBulkAddModalOpen,
     onOpen: onOpenBulkAddModal,
-    onClose: onCloseBulkAddModal,
+    onClose: onCloseBulkAddModal
   } = useDisclosure();
 
   const queryClient = useQueryClient();
@@ -55,7 +55,7 @@ export function RoomDetail({ room }: RoomProps) {
   const localIdToEditedListElementMap = useRef<Dictionary<BaseTodo>>({});
   const previousRoomRef = useRef(room);
 
-  const [bulkEntries, setBulkEntries] = useState("");
+  const [bulkEntries, setBulkEntries] = useState('');
 
   useEffect(() => {
     if (
@@ -81,22 +81,22 @@ export function RoomDetail({ room }: RoomProps) {
     createTodos,
     async ({ todos: newTodos }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
-      await queryClient.cancelQueries("room");
+      await queryClient.cancelQueries('room');
 
       // Snapshot the previous value.
-      const previousRoom = queryClient.getQueryData<BaseRoom>("room");
+      const previousRoom = queryClient.getQueryData<BaseRoom>('room');
 
       // Optimistically update to the new value.
       if (previousRoom) {
         const newPersistedTodos = newTodos.map((todo) => ({
           isPersisted: true,
           isChecked: todo.isChecked,
-          title: todo.title,
+          title: todo.title
         }));
 
-        queryClient.setQueryData<BaseRoom>("room", {
+        queryClient.setQueryData<BaseRoom>('room', {
           ...previousRoom,
-          todos: [...previousRoom.todos, ...newPersistedTodos],
+          todos: [...previousRoom.todos, ...newPersistedTodos]
         });
       }
 
@@ -105,21 +105,21 @@ export function RoomDetail({ room }: RoomProps) {
   );
 
   async function onCreateBulk() {
-    const bulkTodos = bulkEntries.split("\n");
+    const bulkTodos = bulkEntries.split('\n');
 
     try {
       await addBulkMutation.mutate({
         name,
-        todos: bulkTodos.map(parseRawTodoText),
+        todos: bulkTodos.map(parseRawTodoText)
       });
       onCloseBulkAddModal();
-      setBulkEntries("");
+      setBulkEntries('');
     } catch (err) {
       console.error(err);
       toast({
-        title: "Failed to create bulk todos.",
+        title: 'Failed to create bulk todos.',
         description: await getErrorMessage(err),
-        status: "error",
+        status: 'error'
       });
     }
   }
@@ -137,10 +137,10 @@ export function RoomDetail({ room }: RoomProps) {
           >
             {name}
           </Heading>
-          <div>
+          <HStack spacing={2} direction="row">
             <HelpMenu />
             <ActionsMenu room={room} currentTodos={currentTodos} />
-          </div>
+          </HStack>
         </Flex>
         <Box mt={4}>
           <Table variant="simple" width="100%">
@@ -163,16 +163,20 @@ export function RoomDetail({ room }: RoomProps) {
 
           <HStack spacing={2} direction="row" mt={3} ml={3}>
             <Button
-              onClick={() =>
+              onClick={() => {
+                if (currentTodos.length === 25) {
+                  throw new Error('Test error');
+                }
+
                 setCurrentTodos((oldTodos) =>
                   oldTodos.concat({
                     localId: generateHash(),
                     isPersisted: false,
                     isChecked: false,
-                    title: "",
+                    title: ''
                   })
-                )
-              }
+                );
+              }}
             >
               Add New...
             </Button>
@@ -198,7 +202,7 @@ export function RoomDetail({ room }: RoomProps) {
                 />
                 <FormHelperText>
                   By default, each line will be added as a new unchecked entry
-                  unless specified as checked. For more information, see the{" "}
+                  unless specified as checked. For more information, see the{' '}
                   <Link
                     href="https://www.markdownguide.org/basic-syntax/"
                     isExternal
@@ -231,7 +235,7 @@ function resolveExistingTodos(
   const submittedLocalTodoIds: string[] = [];
   const resultTodo: BaseTodo[] = apiTodos.map((todo) => ({
     ...todo,
-    isPersisted: true,
+    isPersisted: true
   }));
   const localIds = resultTodo.map((el) => el.localId);
 
@@ -255,6 +259,6 @@ function resolveExistingTodos(
 
   return {
     todos: resultTodo,
-    submittedLocalTodoIds,
+    submittedLocalTodoIds
   };
 }

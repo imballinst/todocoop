@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import React, { useEffect } from 'react';
+import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import {
   FormControl,
   FormErrorMessage,
-  FormLabel,
-} from "@chakra-ui/form-control";
-import { Controller, useForm } from "react-hook-form";
+  FormLabel
+} from '@chakra-ui/form-control';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Box,
   Button,
@@ -16,10 +16,10 @@ import {
   IconButton,
   Input,
   useColorMode,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import { appTheme } from "../theme";
-import { EditIcon, SmallCloseIcon } from "@chakra-ui/icons";
+  useColorModeValue
+} from '@chakra-ui/react';
+import { appTheme } from '../theme';
+import { EditIcon, SmallCloseIcon } from '@chakra-ui/icons';
 
 interface Props {
   colorMode: ColorMode;
@@ -28,17 +28,17 @@ interface Props {
 
 function Wrapper({
   colorMode: colorModeProp,
-  colorScheme: colorSchemeProp,
+  colorScheme: colorSchemeProp
 }: Props) {
   const {
     control,
-    formState: { errors },
+    formState: { errors }
   } = useForm({
     defaultValues: {
-      name: "",
-    },
+      name: ''
+    }
   });
-  const bg = useColorModeValue("white", "gray.800");
+  const bg = useColorModeValue('white', 'gray.800');
   const { setColorMode } = useColorMode();
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function Wrapper({
           name="name"
           control={control}
           rules={{
-            required: "This field is required.",
+            required: 'This field is required.'
           }}
         />
 
@@ -93,36 +93,36 @@ function Wrapper({
 }
 
 export default {
-  title: "Example/Theme Selector",
+  title: 'Example/Theme Selector',
   component: Wrapper,
   argTypes: {
-    colorMode: { options: ["light", "dark"], control: { type: "radio" } },
+    colorMode: { options: ['light', 'dark'], control: { type: 'radio' } },
     colorScheme: {
       options: [
-        "black",
-        "white",
-        "whiteAlpha",
-        "blackAlpha",
-        "gray",
-        "red",
-        "orange",
-        "yellow",
-        "green",
-        "teal",
-        "blue",
-        "cyan",
-        "purple",
-        "pink",
-        "linkedin",
-        "facebook",
-        "messenger",
-        "whatsapp",
-        "twitter",
-        "telegram",
+        'black',
+        'white',
+        'whiteAlpha',
+        'blackAlpha',
+        'gray',
+        'red',
+        'orange',
+        'yellow',
+        'green',
+        'teal',
+        'blue',
+        'cyan',
+        'purple',
+        'pink',
+        'linkedin',
+        'facebook',
+        'messenger',
+        'whatsapp',
+        'twitter',
+        'telegram'
       ],
-      control: { type: "select" },
-    },
-  },
+      control: { type: 'select' }
+    }
+  }
 } as ComponentMeta<typeof Wrapper>;
 
 const Template: ComponentStory<typeof Wrapper> = (args) => (
@@ -133,6 +133,6 @@ const Template: ComponentStory<typeof Wrapper> = (args) => (
 
 export const Primary = Template.bind({});
 Primary.args = {
-  colorMode: "dark",
-  colorScheme: "teal",
+  colorMode: 'dark',
+  colorScheme: 'teal'
 };

@@ -50,12 +50,7 @@ export function useCurrentRoom({
   redirectToIfOutsideRoom = '',
   queryOptions
 }: Params = {}): UseCurrentRoomType {
-  const {
-    data: room,
-    refetch: refetchRoom,
-    isFetching,
-    isFetched
-  } = useQuery(
+  const { data: room, refetch: refetchRoom, isFetching, isFetched } = useQuery(
     'room',
     async () => {
       try {

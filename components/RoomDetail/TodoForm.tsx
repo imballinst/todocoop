@@ -7,14 +7,14 @@ import {
   SetStateAction,
   useEffect,
   useRef,
-  useState,
-} from "react";
+  useState
+} from 'react';
 import {
   CheckIcon,
   DeleteIcon,
   EditIcon,
-  SmallCloseIcon,
-} from "@chakra-ui/icons";
+  SmallCloseIcon
+} from '@chakra-ui/icons';
 import {
   Box,
   Checkbox,
@@ -24,13 +24,13 @@ import {
   IconButton,
   Input,
   TableCellProps,
-  Td,
-} from "@chakra-ui/react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { useRoomMutations } from "../../lib/hooks";
-import { replaceArrayElementAtIndex } from "../../lib/utils";
-import { Dictionary } from "../../types";
-import { BaseTodo } from "../../types/models";
+  Td
+} from '@chakra-ui/react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { useRoomMutations } from '../../lib/hooks';
+import { replaceArrayElementAtIndex } from '../../lib/utils';
+import { Dictionary } from '../../types';
+import { BaseTodo } from '../../types/models';
 
 export const TodoForm = memo(
   ({
@@ -38,7 +38,7 @@ export const TodoForm = memo(
     todo,
     index,
     localIdToEditedListElementMap,
-    setCurrentTodos,
+    setCurrentTodos
   }: {
     roomName: string;
     todo: BaseTodo;
@@ -49,30 +49,40 @@ export const TodoForm = memo(
     const {
       control,
       formState: { errors },
-      reset,
+      reset
     } = useForm({
-      defaultValues: todo,
+      defaultValues: todo
     });
 
     const { isPersisted, _id: todoId, localId, title, isChecked } = useWatch({
-      control,
+      control
     });
 
     const {
       addTodoMutation,
       updateTodoMutation,
-      deleteTodoMutation,
+      deleteTodoMutation
     } = useRoomMutations();
 
     const [isEditing, setIsEditing] = useState(!isPersisted);
     const previousValue = useRef<BaseTodo>(todo);
 
     useEffect(() => {
-      if (!isEditing) {
+      if (
+        !isEditing &&
+        !addTodoMutation.isError &&
+        !updateTodoMutation.isError
+      ) {
         previousValue.current = todo;
         reset(todo);
       }
-    }, [isEditing, todo, reset]);
+    }, [
+      addTodoMutation.isError,
+      updateTodoMutation.isError,
+      isEditing,
+      todo,
+      reset
+    ]);
 
     useEffect(() => {
       if (isEditing) {
@@ -81,7 +91,7 @@ export const TodoForm = memo(
           _id: todoId,
           localId,
           title,
-          isChecked,
+          isChecked
         };
       }
     }, [
@@ -91,7 +101,7 @@ export const TodoForm = memo(
       isPersisted,
       todoId,
       isChecked,
-      title,
+      title
     ]);
 
     function onSave() {
@@ -104,8 +114,8 @@ export const TodoForm = memo(
             title,
             localId,
             isChecked,
-            isPersisted: true,
-          },
+            isPersisted: true
+          }
         });
       } else {
         updateTodoMutation.mutate({
@@ -115,8 +125,8 @@ export const TodoForm = memo(
             localId,
             isPersisted: true,
             title,
-            isChecked,
-          },
+            isChecked
+          }
         });
       }
 
@@ -133,8 +143,8 @@ export const TodoForm = memo(
           localId,
           isPersisted: true,
           title,
-          isChecked: e.target.checked,
-        },
+          isChecked: e.target.checked
+        }
       });
     }
 
