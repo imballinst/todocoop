@@ -43,7 +43,7 @@ export function RoomForm({
   async function onSubmit(formData: CreateRoomParameters) {
     try {
       setIsSubmitting(true);
-      console.log(formData);
+
       const { data, errors } = await request(formData);
       if (!data) throw new Error(errors?.join(', '));
 

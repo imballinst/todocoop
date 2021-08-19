@@ -154,7 +154,7 @@ export const TodoForm = memo(
 
     return isEditing ? (
       <>
-        <TableColumn colSpan={2}>
+        <TableColumn colSpan={2} borderColor="teal">
           <Box display="flex">
             <Controller
               render={({ field }) => (
@@ -220,7 +220,7 @@ export const TodoForm = memo(
       </>
     ) : (
       <>
-        <TableColumn colSpan={2}>
+        <TableColumn colSpan={2} borderColor="teal">
           <Controller
             render={({ field }) => (
               <Checkbox
