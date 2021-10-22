@@ -8,11 +8,11 @@ async function getCurrentRoomHandler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse
 ) {
-  const room = req.session.get('room');
+  const roomId = req.session.get('roomId');
 
-  if (room) {
+  if (roomId) {
     const roomQuery = RoomModel.findOne({
-      _id: room._id
+      _id: roomId
     });
     const roomFromDb = await roomQuery.exec();
 

@@ -24,7 +24,7 @@ async function roomAccessHandler(
       throw new Error('Invalid room information.');
     }
 
-    req.session.set('room', object);
+    req.session.set('roomId', object._id);
     await req.session.save();
 
     res.status(200);
