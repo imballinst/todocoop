@@ -1,6 +1,6 @@
 module.exports = {
-  swcMinify: true,
-  experimental: {
-    esmExternals: false
-  }
+  // swcMinify: true,
+  // experimental: {
+  //   esmExternals: false
+  // }
 };
