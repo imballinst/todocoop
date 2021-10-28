@@ -1,2 +1,0 @@
-[context.deploy-preview.environment]
-  MONGODB_DB_NAME = "todocoop_dev"
