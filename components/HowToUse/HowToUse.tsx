@@ -1,11 +1,15 @@
-import fs from 'fs'
-import matter from 'gray-matter'
-import { MDXRemote } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
-import dynamic from 'next/dynamic'
-import Head from 'next/head'
-import path from 'path'
-import { Layout } from '../Layout'
+import { Box } from '@chakra-ui/layout';
+import { MDXRemote } from 'next-mdx-remote';
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
+import { ComponentProps } from 'react';
+
+type MDXRemoteProps = ComponentProps<typeof MDXRemote>;
+
+interface HowToUseFrontmatter {
+  title: string;
+  description: string;
+}
 
 // Custom components/renderers to pass to MDX.
 // Since the MDX files aren't loaded by webpack, they have no knowledge of how
@@ -16,21 +20,28 @@ const components = {
   // useful for conditionally loading components for certain routes.
   // See the notes in README.md for more details.
   // TestComponent: dynamic(() => import('../../components/TestComponent')),
-  Head,
-}
+  Head
+};
 
-export function HowToUse({ source, frontMatter }) {
+export function HowToUse({
+  source,
+  frontMatter
+}: {
+  source: MDXRemoteProps;
+  frontMatter: HowToUseFrontmatter;
+}) {
   return (
-    <Layout isLoggedInToARoom={false} isFetching={false} title="How to Use">
-      <div className="post-header">
-        <h1>{frontMatter.title}</h1>
-        {frontMatter.description && (
-          <p className="description">{frontMatter.description}</p>
-        )}
-      </div>
-      <main>
+    <>
+      <Box px={3} py={2} component="article">
+        <div className="post-header">
+          <h1>{frontMatter.title}</h1>
+          {frontMatter.description && (
+            <p className="description">{frontMatter.description}</p>
+          )}
+        </div>
+
         <MDXRemote {...source} components={components} />
-      </main>
+      </Box>
 
       <style jsx>{`
         .post-header h1 {
@@ -44,6 +55,6 @@ export function HowToUse({ source, frontMatter }) {
           opacity: 0.6;
         }
       `}</style>
-    </Layout>
-  )
+    </>
+  );
 }
