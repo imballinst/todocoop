@@ -7,7 +7,7 @@
   "author": "Try Ajitiono <ballinst@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next-remote-watch ./components/docs",
     "build": "next build",
     "start": "next start",
     "test": "jest lib",
@@ -42,6 +42,7 @@
     "@types/node": "15.0.2",
     "@types/react": "17.0.5",
     "jest": "27.0.5",
+    "next-remote-watch": "1.0.0",
     "ts-node": "10.0.0",
     "typescript": "4.2.4"
   }
