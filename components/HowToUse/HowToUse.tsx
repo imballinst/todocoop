@@ -1,8 +1,9 @@
+import { useColorMode, useColorModeValue } from '@chakra-ui/color-mode';
 import { Box } from '@chakra-ui/layout';
 import { MDXRemote } from 'next-mdx-remote';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
-import { ComponentProps } from 'react';
+import { ComponentProps, ReactNode } from 'react';
 
 type MDXRemoteProps = ComponentProps<typeof MDXRemote>;
 
@@ -19,7 +20,10 @@ const components = {
   // It also works with dynamically-imported components, which is especially
   // useful for conditionally loading components for certain routes.
   // See the notes in README.md for more details.
-  // TestComponent: dynamic(() => import('../../components/TestComponent')),
+  HowToUseRoomAccess: dynamic(
+    () => import('../docs/mdx-components/how-to-use')
+  ),
+  Demo,
   Head
 };
 
@@ -30,15 +34,19 @@ export function HowToUse({
   source: MDXRemoteProps;
   frontMatter: HowToUseFrontmatter;
 }) {
+  const hasFrontmatter = Object.keys(frontMatter).length > 0;
+
   return (
     <>
       <Box px={3} py={2} component="article">
-        <div className="post-header">
-          <h1>{frontMatter.title}</h1>
-          {frontMatter.description && (
-            <p className="description">{frontMatter.description}</p>
-          )}
-        </div>
+        {hasFrontmatter && (
+          <div className="post-header">
+            <h1>{frontMatter.title}</h1>
+            {frontMatter.description && (
+              <p className="description">{frontMatter.description}</p>
+            )}
+          </div>
+        )}
 
         <MDXRemote {...source} components={components} />
       </Box>
@@ -56,5 +64,22 @@ export function HowToUse({
         }
       `}</style>
     </>
+  );
+}
+
+// Components.
+function Demo({ children }: { children: ReactNode }) {
+  const borderColor = useColorModeValue('gray.800', 'gray.600');
+
+  return (
+    <Box
+      my={4}
+      borderColor={borderColor}
+      borderWidth={1}
+      borderStyle="dotted"
+      rounded="md"
+    >
+      {children}
+    </Box>
   );
 }

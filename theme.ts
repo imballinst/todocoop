@@ -1,35 +1,43 @@
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme, withDefaultColorScheme } from '@chakra-ui/react';
 
-export const appTheme = extendTheme({
-  fonts: {
-    heading: 'Montserrat'
-    // body: 'Montserrat'
-  },
-  config: {
-    initialColorMode: 'light',
-    useSystemColorMode: false
-  },
-  components: {
-    FormLabel: {
-      baseStyle: {
-        marginBottom: 'var(--chakra-space-1)',
-        fontSize: 'var(--chakra-fontSizes-sm)',
-        fontWeight: 'var(--chakra-fontWeights-bold)'
-      }
+import customInputTheme from './theme/input';
+
+export const appTheme = extendTheme(
+  withDefaultColorScheme({ colorScheme: 'teal' }),
+  {
+    fonts: {
+      heading: 'Montserrat'
+      // body: 'Montserrat'
     },
-    Form: {
-      baseStyle: {
-        helperText: {
-          marginTop: 'var(--chakra-space-1)'
-        }
-      }
+    config: {
+      initialColorMode: 'light',
+      useSystemColorMode: false
     },
-    FormError: {
-      baseStyle: {
-        text: {
-          marginTop: 'var(--chakra-space-1)'
+    components: {
+      FormLabel: {
+        baseStyle: {
+          marginBottom: 'var(--chakra-space-1)',
+          fontSize: 'var(--chakra-fontSizes-sm)',
+          fontWeight: 'var(--chakra-fontWeights-bold)'
         }
+      },
+      Form: {
+        baseStyle: {
+          helperText: {
+            marginTop: 'var(--chakra-space-1)'
+          }
+        }
+      },
+      FormError: {
+        baseStyle: {
+          text: {
+            marginTop: 'var(--chakra-space-1)'
+          }
+        }
+      },
+      Input: {
+        ...customInputTheme
       }
     }
   }
-});
+);
