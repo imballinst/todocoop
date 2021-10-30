@@ -1,18 +1,41 @@
-import { mode } from '@chakra-ui/theme-tools';
+import { mode, getColor } from '@chakra-ui/theme-tools';
 import { StyleObjectOrFn } from '@chakra-ui/styled-system';
 
+// Mostly copied from https://github.com/chakra-ui/chakra-ui/blob/main/packages/theme/src/components/input.ts.
 const variantOutline: StyleObjectOrFn = (props) => {
-  const borderColor = mode(`gray.200`, `whiteAlpha.300`)(props);
-  const borderFocusedColor = mode(`teal.200`, `teal.500`)(props);
+  const { theme } = props;
+  const { focusBorderColor: fc, errorBorderColor: ec } = getDefaults(props);
 
   return {
     field: {
       border: '1px solid',
-      borderColor: 'gray.200',
-      boxShadow: 'none',
+      borderColor: mode('gray.200', 'whiteAlpha.300')(props),
+      bg: 'transparent',
+      _hover: {
+        borderColor: mode('gray.300', 'whiteAlpha.400')(props)
+      },
+      _readOnly: {
+        boxShadow: 'none !important',
+        userSelect: 'all'
+      },
+      _disabled: {
+        opacity: 0.4,
+        cursor: 'not-allowed'
+      },
+      _invalid: {
+        borderColor: getColor(theme, ec),
+        boxShadow: `0 0 0 1px ${getColor(theme, ec)}`
+      },
       _focus: {
-        borderColor: borderFocusedColor
+        zIndex: 1,
+        borderColor: getColor(theme, fc),
+        boxShadow: `0 0 0 1px ${getColor(theme, fc)}`
       }
+    },
+    addon: {
+      border: '1px solid',
+      borderColor: mode('inherit', 'whiteAlpha.50')(props),
+      bg: mode('gray.100', 'whiteAlpha.300')(props)
     }
   };
 };
@@ -32,3 +55,11 @@ const customInputTheme = {
 };
 
 export default customInputTheme;
+
+function getDefaults(props: Record<string, any>) {
+  const { focusBorderColor: fc, errorBorderColor: ec } = props;
+  return {
+    focusBorderColor: fc || mode('teal.500', 'teal.300')(props),
+    errorBorderColor: ec || mode('red.500', 'red.300')(props)
+  };
+}

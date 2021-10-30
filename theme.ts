@@ -3,7 +3,6 @@ import { extendTheme, withDefaultColorScheme } from '@chakra-ui/react';
 import customInputTheme from './theme/input';
 
 export const appTheme = extendTheme(
-  withDefaultColorScheme({ colorScheme: 'teal' }),
   {
     fonts: {
       heading: 'Montserrat'
@@ -39,5 +38,6 @@ export const appTheme = extendTheme(
         ...customInputTheme
       }
     }
-  }
+  },
+  withDefaultColorScheme({ colorScheme: 'teal' })
 );
