@@ -37,9 +37,11 @@ import { useQueryClient } from 'react-query';
 interface Props {
   currentTodos: BaseTodo[];
   room: BaseRoom;
+  // For demo purposes.
+  onLeaveRoom?: () => void;
 }
 
-export function ActionsMenu({ currentTodos, room }: Props) {
+export function ActionsMenu({ currentTodos, room, onLeaveRoom: onLeaveRoomProp }: Props) {
   const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
@@ -74,6 +76,8 @@ export function ActionsMenu({ currentTodos, room }: Props) {
     }
   }
 
+  const onLeaveRoomClick = onLeaveRoomProp || onLeaveRoom
+
   return (
     <>
       <Menu>
@@ -94,7 +98,7 @@ export function ActionsMenu({ currentTodos, room }: Props) {
           <MenuItem onClick={onCopyToClipboard}>
             Copy list to clipboard
           </MenuItem>
-          <MenuItem onClick={onLeaveRoom}>Leave room</MenuItem>
+          <MenuItem onClick={onLeaveRoomClick}>Leave room</MenuItem>
         </MenuList>
       </Menu>
 

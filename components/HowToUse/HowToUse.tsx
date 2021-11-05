@@ -21,7 +21,10 @@ const components = {
   // useful for conditionally loading components for certain routes.
   // See the notes in README.md for more details.
   HowToUseRoomAccess: dynamic(
-    () => import('../docs/mdx-components/how-to-use')
+    () => import('../docs/mdx-components/how-to-use').then(all => all.HowToUseRoomAccess)
+  ),
+  HowToUseHelpMenu: dynamic(
+    () => import('../docs/mdx-components/how-to-use').then(all => all.HowToUseHelpMenu)
   ),
   Demo,
   Head

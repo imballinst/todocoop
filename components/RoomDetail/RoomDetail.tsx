@@ -5,7 +5,7 @@ import {
   FormControl,
   FormLabel
 } from '@chakra-ui/form-control';
-import { Box, Flex, Heading, HStack } from '@chakra-ui/layout';
+import { Box, Flex, Heading } from '@chakra-ui/layout';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { Button } from '@chakra-ui/button';
 import { Table, Tbody, Tr } from '@chakra-ui/table';
@@ -32,7 +32,7 @@ import { createTodos } from '../../query/rooms';
 import { Dictionary } from '../../types';
 import { TodoForm } from './TodoForm';
 import { ActionsMenu } from './ActionsMenu';
-import { HelpMenu } from './HelpMenu';
+import { AddTodoButtons } from './AddTodoButtons';
 
 interface RoomProps {
   room: BaseRoom;
@@ -138,7 +138,6 @@ export function RoomDetail({ room }: RoomProps) {
             {name}
           </Heading>
           <div>
-            <HelpMenu />
             <ActionsMenu room={room} currentTodos={currentTodos} />
           </div>
         </Flex>
@@ -161,27 +160,19 @@ export function RoomDetail({ room }: RoomProps) {
             </Tbody>
           </Table>
 
-          <HStack spacing={2} direction="row" mt={3} ml={3}>
-            <Button
-              colorScheme="teal"
-              onClick={() =>
-                setCurrentTodos((oldTodos) =>
-                  oldTodos.concat({
-                    localId: generateHash(),
-                    isPersisted: false,
-                    isChecked: false,
-                    title: ''
-                  })
-                )
-              }
-            >
-              Add New...
-            </Button>
-
-            <Button colorScheme="teal" onClick={onOpenBulkAddModal}>
-              Add Bulk from List...
-            </Button>
-          </HStack>
+          <AddTodoButtons
+            onSingleAdd={() =>
+              setCurrentTodos((oldTodos) =>
+                oldTodos.concat({
+                  localId: generateHash(),
+                  isPersisted: false,
+                  isChecked: false,
+                  title: ''
+                })
+              )
+            }
+            onBulkAdd={onOpenBulkAddModal}
+          />
         </Box>
       </form>
 

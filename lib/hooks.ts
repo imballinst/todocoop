@@ -131,11 +131,17 @@ export function useMutateRoom<R, T>(
 }
 
 // Source: https://react-query.tanstack.com/examples/optimistic-updates-typescript.
-export function useRoomMutations() {
+export function useRoomMutations(
+  { onCreateTodo, onUpdateTodo, onDeleteTodo } = {
+    onCreateTodo: createTodo,
+    onUpdateTodo: updateTodo,
+    onDeleteTodo: deleteTodo
+  }
+) {
   const queryClient = useQueryClient();
 
   const addTodoMutation = useMutateRoom(
-    createTodo,
+    onCreateTodo,
     async ({ todo: newTodo }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('room');
@@ -164,7 +170,7 @@ export function useRoomMutations() {
   );
 
   const updateTodoMutation = useMutateRoom(
-    updateTodo,
+    onUpdateTodo,
     async ({ todo: updatedTodo }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('room');
@@ -192,7 +198,7 @@ export function useRoomMutations() {
     }
   );
 
-  const deleteTodoMutation = useMutateRoom(deleteTodo, async ({ todoId }) => {
+  const deleteTodoMutation = useMutateRoom(onDeleteTodo, async ({ todoId }) => {
     // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
     await queryClient.cancelQueries('room');
 
