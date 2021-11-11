@@ -160,19 +160,21 @@ export function RoomDetail({ room }: RoomProps) {
             </Tbody>
           </Table>
 
-          <AddTodoButtons
-            onSingleAdd={() =>
-              setCurrentTodos((oldTodos) =>
-                oldTodos.concat({
-                  localId: generateHash(),
-                  isPersisted: false,
-                  isChecked: false,
-                  title: ''
-                })
-              )
-            }
-            onBulkAdd={onOpenBulkAddModal}
-          />
+          <Box mt={3} ml={3}>
+            <AddTodoButtons
+              onSingleAdd={() =>
+                setCurrentTodos((oldTodos) =>
+                  oldTodos.concat({
+                    localId: generateHash(),
+                    isPersisted: false,
+                    isChecked: false,
+                    title: ''
+                  })
+                )
+              }
+              onBulkAdd={onOpenBulkAddModal}
+            />
+          </Box>
         </Box>
       </form>
 

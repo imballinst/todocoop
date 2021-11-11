@@ -41,7 +41,11 @@ interface Props {
   onLeaveRoom?: () => void;
 }
 
-export function ActionsMenu({ currentTodos, room, onLeaveRoom: onLeaveRoomProp }: Props) {
+export function ActionsMenu({
+  currentTodos,
+  room,
+  onLeaveRoom: onLeaveRoomProp
+}: Props) {
   const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
@@ -76,23 +80,26 @@ export function ActionsMenu({ currentTodos, room, onLeaveRoom: onLeaveRoomProp }
     }
   }
 
-  const onLeaveRoomClick = onLeaveRoomProp || onLeaveRoom
+  const onLeaveRoomClick = onLeaveRoomProp || onLeaveRoom;
 
   return (
     <>
       <Menu>
-        {isLargerThan768 ? (
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            Actions
-          </MenuButton>
-        ) : (
-          <MenuButton
-            as={IconButton}
-            aria-label="Actions"
-            icon={<MdMoreVert />}
-            variant="ghost"
-          />
-        )}
+        <MenuButton
+          as={Button}
+          rightIcon={<ChevronDownIcon />}
+          display={{ sm: 'none', md: 'flex' }}
+        >
+          Actions
+        </MenuButton>
+        <MenuButton
+          as={IconButton}
+          aria-label="Actions"
+          icon={<MdMoreVert />}
+          variant="ghost"
+          display={{ sm: 'flex', md: 'none' }}
+        />
+
         <MenuList>
           <MenuItem onClick={onOpen}>Room information</MenuItem>
           <MenuItem onClick={onCopyToClipboard}>

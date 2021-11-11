@@ -76,5 +76,11 @@ export function HowToUseEditTodo() {
 }
 
 export function HowToUseActionsMenu() {
-  return <ActionsMenu room={ROOM_OBJECT} currentTodos={ROOM_OBJECT.todos} />;
+  return (
+    <ActionsMenu
+      room={ROOM_OBJECT}
+      currentTodos={ROOM_OBJECT.todos}
+      onLeaveRoom={stubFn}
+    />
+  );
 }

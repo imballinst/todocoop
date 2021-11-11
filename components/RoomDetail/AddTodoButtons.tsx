@@ -9,7 +9,7 @@ export function AddTodoButtons({
   onBulkAdd: () => void;
 }) {
   return (
-    <HStack spacing={2} direction="row" mt={3} ml={3}>
+    <HStack spacing={2} direction="row">
       <Button colorScheme="teal" onClick={onSingleAdd}>
         Add New...
       </Button>

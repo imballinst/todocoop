@@ -15,7 +15,9 @@ This form is used to access an existing room (whether it is created by you or ot
 The same form will also be shown when you choose "Create room", but instead of accessing
 an existing room, it will create a new room (if the same room name doesn't exist yet).
 
-<!-- Show tip regarding room that's not updated for 1 day will be deleted. -->
+<Tip>
+  When there is no activity in a room for 1 day, the room will be deleted.
+</Tip>
 
 After getting through either form, you will be redirected to a new page. This new page has
 some important elements, which will be explained in the sections below.
@@ -24,14 +26,18 @@ some important elements, which will be explained in the sections below.
 
 To add a single todo or multiple todos, you can use the 2 buttons below:
 
-<!-- Show "Add todo" and "Add bulk todo list" buttons. -->
+<Demo>
+  <HowToUseAddTodoButtons />
+</Demo>
 
 When the "Add todo" button is clicked, it will add a single todo. You can then update the checked status
 as well as the todo text. If you want to cancel the creation, you can click on the "Cancel" button
 (the one with the "x" icon). If you want to submit the todo, you can click on the "Submit" button (the one
 with the checklist icon).
 
-<!-- Add admonition suggestion regarding to not store sensitive todos, such as password, emails, etc. -->
+<Warning>
+  It is not recommended to store sensitive information in the to-do list.
+</Warning>
 
 To check or uncheck a todo, you can click on the checkbox. Alternatively, you can also click on the text instead.
 This is intended because sometimes the checkbox can be hard to click or tap (in smaller devices).
@@ -43,14 +49,18 @@ you can click on the "Submit" button (the one with the checklist icon).
 
 Lastly, if you want to delete a todo, you can click on the "Delete" button (the one with the bin icon).
 
-<!-- Show admonition warning that this will delete entirely the todo without any warning to fasten the deletion process. -->
+<Warning>
+  When you click the "Delete" button, it will delete the button at once (without
+  confirmation). As such, it is recommended to be careful when you want to
+  delete a todo.
+</Warning>
 
 To add multiple todos, click the "Add bulk todos". This will open a modal with a big text input, which you can use
 to input multiple todos. To input multiple todos, you can simply create a list, such as:
 
 ```
 Sample input todo 1
-Sample input todo 2this will open a modal with the room name and password, which you can use to share them to others.
+Sample input todo 2
 Sample input todo 3
 
 - Sample input todo 1
@@ -78,7 +88,9 @@ All of these variations above will result in new unchecked todos. If you want to
 
 The actions menu is located on the top-right of the section, which looks like this:
 
-<!-- Show the Actions menu demo. -->
+<Demo>
+  <HowToUseActionsMenu />
+</Demo>
 
 It has 3 menu items:
 
