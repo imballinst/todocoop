@@ -1,16 +1,9 @@
-import { ComponentProps, ReactNode } from 'react';
-import { useColorMode, useColorModeValue } from '@chakra-ui/color-mode';
+import { useColorModeValue } from '@chakra-ui/color-mode';
 import { Box, BoxProps } from '@chakra-ui/layout';
-import { MDXRemote } from 'next-mdx-remote';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 
-type MDXRemoteProps = ComponentProps<typeof MDXRemote>;
-
-interface HowToUseFrontmatter {
-  title: string;
-  description: string;
-}
+import HowToUseMdx from '../docs/how-to-use.mdx';
 
 const Heading2 = (props) => <Box as="h2" {...props} fontSize="1.5rem" my={4} />;
 const Paragraph = (props) => <Box as="p" {...props} mb={2} />;
@@ -60,43 +53,11 @@ const components = {
   )
 };
 
-export function HowToUse({
-  source,
-  frontMatter
-}: {
-  source: MDXRemoteProps;
-  frontMatter: HowToUseFrontmatter;
-}) {
-  const hasFrontmatter = Object.keys(frontMatter).length > 0;
-
+export function HowToUse() {
   return (
-    <>
-      <Box px={3} py={2} component="article">
-        {hasFrontmatter && (
-          <div className="post-header">
-            <h1>{frontMatter.title}</h1>
-            {frontMatter.description && (
-              <p className="description">{frontMatter.description}</p>
-            )}
-          </div>
-        )}
-
-        <MDXRemote {...source} components={components} />
-      </Box>
-
-      <style jsx>{`
-        .post-header h1 {
-          margin-bottom: 0;
-        }
-
-        .post-header {
-          margin-bottom: 2rem;
-        }
-        .description {
-          opacity: 0.6;
-        }
-      `}</style>
-    </>
+    <Box px={3} py={2} component="article">
+      <HowToUseMdx components={components} />
+    </Box>
   );
 }
 
