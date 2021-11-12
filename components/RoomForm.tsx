@@ -115,13 +115,7 @@ export function RoomForm({
           </FormControl>
         </VStack>
 
-        <Button
-          mt={2}
-          isFullWidth
-          type="submit"
-          colorScheme="blue"
-          isDisabled={isSubmitting}
-        >
+        <Button mt={2} isFullWidth type="submit" isDisabled={isSubmitting}>
           {isSubmitting ? loadingButtonTitle : title}
         </Button>
       </Box>

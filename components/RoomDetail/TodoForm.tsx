@@ -33,100 +33,101 @@ import { Dictionary } from '../../types';
 import { BaseTodo } from '../../types/models';
 
 export const TodoForm = memo(
-  ({
-    roomName,
-    todo,
-    index,
-    localIdToEditedListElementMap,
-    setCurrentTodos
-  }: {
+  (props: {
     roomName: string;
     todo: BaseTodo;
     index: number;
     localIdToEditedListElementMap: MutableRefObject<Dictionary<BaseTodo>>;
     setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
   }) => {
-    const {
-      control,
-      formState: { errors },
-      reset
-    } = useForm({
-      defaultValues: todo
-    });
+    const hooks = useRoomMutations();
 
-    const {
-      isPersisted,
-      _id: todoId,
-      localId,
-      title,
-      isChecked
-    } = useWatch({ control });
+    return <TodoFormRaw {...props} {...hooks} />;
+  }
+);
 
-    const { addTodoMutation, updateTodoMutation, deleteTodoMutation } =
-      useRoomMutations();
+type UseRoomMutationType = ReturnType<typeof useRoomMutations>;
 
-    const [isEditing, setIsEditing] = useState(!isPersisted);
-    const previousValue = useRef<BaseTodo>(todo);
+export function TodoFormRaw({
+  roomName,
+  todo,
+  index,
+  localIdToEditedListElementMap,
+  setCurrentTodos,
+  addTodoMutation,
+  updateTodoMutation,
+  deleteTodoMutation
+}: {
+  roomName: string;
+  todo: BaseTodo;
+  index: number;
+  localIdToEditedListElementMap: MutableRefObject<Dictionary<BaseTodo>>;
+  setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
+  // These are from `useRoomMutations`.
+  addTodoMutation: UseRoomMutationType['addTodoMutation'];
+  updateTodoMutation: UseRoomMutationType['updateTodoMutation'];
+  deleteTodoMutation: UseRoomMutationType['deleteTodoMutation'];
+}) {
+  const {
+    control,
+    formState: { errors },
+    reset
+  } = useForm({
+    defaultValues: todo
+  });
 
-    useEffect(() => {
-      if (!isEditing) {
-        previousValue.current = todo;
-        reset(todo);
-      }
-    }, [isEditing, todo, reset]);
+  const {
+    isPersisted,
+    _id: todoId,
+    localId,
+    title,
+    isChecked
+  } = useWatch({ control });
 
-    useEffect(() => {
-      if (isEditing) {
-        localIdToEditedListElementMap.current[localId] = {
-          isPersisted,
-          _id: todoId,
-          localId,
-          title,
-          isChecked
-        };
-      }
-    }, [
-      localIdToEditedListElementMap,
-      localId,
-      isEditing,
-      isPersisted,
-      todoId,
-      isChecked,
-      title
-    ]);
+  const [isEditing, setIsEditing] = useState(!isPersisted);
+  const previousValue = useRef<BaseTodo>(todo);
 
-    function onSave() {
-      // Finish save happens when the text field is blurred, or when
-      // the checkbox tick is changed.
-      if (!isPersisted) {
-        addTodoMutation.mutate({
-          name: roomName,
-          todo: {
-            title,
-            localId,
-            isChecked,
-            isPersisted: true
-          }
-        });
-      } else {
-        updateTodoMutation.mutate({
-          name: roomName,
-          todo: {
-            _id: todoId,
-            localId,
-            isPersisted: true,
-            title,
-            isChecked
-          }
-        });
-      }
-
+  useEffect(() => {
+    if (!isEditing) {
       previousValue.current = todo;
-      setIsEditing(false);
+      reset(todo);
     }
+  }, [isEditing, todo, reset]);
 
-    function onChangeTick(e: ChangeEvent<HTMLInputElement>) {
-      previousValue.current = todo;
+  useEffect(() => {
+    if (isEditing) {
+      localIdToEditedListElementMap.current[localId] = {
+        isPersisted,
+        _id: todoId,
+        localId,
+        title,
+        isChecked
+      };
+    }
+  }, [
+    localIdToEditedListElementMap,
+    localId,
+    isEditing,
+    isPersisted,
+    todoId,
+    isChecked,
+    title
+  ]);
+
+  function onSave() {
+    // Finish save happens when the text field is blurred, or when
+    // the checkbox tick is changed.
+    if (!isPersisted) {
+      addTodoMutation.mutate({
+        name: roomName,
+        todo: {
+          title,
+          localId,
+          isChecked,
+          isPersisted: true
+        }
+      });
+    } else {
       updateTodoMutation.mutate({
         name: roomName,
         todo: {
@@ -134,132 +135,149 @@ export const TodoForm = memo(
           localId,
           isPersisted: true,
           title,
-          isChecked: e.target.checked
+          isChecked
         }
       });
     }
 
-    function onDelete() {
-      deleteTodoMutation.mutate({ name: roomName, todoId: todo._id });
-    }
+    previousValue.current = todo;
+    setIsEditing(false);
+  }
 
-    return isEditing ? (
-      <>
-        <TableColumn colSpan={2}>
-          <Box display="flex">
-            <Controller
-              render={({ field }) => (
-                <Checkbox
-                  name={field.name}
-                  onBlur={field.onBlur}
-                  onChange={field.onChange}
-                  isChecked={field.value}
-                  ref={field.ref}
-                />
-              )}
-              name="isChecked"
-              control={control}
-            />
+  function onChangeTick(e: ChangeEvent<HTMLInputElement>) {
+    previousValue.current = todo;
+    updateTodoMutation.mutate({
+      name: roomName,
+      todo: {
+        _id: todoId,
+        localId,
+        isPersisted: true,
+        title,
+        isChecked: e.target.checked
+      }
+    });
+  }
 
-            <FormControl ml={2}>
-              <Controller
-                render={({ field }) => <Input {...field} />}
-                name="title"
-                control={control}
-              />
+  function onDelete() {
+    deleteTodoMutation.mutate({ name: roomName, todoId: todo._id });
+  }
 
-              {errors[index]?.title && (
-                <FormHelperText>{errors[index]?.title}</FormHelperText>
-              )}
-            </FormControl>
-          </Box>
-        </TableColumn>
-
-        <TableColumn width={1}>
-          <HStack spacing={2} direction="row" justifyContent="flex-end">
-            <IconButton
-              minWidth="var(--chakra-sizes-6)"
-              height="var(--chakra-sizes-6)"
-              variant="ghost"
-              colorScheme="teal"
-              onClick={() => {
-                localIdToEditedListElementMap.current[localId] = undefined;
-
-                if (todo.isPersisted) {
-                  setIsEditing(false);
-                } else {
-                  setCurrentTodos((oldState) => {
-                    const idxToDelete = oldState.findIndex(
-                      (el) => el.localId === todo.localId
-                    );
-                    return replaceArrayElementAtIndex(oldState, idxToDelete);
-                  });
-                }
-              }}
-              aria-label="Cancel"
-              icon={<SmallCloseIcon />}
-            />
-            <IconButton
-              minWidth="var(--chakra-sizes-6)"
-              height="var(--chakra-sizes-6)"
-              variant="ghost"
-              colorScheme="teal"
-              onClick={onSave}
-              aria-label="Save"
-              icon={<CheckIcon />}
-            />
-          </HStack>
-        </TableColumn>
-      </>
-    ) : (
-      <>
-        <TableColumn colSpan={2}>
+  return isEditing ? (
+    <>
+      <TableColumn colSpan={2}>
+        <Box display="flex">
           <Controller
             render={({ field }) => (
               <Checkbox
                 name={field.name}
                 onBlur={field.onBlur}
+                onChange={field.onChange}
                 isChecked={field.value}
                 ref={field.ref}
-                onChange={(e) => {
-                  field.onChange(e);
-                  onChangeTick(e);
-                }}
-                colorScheme="teal"
-              >
-                {todo.title || title}
-              </Checkbox>
+              />
             )}
             name="isChecked"
             control={control}
           />
-        </TableColumn>
-        <TableColumn width={1}>
-          <HStack spacing={2} direction="row" justifyContent="flex-end">
-            <IconButton
-              minWidth="var(--chakra-sizes-6)"
-              height="var(--chakra-sizes-6)"
-              variant="ghost"
-              colorScheme="teal"
-              onClick={() => setIsEditing(true)}
-              aria-label="Edit"
-              icon={<EditIcon />}
+
+          <FormControl ml={2}>
+            <Controller
+              render={({ field }) => <Input {...field} />}
+              name="title"
+              control={control}
             />
-            <IconButton
-              minWidth="var(--chakra-sizes-6)"
-              height="var(--chakra-sizes-6)"
-              variant="ghost"
+
+            {errors[index]?.title && (
+              <FormHelperText>{errors[index]?.title}</FormHelperText>
+            )}
+          </FormControl>
+        </Box>
+      </TableColumn>
+
+      <TableColumn width={1}>
+        <HStack spacing={2} direction="row" justifyContent="flex-end">
+          <IconButton
+            minWidth="var(--chakra-sizes-6)"
+            height="var(--chakra-sizes-6)"
+            variant="ghost"
+            colorScheme="teal"
+            onClick={() => {
+              localIdToEditedListElementMap.current[localId] = undefined;
+
+              if (todo.isPersisted) {
+                setIsEditing(false);
+              } else {
+                setCurrentTodos((oldState) => {
+                  const idxToDelete = oldState.findIndex(
+                    (el) => el.localId === todo.localId
+                  );
+                  return replaceArrayElementAtIndex(oldState, idxToDelete);
+                });
+              }
+            }}
+            aria-label="Cancel"
+            icon={<SmallCloseIcon />}
+          />
+          <IconButton
+            minWidth="var(--chakra-sizes-6)"
+            height="var(--chakra-sizes-6)"
+            variant="ghost"
+            colorScheme="teal"
+            onClick={onSave}
+            aria-label="Save"
+            icon={<CheckIcon />}
+          />
+        </HStack>
+      </TableColumn>
+    </>
+  ) : (
+    <>
+      <TableColumn colSpan={2}>
+        <Controller
+          render={({ field }) => (
+            <Checkbox
+              name={field.name}
+              onBlur={field.onBlur}
+              isChecked={field.value}
+              ref={field.ref}
+              onChange={(e) => {
+                field.onChange(e);
+                onChangeTick(e);
+              }}
               colorScheme="teal"
-              onClick={onDelete}
-              aria-label="Edit"
-              icon={<DeleteIcon />}
-            />
-          </HStack>
-        </TableColumn>
-      </>
-    );
-  }
-);
+            >
+              {todo.title || title}
+            </Checkbox>
+          )}
+          name="isChecked"
+          control={control}
+        />
+      </TableColumn>
+      <TableColumn width={1}>
+        <HStack spacing={2} direction="row" justifyContent="flex-end">
+          <IconButton
+            minWidth="var(--chakra-sizes-6)"
+            height="var(--chakra-sizes-6)"
+            variant="ghost"
+            colorScheme="teal"
+            onClick={() => setIsEditing(true)}
+            aria-label="Edit"
+            icon={<EditIcon />}
+          />
+          <IconButton
+            minWidth="var(--chakra-sizes-6)"
+            height="var(--chakra-sizes-6)"
+            variant="ghost"
+            colorScheme="teal"
+            onClick={onDelete}
+            aria-label="Edit"
+            icon={<DeleteIcon />}
+          />
+        </HStack>
+      </TableColumn>
+    </>
+  );
+}
 
 function TableColumn(props: { children: ReactNode } & TableCellProps) {
   return <Td {...props} paddingInline={3} py={2} />;
