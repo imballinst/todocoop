@@ -137,9 +137,9 @@ export function RoomDetail({ room }: RoomProps) {
           >
             {name}
           </Heading>
-          <div>
+          <Box position="relative">
             <ActionsMenu room={room} currentTodos={currentTodos} />
-          </div>
+          </Box>
         </Flex>
         <Box mt={4}>
           <Table variant="simple" width="100%">

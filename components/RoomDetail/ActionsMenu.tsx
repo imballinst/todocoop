@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   Textarea,
@@ -41,6 +41,20 @@ interface Props {
   onLeaveRoom?: () => void;
 }
 
+const MENU_BUTTON_MD = (
+  <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+    Actions
+  </MenuButton>
+);
+const MENU_BUTTON_SM = (
+  <MenuButton
+    as={IconButton}
+    aria-label="Actions"
+    icon={<MdMoreVert />}
+    variant="ghost"
+  />
+);
+
 export function ActionsMenu({
   currentTodos,
   room,
@@ -50,6 +64,14 @@ export function ActionsMenu({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [isLargerThan768] = useMediaQuery(['(min-width: 768px)']);
+
+  // Need to store the button in a state, because otherwise there will be styling
+  // mismatch(es). Read more about it here: https://github.com/vercel/next.js/discussions/17443#discussioncomment-87097.
+  const [menuButton, setMenuButton] = useState(MENU_BUTTON_MD);
+
+  useEffect(() => {
+    setMenuButton(isLargerThan768 ? MENU_BUTTON_MD : MENU_BUTTON_SM);
+  }, [isLargerThan768]);
 
   async function onCopyToClipboard() {
     const currentTodosText = currentTodos
@@ -85,20 +107,7 @@ export function ActionsMenu({
   return (
     <>
       <Menu>
-        <MenuButton
-          as={Button}
-          rightIcon={<ChevronDownIcon />}
-          display={{ sm: 'none', md: 'flex' }}
-        >
-          Actions
-        </MenuButton>
-        <MenuButton
-          as={IconButton}
-          aria-label="Actions"
-          icon={<MdMoreVert />}
-          variant="ghost"
-          display={{ sm: 'flex', md: 'none' }}
-        />
+        {menuButton}
 
         <MenuList>
           <MenuItem onClick={onOpen}>Room information</MenuItem>

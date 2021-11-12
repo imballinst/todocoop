@@ -7,7 +7,7 @@
   "author": "Try Ajitiono <ballinst@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "next-remote-watch ./components/docs",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "test": "jest lib",
