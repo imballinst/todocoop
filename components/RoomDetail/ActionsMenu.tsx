@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   Textarea,
@@ -37,13 +37,41 @@ import { useQueryClient } from 'react-query';
 interface Props {
   currentTodos: BaseTodo[];
   room: BaseRoom;
+  // For demo purposes.
+  onLeaveRoom?: () => void;
 }
 
-export function ActionsMenu({ currentTodos, room }: Props) {
+const MENU_BUTTON_MD = (
+  <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+    Actions
+  </MenuButton>
+);
+const MENU_BUTTON_SM = (
+  <MenuButton
+    as={IconButton}
+    aria-label="Actions"
+    icon={<MdMoreVert />}
+    variant="ghost"
+  />
+);
+
+export function ActionsMenu({
+  currentTodos,
+  room,
+  onLeaveRoom: onLeaveRoomProp
+}: Props) {
   const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [isLargerThan768] = useMediaQuery(['(min-width: 768px)']);
+
+  // Need to store the button in a state, because otherwise there will be styling
+  // mismatch(es). Read more about it here: https://github.com/vercel/next.js/discussions/17443#discussioncomment-87097.
+  const [menuButton, setMenuButton] = useState(MENU_BUTTON_MD);
+
+  useEffect(() => {
+    setMenuButton(isLargerThan768 ? MENU_BUTTON_MD : MENU_BUTTON_SM);
+  }, [isLargerThan768]);
 
   async function onCopyToClipboard() {
     const currentTodosText = currentTodos
@@ -74,27 +102,19 @@ export function ActionsMenu({ currentTodos, room }: Props) {
     }
   }
 
+  const onLeaveRoomClick = onLeaveRoomProp || onLeaveRoom;
+
   return (
     <>
       <Menu>
-        {isLargerThan768 ? (
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            Actions
-          </MenuButton>
-        ) : (
-          <MenuButton
-            as={IconButton}
-            aria-label="Actions"
-            icon={<MdMoreVert />}
-            variant="ghost"
-          />
-        )}
+        {menuButton}
+
         <MenuList>
           <MenuItem onClick={onOpen}>Room information</MenuItem>
           <MenuItem onClick={onCopyToClipboard}>
             Copy list to clipboard
           </MenuItem>
-          <MenuItem onClick={onLeaveRoom}>Leave room</MenuItem>
+          <MenuItem onClick={onLeaveRoomClick}>Leave room</MenuItem>
         </MenuList>
       </Menu>
 

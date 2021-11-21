@@ -36,7 +36,7 @@ export default function IndexPage() {
               <Button>Access Room</Button>
             </AppLink>
             <AppLink href="/create">
-              <Button colorScheme="gray">Create Room</Button>
+              <Button variant="outline">Create Room</Button>
             </AppLink>
           </VStack>
         </Box>

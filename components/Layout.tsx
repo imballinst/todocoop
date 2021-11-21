@@ -5,7 +5,7 @@ import { useColorModeValue } from '@chakra-ui/react';
 
 import { useColorMode } from '@chakra-ui/color-mode';
 import { IconButton } from '@chakra-ui/button';
-import { Box, Flex } from '@chakra-ui/layout';
+import { Box, Flex, HStack } from '@chakra-ui/layout';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { AppLink } from './AppLink';
@@ -56,9 +56,10 @@ export function Layout({
           px={3}
           py={2}
         >
-          <AppLink href={isAccessingRoom ? '/room' : '/'} fontWeight={700}>
-            Home
-          </AppLink>
+          <HStack spacing={4}>
+            <AppLink href={isAccessingRoom ? '/room' : '/'}>Home</AppLink>
+            <AppLink href="/how-to-use">How to Use</AppLink>
+          </HStack>
           <IconButton
             aria-label={`Toggle ${colorMode === 'light' ? 'Dark' : 'Light'}`}
             variant="ghost"

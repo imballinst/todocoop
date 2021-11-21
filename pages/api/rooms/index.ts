@@ -17,7 +17,7 @@ async function createRoomHandler(
     const room = new RoomModel(req.body);
     const object = await room.save();
 
-    req.session.set('room', object);
+    req.session.set('roomId', object._id);
     await req.session.save();
 
     res.status(200);
