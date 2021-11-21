@@ -207,7 +207,7 @@ export function RoomDetail({ room }: RoomProps) {
               </FormControl>
 
               <Flex flexDirection="row" justifyContent="flex-end">
-                <Button colorScheme="teal" onClick={onCreateBulk} mt={4}>
+                <Button onClick={onCreateBulk} mt={4}>
                   Add Bulk List
                 </Button>
               </Flex>

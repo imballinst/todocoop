@@ -1,10 +1,10 @@
-const subMinutes = require('date-fns/subMinutes');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const fs = require('fs');
-const path = require('path');
+import subMinutes from 'date-fns/subMinutes';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
-const { RoomModel } = require('../models');
+import { RoomModel } from '../models';
 
 const configPath = path.resolve(__dirname, '../.env.development.local');
 if (fs.existsSync(configPath)) {
@@ -27,7 +27,7 @@ if (
   !MONGODB_DB_NAME
 ) {
   throw new Error(
-    'Please define the MONGODB_URI environment variable inside .env.local'
+    'Please define the MONGODB_URI environment variable inside .env.development.local'
   );
 }
 
