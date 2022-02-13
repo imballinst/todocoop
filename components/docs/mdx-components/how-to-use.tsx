@@ -1,9 +1,7 @@
 import { useRef, useState } from 'react';
-import { useRoomMutations } from '../../../lib/ui/hooks';
 import { BaseTodo } from '../../../lib/models/types';
 import { ActionsMenu } from '../../RoomDetail/ActionsMenu';
 import { AddTodoButtons } from '../../RoomDetail/AddTodoButtons';
-import { TodoFormRaw } from '../../RoomDetail/TodoForm';
 import { RoomForm } from '../../RoomForm';
 
 const onSuccessfulAccess = () => {};
@@ -53,25 +51,7 @@ export function HowToUseEditTodo() {
     ROOM_OBJECT.todos
   );
 
-  const { addTodoMutation, deleteTodoMutation, updateTodoMutation } =
-    useRoomMutations({
-      onCreateTodo: async () => ({}),
-      onDeleteTodo: async () => ({}),
-      onUpdateTodo: async () => ({})
-    });
-
-  return (
-    <TodoFormRaw
-      index={0}
-      roomName="test"
-      todo={currentTodos[0]}
-      setCurrentTodos={setCurrentTodos}
-      localIdToEditedListElementMap={localIdToEditedListElementMap}
-      addTodoMutation={addTodoMutation}
-      deleteTodoMutation={deleteTodoMutation}
-      updateTodoMutation={updateTodoMutation}
-    />
-  );
+  return null;
 }
 
 export function HowToUseActionsMenu() {
