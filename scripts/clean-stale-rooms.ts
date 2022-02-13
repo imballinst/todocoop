@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
-import { RoomModel } from '../models';
+import { RoomModel } from '../lib/models';
 
 const configPath = path.resolve(__dirname, '../.env.development.local');
 if (fs.existsSync(configPath)) {

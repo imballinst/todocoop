@@ -9,8 +9,8 @@ import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
 import { useToast } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { getErrorMessage } from '../lib/utils';
-import { createRoom, CreateRoomParameters } from '../query/rooms';
+import { getErrorMessage } from '../lib/ui/utils';
+import { createRoom, CreateRoomParameters } from '../lib/ui/query/rooms';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
   name: '',

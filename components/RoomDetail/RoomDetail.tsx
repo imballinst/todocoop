@@ -25,11 +25,10 @@ import {
   generateHash,
   getErrorMessage,
   parseRawTodoText
-} from '../../lib/utils';
-import { useMutateRoom } from '../../lib/hooks';
-import { BaseTodo, BaseRoom } from '../../types/models';
-import { createTodos } from '../../query/rooms';
-import { Dictionary } from '../../types';
+} from '../../lib/ui/utils';
+import { useMutateRoom } from '../../lib/ui/hooks';
+import { BaseTodo, BaseRoom } from '../../lib/models/types';
+import { createTodos } from '../../lib/ui/query/rooms';
 import { TodoForm } from './TodoForm';
 import { ActionsMenu } from './ActionsMenu';
 import { AddTodoButtons } from './AddTodoButtons';
@@ -52,7 +51,7 @@ export function RoomDetail({ room }: RoomProps) {
   const [resolvedInitialTodos] = useState(resolveExistingTodos(todos));
   const [currentTodos, setCurrentTodos] = useState(resolvedInitialTodos.todos);
 
-  const localIdToEditedListElementMap = useRef<Dictionary<BaseTodo>>({});
+  const localIdToEditedListElementMap = useRef<Record<string, BaseTodo>>({});
   const previousRoomRef = useRef(room);
 
   const [bulkEntries, setBulkEntries] = useState('');
@@ -222,7 +221,7 @@ export function RoomDetail({ room }: RoomProps) {
 // Helper functions/components.
 function resolveExistingTodos(
   apiTodos: BaseTodo[],
-  currentlyEditedTodosDictionary: Dictionary<BaseTodo> = {}
+  currentlyEditedTodosDictionary: Record<string, BaseTodo> = {}
 ) {
   const submittedLocalTodoIds: string[] = [];
   const resultTodo: BaseTodo[] = apiTodos.map((todo) => ({

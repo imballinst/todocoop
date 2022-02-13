@@ -1,9 +1,9 @@
 // Source: https://github.com/vercel/next.js/blob/canary/examples/with-iron-session/lib/session.js.
-import { withIronSession } from 'next-iron-session';
+import { withIronSessionApiRoute } from 'iron-session/next';
 import { NextHandler } from '../types';
 
 export function withSession(handler: NextHandler) {
-  return withIronSession(handler, {
+  return withIronSessionApiRoute(handler, {
     password: process.env.SECRET_COOKIE_PASSWORD,
     cookieName: 'todocoop',
     cookieOptions: {

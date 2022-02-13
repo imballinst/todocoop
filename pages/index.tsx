@@ -1,16 +1,16 @@
-import { Box, Button, Flex, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
 
-import { AppLink } from "../components/AppLink";
-import { Layout } from "../components/Layout";
-import { useCurrentRoom } from "../lib/hooks";
+import { AppLink } from '../components/AppLink';
+import { Layout } from '../components/Layout';
+import { useCurrentRoom } from '../lib/ui/hooks';
 
 export default function IndexPage() {
   const { room, isFetching } = useCurrentRoom({
     queryOptions: {
       refetchIntervalInBackground: false,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: false
     },
-    redirectToIfInsideRoom: "/room",
+    redirectToIfInsideRoom: '/room'
   });
 
   return (
@@ -21,7 +21,7 @@ export default function IndexPage() {
         justifyContent="center"
         height="100%"
       >
-        <Box height="50%" width={{ base: "100%", md: "50%" }}>
+        <Box height="50%" width={{ base: '100%', md: '50%' }}>
           <Flex flexDirection="column" alignItems="center" mb={8}>
             <Heading as="h1" size="xl">
               TodoCoop

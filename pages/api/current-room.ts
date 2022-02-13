@@ -1,14 +1,14 @@
 import { NextApiResponse } from 'next';
 
-import { withDB, withSession } from '../../middlewares';
-import { RoomModel } from '../../models';
-import { ExtendedNextApiRequest } from '../../types';
+import { withDB, withSession } from '../../lib/server/middlewares';
+import { RoomModel } from '../../lib/models';
+import { ExtendedNextApiRequest } from '../../lib/server/types';
 
 async function getCurrentRoomHandler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse
 ) {
-  const roomId = req.session.get('roomId');
+  const roomId = req.session.roomId;
 
   if (roomId) {
     const roomQuery = RoomModel.findOne({

@@ -1,7 +1,10 @@
 import { NextApiResponse } from 'next';
-import { withDB, withSession } from '../../../../middlewares';
-import { Room, RoomModel } from '../../../../models';
-import { ApiResponse, ExtendedNextApiRequest } from '../../../../types';
+import { withDB, withSession } from '../../../../lib/server/middlewares';
+import { Room, RoomModel } from '../../../../lib/models';
+import {
+  ApiResponse,
+  ExtendedNextApiRequest
+} from '../../../../lib/server/types';
 
 async function roomAccessHandler(
   req: ExtendedNextApiRequest,
@@ -24,7 +27,7 @@ async function roomAccessHandler(
       throw new Error('Invalid room information.');
     }
 
-    req.session.set('roomId', object._id);
+    req.session.roomId = object._id;
     await req.session.save();
 
     res.status(200);

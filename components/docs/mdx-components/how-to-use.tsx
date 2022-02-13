@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
-import { useRoomMutations } from '../../../lib/hooks';
-import { Dictionary } from '../../../types';
-import { BaseTodo } from '../../../types/models';
+import { useRoomMutations } from '../../../lib/ui/hooks';
+import { BaseTodo } from '../../../lib/models/types';
 import { ActionsMenu } from '../../RoomDetail/ActionsMenu';
 import { AddTodoButtons } from '../../RoomDetail/AddTodoButtons';
 import { TodoFormRaw } from '../../RoomDetail/TodoForm';
@@ -49,7 +48,7 @@ const ROOM_OBJECT = {
 };
 
 export function HowToUseEditTodo() {
-  const localIdToEditedListElementMap = useRef<Dictionary<BaseTodo>>({});
+  const localIdToEditedListElementMap = useRef<Record<string, BaseTodo>>({});
   const [currentTodos, setCurrentTodos] = useState<BaseTodo[]>(
     ROOM_OBJECT.todos
   );

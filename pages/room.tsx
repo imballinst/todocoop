@@ -1,4 +1,4 @@
-import { useCurrentRoom } from '../lib/hooks';
+import { useCurrentRoom } from '../lib/ui/hooks';
 import { RoomDetail } from '../components/RoomDetail';
 import { Layout } from '../components/Layout';
 import { useClientState } from '../components/contexts/ClientStateContext';

@@ -27,17 +27,16 @@ import {
   Td
 } from '@chakra-ui/react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useRoomMutations } from '../../lib/hooks';
-import { replaceArrayElementAtIndex } from '../../lib/utils';
-import { Dictionary } from '../../types';
-import { BaseTodo } from '../../types/models';
+import { useRoomMutations } from '../../lib/ui/hooks';
+import { replaceArrayElementAtIndex } from '../../lib/ui/utils';
+import { BaseTodo } from '../../lib/models/types';
 
 export const TodoForm = memo(
   (props: {
     roomName: string;
     todo: BaseTodo;
     index: number;
-    localIdToEditedListElementMap: MutableRefObject<Dictionary<BaseTodo>>;
+    localIdToEditedListElementMap: MutableRefObject<Record<string, BaseTodo>>;
     setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
   }) => {
     const hooks = useRoomMutations();
@@ -61,7 +60,7 @@ export function TodoFormRaw({
   roomName: string;
   todo: BaseTodo;
   index: number;
-  localIdToEditedListElementMap: MutableRefObject<Dictionary<BaseTodo>>;
+  localIdToEditedListElementMap: MutableRefObject<Record<string, BaseTodo>>;
   setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
   // These are from `useRoomMutations`.
   addTodoMutation: UseRoomMutationType['addTodoMutation'];

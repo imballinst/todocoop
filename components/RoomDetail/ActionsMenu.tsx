@@ -29,9 +29,9 @@ import {
 } from '@chakra-ui/modal';
 import { MdMoreVert } from 'react-icons/md';
 
-import { copyTextToClipboard, getErrorMessage } from '../../lib/utils';
-import { leaveRoom } from '../../query/rooms';
-import { BaseRoom, BaseTodo } from '../../types/models';
+import { copyTextToClipboard, getErrorMessage } from '../../lib/ui/utils';
+import { leaveRoom } from '../../lib/ui/query/rooms';
+import { BaseRoom, BaseTodo } from '../../lib/models/types';
 import { useQueryClient } from 'react-query';
 
 interface Props {

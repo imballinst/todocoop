@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
-import { withDB, withSession } from '../../../middlewares';
-import { Room, RoomModel } from '../../../models';
-import { ApiResponse, ExtendedNextApiRequest } from '../../../types';
+import { withDB, withSession } from '../../../lib/server/middlewares';
+import { Room, RoomModel } from '../../../lib/models';
+import { ApiResponse, ExtendedNextApiRequest } from '../../../lib/server/types';
 
 async function createRoomHandler(
   req: ExtendedNextApiRequest,
@@ -17,7 +17,7 @@ async function createRoomHandler(
     const room = new RoomModel(req.body);
     const object = await room.save();
 
-    req.session.set('roomId', object._id);
+    req.session.roomId = object._id;
     await req.session.save();
 
     res.status(200);

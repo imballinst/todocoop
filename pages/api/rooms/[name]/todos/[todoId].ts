@@ -1,9 +1,12 @@
 import { NextApiResponse } from 'next';
 
 import { replaceArrayElementAtIndex } from '../../../../../lib/utils';
-import { withDB, withSession } from '../../../../../middlewares';
-import { RoomModel, Todo } from '../../../../../models';
-import { ApiResponse, ExtendedNextApiRequest } from '../../../../../types';
+import { withDB, withSession } from '../../../../../lib/server/middlewares';
+import { RoomModel, Todo } from '../../../../../lib/models';
+import {
+  ApiResponse,
+  ExtendedNextApiRequest
+} from '../../../../../lib/server/types';
 
 async function updateAndDeleteTodoHandler(
   req: ExtendedNextApiRequest,

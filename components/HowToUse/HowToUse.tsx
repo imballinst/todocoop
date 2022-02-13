@@ -55,7 +55,7 @@ const components = {
 
 export function HowToUse() {
   return (
-    <Box px={3} py={2} component="article">
+    <Box px={3} py={2} as="article">
       <HowToUseMdx components={components} />
     </Box>
   );

@@ -9,7 +9,7 @@ import { Box, Flex, HStack } from '@chakra-ui/layout';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { AppLink } from './AppLink';
-import { EFFECTIVE_WIDTHS } from '../lib/constants';
+import { EFFECTIVE_WIDTHS } from '../lib/ui/constants';
 import { useClientState } from './contexts/ClientStateContext';
 
 interface LayoutProps {

@@ -1,6 +1,6 @@
 import { model, Schema, Document, Model, models } from 'mongoose';
 
-import { BaseRoom, BaseTodo } from '../types/models';
+import { BaseRoom, BaseTodo } from './types';
 
 // Todo.
 export interface Todo extends BaseTodo, Document {}

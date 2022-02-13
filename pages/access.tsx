@@ -1,7 +1,7 @@
 import { Layout } from '../components/Layout';
-import { accessRoom } from '../query/rooms';
+import { accessRoom } from '../lib/ui/query/rooms';
 import { RoomForm } from '../components/RoomForm';
-import { useCurrentRoom } from '../lib/hooks';
+import { useCurrentRoom } from '../lib/ui/hooks';
 
 export default function AccessRoom() {
   const { isFetching, room, refetchRoom } = useCurrentRoom({
