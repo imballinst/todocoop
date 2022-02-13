@@ -1,6 +1,7 @@
 import { extendTheme, withDefaultColorScheme } from '@chakra-ui/react';
 
 import customInputTheme from './theme/input';
+import customLinkTheme from './theme/link';
 
 export const appTheme = extendTheme(
   {
@@ -36,6 +37,9 @@ export const appTheme = extendTheme(
       },
       Input: {
         ...customInputTheme
+      },
+      Link: {
+        ...customLinkTheme
       }
     }
   },

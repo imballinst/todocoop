@@ -12,10 +12,6 @@ export default function CreateRoom() {
     redirectToIfInsideRoom: '/room'
   });
 
-  function onSuccessfulAccess() {
-    refetchRoom();
-  }
-
   return (
     <Layout
       isFetching={isFetching}
@@ -24,7 +20,7 @@ export default function CreateRoom() {
     >
       <RoomForm
         request={createRoom}
-        onSuccessfulAccess={onSuccessfulAccess}
+        onSuccessfulAccess={refetchRoom}
         title="Create room"
         loadingButtonTitle="Creating room..."
       />
