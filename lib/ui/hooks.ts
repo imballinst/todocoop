@@ -9,17 +9,19 @@ import {
   useQueryClient,
   UseQueryOptions
 } from 'react-query';
+import { AxiosError } from 'axios';
+import { useToast } from '@chakra-ui/react';
 
 import {
   createTodo,
   deleteTodo,
   getCurrentRoom,
   updateTodo
-} from '../query/rooms';
+} from './query/rooms';
 import { Room } from '../models';
-import { ApiResponse } from '../types';
-import { BaseRoom } from '../types/models';
-import { replaceArrayElementAtIndex } from './utils';
+import { ApiResponse } from '../server/types';
+import { BaseRoom } from '../models/types';
+import { getErrorMessage, replaceArrayElementAtIndex } from '../utils';
 
 interface Params {
   redirectToIfOutsideRoom?: string;
@@ -32,7 +34,7 @@ type PickedUseQueryFields = Pick<
   'refetch' | 'isFetching'
 >;
 
-export type UseCurrentRoomType = {
+type UseCurrentRoomType = {
   room: Room | undefined;
   refetchRoom: PickedUseQueryFields['refetch'];
   isFetching: PickedUseQueryFields['isFetching'];
@@ -50,7 +52,12 @@ export function useCurrentRoom({
   redirectToIfOutsideRoom = '',
   queryOptions
 }: Params = {}): UseCurrentRoomType {
-  const { data: room, refetch: refetchRoom, isFetching, isFetched } = useQuery(
+  const {
+    data: room,
+    refetch: refetchRoom,
+    isFetching,
+    isFetched
+  } = useQuery(
     'room',
     async () => {
       try {
@@ -102,42 +109,55 @@ interface MutateContext {
   previousRoom: BaseRoom;
 }
 
-export function useMutateRoom<R, T>(
-  mutationFn: MutationFunction<ApiResponse<R>, T>,
+export function useMutateRoom<R, T>({
+  mutationFn,
+  onMutate,
+  errorTitle,
+  onSettled
+}: {
+  mutationFn: MutationFunction<ApiResponse<R>, T>;
   onMutate: (
     variables: T
-  ) => Promise<undefined> | MutateContext | Promise<MutateContext>
-) {
+  ) => Promise<undefined> | MutateContext | Promise<MutateContext>;
+  errorTitle: string;
+  onSettled?: () => void;
+}) {
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   return useMutation(mutationFn, {
     onMutate,
     // If the mutation fails, use the context returned from onMutate to roll back.
-    onError: (_err, _variables, context) => {
+    onError: async (err: AxiosError, _variables, context) => {
+      const error = getErrorMessage(err);
+      toast({
+        title: errorTitle,
+        description: error,
+        status: 'error'
+      });
+
       if (context?.previousRoom) {
         queryClient.setQueryData<BaseRoom>('room', context.previousRoom);
       }
     },
     // Always refetch after error or success.
     onSettled: () => {
+      if (onSettled) {
+        onSettled();
+      }
+
       queryClient.invalidateQueries('room');
     }
   });
 }
 
 // Source: https://react-query.tanstack.com/examples/optimistic-updates-typescript.
-export function useRoomMutations(
-  { onCreateTodo, onUpdateTodo, onDeleteTodo } = {
-    onCreateTodo: createTodo,
-    onUpdateTodo: updateTodo,
-    onDeleteTodo: deleteTodo
-  }
-) {
+export function useCreateTodo(mutationFn = createTodo) {
   const queryClient = useQueryClient();
 
-  const addTodoMutation = useMutateRoom(
-    onCreateTodo,
-    async ({ todo: newTodo }) => {
+  return useMutateRoom({
+    mutationFn,
+    onMutate: async ({ todo: newTodo }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('room');
 
@@ -161,12 +181,17 @@ export function useRoomMutations(
       }
 
       return { previousRoom };
-    }
-  );
+    },
+    errorTitle: 'Failed to add todo'
+  });
+}
 
-  const updateTodoMutation = useMutateRoom(
-    onUpdateTodo,
-    async ({ todo: updatedTodo }) => {
+export function useUpdateTodo(mutationFn = updateTodo) {
+  const queryClient = useQueryClient();
+
+  return useMutateRoom({
+    mutationFn,
+    onMutate: async ({ todo: updatedTodo }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('room');
 
@@ -190,32 +215,35 @@ export function useRoomMutations(
       }
 
       return { previousRoom };
-    }
-  );
-
-  const deleteTodoMutation = useMutateRoom(onDeleteTodo, async ({ todoId }) => {
-    // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
-    await queryClient.cancelQueries('room');
-
-    // Snapshot the previous value.
-    const previousRoom = queryClient.getQueryData<BaseRoom>('room');
-
-    // Optimistically update to the new value.
-    if (previousRoom) {
-      const idx = previousRoom.todos.findIndex((el) => el._id === todoId);
-
-      queryClient.setQueryData<BaseRoom>('room', {
-        ...previousRoom,
-        todos: replaceArrayElementAtIndex(previousRoom.todos, idx, undefined)
-      });
-    }
-
-    return { previousRoom };
+    },
+    errorTitle: 'Failed to update todo'
   });
+}
 
-  return {
-    addTodoMutation,
-    updateTodoMutation,
-    deleteTodoMutation
-  };
+export function useDeleteTodo(mutationFn = deleteTodo) {
+  const queryClient = useQueryClient();
+
+  return useMutateRoom({
+    mutationFn,
+    onMutate: async ({ todoId }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
+      await queryClient.cancelQueries('room');
+
+      // Snapshot the previous value.
+      const previousRoom = queryClient.getQueryData<BaseRoom>('room');
+
+      // Optimistically update to the new value.
+      if (previousRoom) {
+        const idx = previousRoom.todos.findIndex((el) => el._id === todoId);
+
+        queryClient.setQueryData<BaseRoom>('room', {
+          ...previousRoom,
+          todos: replaceArrayElementAtIndex(previousRoom.todos, idx, undefined)
+        });
+      }
+
+      return { previousRoom };
+    },
+    errorTitle: 'Failed to delete todo'
+  });
 }

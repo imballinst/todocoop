@@ -5,20 +5,25 @@ import { BaseRoom, BaseTodo } from './types';
 // Todo.
 export interface Todo extends BaseTodo, Document {}
 
-const TodoSchema = new Schema<Todo>({
-  title: {
-    type: String,
-    required: true
+const TodoSchema = new Schema<Todo>(
+  {
+    title: {
+      type: String,
+      required: [true, 'Todo title is required.']
+    },
+    localId: {
+      type: String,
+      required: true
+    },
+    isChecked: {
+      type: Boolean,
+      default: false
+    }
   },
-  localId: {
-    type: String,
-    required: true
-  },
-  isChecked: {
-    type: Boolean,
-    default: false
+  {
+    timestamps: true
   }
-});
+);
 
 // Room.
 export interface Room extends BaseRoom, Document {

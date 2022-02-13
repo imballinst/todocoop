@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
   Text,
-  Textarea,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  Link,
   useToast,
   useMediaQuery
 } from '@chakra-ui/react';
-import {
-  FormHelperText,
-  FormControl,
-  FormLabel
-} from '@chakra-ui/form-control';
-import { Box, Flex } from '@chakra-ui/layout';
-import { ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons';
+import { Box, HStack } from '@chakra-ui/layout';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import { Button, IconButton } from '@chakra-ui/button';
 import { useDisclosure } from '@chakra-ui/hooks';
 import {
@@ -29,7 +22,7 @@ import {
 } from '@chakra-ui/modal';
 import { MdMoreVert } from 'react-icons/md';
 
-import { copyTextToClipboard, getErrorMessage } from '../../lib/ui/utils';
+import { copyTextToClipboard, getErrorMessage } from '../../lib/utils';
 import { leaveRoom } from '../../lib/ui/query/rooms';
 import { BaseRoom, BaseTodo } from '../../lib/models/types';
 import { useQueryClient } from 'react-query';
@@ -73,7 +66,7 @@ export function ActionsMenu({
     setMenuButton(isLargerThan768 ? MENU_BUTTON_MD : MENU_BUTTON_SM);
   }, [isLargerThan768]);
 
-  async function onCopyToClipboard() {
+  async function copyListToClipboard() {
     const currentTodosText = currentTodos
       .map((todo) => `- [${todo.isChecked ? 'x' : ' '}] ${todo.title}`)
       .join('\n');
@@ -87,7 +80,26 @@ export function ActionsMenu({
       console.error(err);
       toast({
         title: 'Failed to copy to clipboard.',
-        description: await getErrorMessage(err),
+        description: getErrorMessage(err),
+        status: 'error'
+      });
+    }
+  }
+
+  async function copyRoomInformationToClipboard() {
+    const currentTodosText = `Room name: ${room.name}\nRoom password: ${room.password}`;
+
+    try {
+      await copyTextToClipboard(currentTodosText);
+      toast({
+        description: 'Copied room information to clipboard.',
+        status: 'success'
+      });
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: 'Failed to copy to clipboard.',
+        description: getErrorMessage(err),
         status: 'error'
       });
     }
@@ -111,7 +123,7 @@ export function ActionsMenu({
 
         <MenuList>
           <MenuItem onClick={onOpen}>Room information</MenuItem>
-          <MenuItem onClick={onCopyToClipboard}>
+          <MenuItem onClick={copyListToClipboard}>
             Copy list to clipboard
           </MenuItem>
           <MenuItem onClick={onLeaveRoomClick}>Leave room</MenuItem>
@@ -136,6 +148,11 @@ export function ActionsMenu({
               </Text>{' '}
               {room.password}
             </Box>
+            <HStack mt={4} display="flex" spacing={2}>
+              <Button variant="solid" onClick={copyRoomInformationToClipboard}>
+                Copy to clipboard
+              </Button>
+            </HStack>
           </ModalBody>
         </ModalContent>
       </Modal>

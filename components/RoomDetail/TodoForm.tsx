@@ -1,7 +1,6 @@
 import {
   ChangeEvent,
   Dispatch,
-  memo,
   MutableRefObject,
   ReactNode,
   SetStateAction,
@@ -27,25 +26,37 @@ import {
   Td
 } from '@chakra-ui/react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useRoomMutations } from '../../lib/ui/hooks';
-import { replaceArrayElementAtIndex } from '../../lib/ui/utils';
+import {
+  useCreateTodo,
+  useDeleteTodo,
+  useUpdateTodo
+} from '../../lib/ui/hooks';
+import { replaceArrayElementAtIndex } from '../../lib/utils';
 import { BaseTodo } from '../../lib/models/types';
+import { createTodo, deleteTodo, updateTodo } from '../../lib/ui/query/rooms';
 
-export const TodoForm = memo(
-  (props: {
-    roomName: string;
-    todo: BaseTodo;
-    index: number;
-    localIdToEditedListElementMap: MutableRefObject<Record<string, BaseTodo>>;
-    setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
-  }) => {
-    const hooks = useRoomMutations();
+interface TodoFormBaseProps {
+  roomName: string;
+  todo: BaseTodo;
+  index: number;
+  localIdToEditedListElementMap: MutableRefObject<Record<string, BaseTodo>>;
+  setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
+}
 
-    return <TodoFormRaw {...props} {...hooks} />;
-  }
-);
+export function TodoForm(props: TodoFormBaseProps) {
+  const createTodoMutation = useCreateTodo(createTodo);
+  const updateTodoMutation = useUpdateTodo(updateTodo);
+  const deleteTodoMutation = useDeleteTodo(deleteTodo);
 
-type UseRoomMutationType = ReturnType<typeof useRoomMutations>;
+  return (
+    <TodoFormRaw
+      {...props}
+      createTodoMutation={createTodoMutation}
+      updateTodoMutation={updateTodoMutation}
+      deleteTodoMutation={deleteTodoMutation}
+    />
+  );
+}
 
 export function TodoFormRaw({
   roomName,
@@ -53,19 +64,14 @@ export function TodoFormRaw({
   index,
   localIdToEditedListElementMap,
   setCurrentTodos,
-  addTodoMutation,
+  createTodoMutation,
   updateTodoMutation,
   deleteTodoMutation
-}: {
-  roomName: string;
-  todo: BaseTodo;
-  index: number;
-  localIdToEditedListElementMap: MutableRefObject<Record<string, BaseTodo>>;
-  setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
+}: TodoFormBaseProps & {
   // These are from `useRoomMutations`.
-  addTodoMutation: UseRoomMutationType['addTodoMutation'];
-  updateTodoMutation: UseRoomMutationType['updateTodoMutation'];
-  deleteTodoMutation: UseRoomMutationType['deleteTodoMutation'];
+  createTodoMutation: ReturnType<typeof useCreateTodo>;
+  updateTodoMutation: ReturnType<typeof useUpdateTodo>;
+  deleteTodoMutation: ReturnType<typeof useDeleteTodo>;
 }) {
   const {
     control,
@@ -117,7 +123,7 @@ export function TodoFormRaw({
     // Finish save happens when the text field is blurred, or when
     // the checkbox tick is changed.
     if (!isPersisted) {
-      addTodoMutation.mutate({
+      createTodoMutation.mutate({
         name: roomName,
         todo: {
           title,

@@ -9,7 +9,7 @@ import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
 import { useToast } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { getErrorMessage } from '../lib/ui/utils';
+import { getErrorMessage } from '../lib/utils';
 import { createRoom, CreateRoomParameters } from '../lib/ui/query/rooms';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
@@ -52,7 +52,7 @@ export function RoomForm({
       console.error(err);
       toast({
         title: 'Failed to access room.',
-        description: await getErrorMessage(err),
+        description: getErrorMessage(err),
         status: 'error'
       });
     } finally {

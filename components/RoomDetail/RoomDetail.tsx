@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Textarea, Link, useToast } from '@chakra-ui/react';
 import {
   FormHelperText,
@@ -20,12 +20,7 @@ import {
 } from '@chakra-ui/modal';
 import { useQueryClient } from 'react-query';
 
-import {
-  deepClone,
-  generateHash,
-  getErrorMessage,
-  parseRawTodoText
-} from '../../lib/ui/utils';
+import { deepClone, generateHash, parseRawTodoText } from '../../lib/utils';
 import { useMutateRoom } from '../../lib/ui/hooks';
 import { BaseTodo, BaseRoom } from '../../lib/models/types';
 import { createTodos } from '../../lib/ui/query/rooms';
@@ -39,7 +34,6 @@ interface RoomProps {
 
 export function RoomDetail({ room }: RoomProps) {
   const { name, todos } = room;
-  const toast = useToast();
   const {
     isOpen: isBulkAddModalOpen,
     onOpen: onOpenBulkAddModal,
@@ -48,13 +42,13 @@ export function RoomDetail({ room }: RoomProps) {
 
   const queryClient = useQueryClient();
 
-  const [resolvedInitialTodos] = useState(resolveExistingTodos(todos));
-  const [currentTodos, setCurrentTodos] = useState(resolvedInitialTodos.todos);
+  const [currentTodos, setCurrentTodos] = useState(
+    resolveExistingTodos(todos).todos
+  );
+  const [bulkEntries, setBulkEntries] = useState('');
 
   const localIdToEditedListElementMap = useRef<Record<string, BaseTodo>>({});
   const previousRoomRef = useRef(room);
-
-  const [bulkEntries, setBulkEntries] = useState('');
 
   useEffect(() => {
     if (
@@ -76,9 +70,9 @@ export function RoomDetail({ room }: RoomProps) {
     }
   }, [room]);
 
-  const addBulkMutation = useMutateRoom(
-    createTodos,
-    async ({ todos: newTodos }) => {
+  const addBulkMutation = useMutateRoom({
+    mutationFn: createTodos,
+    onMutate: async ({ todos: newTodos }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('room');
 
@@ -100,27 +94,20 @@ export function RoomDetail({ room }: RoomProps) {
       }
 
       return { previousRoom };
+    },
+    errorTitle: 'Failed to add todos',
+    onSettled: () => {
+      onCloseBulkAddModal();
+      setBulkEntries('');
     }
-  );
+  });
 
   async function onCreateBulk() {
     const bulkTodos = bulkEntries.split('\n');
-
-    try {
-      await addBulkMutation.mutate({
-        name,
-        todos: bulkTodos.map(parseRawTodoText)
-      });
-      onCloseBulkAddModal();
-      setBulkEntries('');
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: 'Failed to create bulk todos.',
-        description: await getErrorMessage(err),
-        status: 'error'
-      });
-    }
+    addBulkMutation.mutate({
+      name,
+      todos: bulkTodos.map(parseRawTodoText)
+    });
   }
 
   return (
