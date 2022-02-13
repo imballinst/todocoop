@@ -51,10 +51,7 @@ export function RoomDetail({ room }: RoomProps) {
   const previousRoomRef = useRef(room);
 
   useEffect(() => {
-    if (
-      previousRoomRef.current.__v !== room.__v ||
-      previousRoomRef.current.todos.length !== room.todos.length
-    ) {
+    if (previousRoomRef.current.__v !== room.__v) {
       const cloned = deepClone(localIdToEditedListElementMap.current);
       const { todos, submittedLocalTodoIds } = resolveExistingTodos(
         room.todos,

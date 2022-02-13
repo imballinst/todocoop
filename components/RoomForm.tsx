@@ -70,15 +70,13 @@ export function RoomForm({
     <Flex justifyContent="center" alignItems="center">
       <Box
         width={['100%', 320]}
-        height={300}
         as="form"
         onSubmit={handleSubmit(onSubmit)}
         display="flex"
         flexDirection="column"
-        justifyContent="space-between"
         autoComplete="off"
       >
-        <Heading as={titleTag} size={titleSize} textAlign="center">
+        <Heading as={titleTag} size={titleSize} textAlign="center" mb={8}>
           {title}
         </Heading>
 
