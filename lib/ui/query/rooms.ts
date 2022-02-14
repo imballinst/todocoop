@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 import { ApiResponse } from '../../server/types';
-import { BaseRoom, BaseTodo } from '../../models/types';
+import { BaseRoom } from '../../models/types';
+import { Room } from '../../models';
 
 export interface CreateRoomParameters {
   name: string;
@@ -38,53 +39,10 @@ export async function getCurrentRoom(): Promise<ApiResponse<BaseRoom>> {
 }
 
 // Todos.
-export interface TodoParameters {
-  name: string;
-  todo: Partial<BaseTodo>;
+export interface SyncTodoParameters {
+  room: Room;
 }
 
-export async function createTodo({
-  name,
-  todo
-}: TodoParameters): Promise<ApiResponse<BaseTodo>> {
-  return axios.post(`/api/rooms/${name}/todos`, todo);
-}
-
-export interface UpdateTodoParameters {
-  name: string;
-  todo: BaseTodo;
-}
-
-export async function createTodos({
-  name,
-  todos
-}: {
-  name: string;
-  todos: Partial<BaseTodo>[];
-}): Promise<ApiResponse<BaseTodo>> {
-  return axios.post(`/api/rooms/${name}/todos/bulk`, { todos });
-}
-
-export interface UpdateTodoParameters {
-  name: string;
-  todo: BaseTodo;
-}
-
-export async function updateTodo({
-  name,
-  todo
-}: UpdateTodoParameters): Promise<ApiResponse<BaseTodo>> {
-  return axios.put(`/api/rooms/${name}/todos/${todo._id}`, todo);
-}
-
-export interface DeleteTodoParameters {
-  name: string;
-  todoId: string;
-}
-
-export async function deleteTodo({
-  name,
-  todoId
-}: DeleteTodoParameters): Promise<ApiResponse<object>> {
-  return axios.delete(`/api/rooms/${name}/todos/${todoId}`);
+export async function syncTodos({ room }): Promise<ApiResponse<Room>> {
+  return axios.post(`/api/rooms/${room.name}/sync-todos`, room);
 }

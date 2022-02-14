@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import Router from 'next/router';
 import {
-  MutationFunction,
   useMutation,
   useQuery,
   useQueryClient,
@@ -12,16 +11,10 @@ import {
 import { AxiosError } from 'axios';
 import { useToast } from '@chakra-ui/react';
 
-import {
-  createTodo,
-  deleteTodo,
-  getCurrentRoom,
-  updateTodo
-} from './query/rooms';
+import { getCurrentRoom, syncTodos } from './query/rooms';
 import { Room } from '../models';
-import { ApiResponse } from '../server/types';
-import { BaseRoom } from '../models/types';
-import { getErrorMessage, replaceArrayElementAtIndex } from '../utils';
+import { BaseTodo } from '../models/types';
+import { getErrorMessage } from '../utils';
 
 interface Params {
   redirectToIfOutsideRoom?: string;
@@ -105,39 +98,32 @@ export function useCurrentRoom({
 }
 
 // Mutations for react-query.
-interface MutateContext {
-  previousRoom: BaseRoom;
+interface UseSyncRoomParameters {
+  mutationFn?: typeof syncTodos;
+  onSettled?: () => void;
 }
 
-export function useMutateRoom<R, T>({
-  mutationFn,
-  onMutate,
-  errorTitle,
-  onSettled
-}: {
-  mutationFn: MutationFunction<ApiResponse<R>, T>;
-  onMutate: (
-    variables: T
-  ) => Promise<undefined> | MutateContext | Promise<MutateContext>;
-  errorTitle: string;
-  onSettled?: () => void;
-}) {
+export function useSyncRoom(
+  { mutationFn = syncTodos, onSettled }: UseSyncRoomParameters | undefined = {
+    mutationFn: syncTodos
+  }
+) {
   const queryClient = useQueryClient();
   const toast = useToast();
 
   return useMutation(mutationFn, {
-    onMutate,
+    onMutate: mutationFn,
     // If the mutation fails, use the context returned from onMutate to roll back.
     onError: async (err: AxiosError, _variables, context) => {
       const error = getErrorMessage(err);
       toast({
-        title: errorTitle,
+        title: 'Failed to sync todos',
         description: error,
         status: 'error'
       });
 
-      if (context?.previousRoom) {
-        queryClient.setQueryData<BaseRoom>('room', context.previousRoom);
+      if (context?.data !== undefined) {
+        queryClient.setQueryData('room', context.data);
       }
     },
     // Always refetch after error or success.
@@ -148,102 +134,5 @@ export function useMutateRoom<R, T>({
 
       queryClient.invalidateQueries('room');
     }
-  });
-}
-
-// Source: https://react-query.tanstack.com/examples/optimistic-updates-typescript.
-export function useCreateTodo(mutationFn = createTodo) {
-  const queryClient = useQueryClient();
-
-  return useMutateRoom({
-    mutationFn,
-    onMutate: async ({ todo: newTodo }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
-      await queryClient.cancelQueries('room');
-
-      // Snapshot the previous value.
-      const previousRoom = queryClient.getQueryData<BaseRoom>('room');
-
-      // Optimistically update to the new value.
-      if (previousRoom) {
-        const newPersistedTodo = {
-          _id: newTodo._id,
-          localId: newTodo.localId,
-          isPersisted: true,
-          isChecked: newTodo.isChecked,
-          title: newTodo.title
-        };
-
-        queryClient.setQueryData<BaseRoom>('room', {
-          ...previousRoom,
-          todos: [...previousRoom.todos, newPersistedTodo]
-        });
-      }
-
-      return { previousRoom };
-    },
-    errorTitle: 'Failed to add todo'
-  });
-}
-
-export function useUpdateTodo(mutationFn = updateTodo) {
-  const queryClient = useQueryClient();
-
-  return useMutateRoom({
-    mutationFn,
-    onMutate: async ({ todo: updatedTodo }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
-      await queryClient.cancelQueries('room');
-
-      // Snapshot the previous value.
-      const previousRoom = queryClient.getQueryData<BaseRoom>('room');
-
-      // Optimistically update to the new value.
-      if (previousRoom) {
-        const idx = previousRoom.todos.findIndex(
-          (el) => el._id === updatedTodo._id
-        );
-
-        queryClient.setQueryData<BaseRoom>('room', {
-          ...previousRoom,
-          todos: replaceArrayElementAtIndex(
-            previousRoom.todos,
-            idx,
-            updatedTodo
-          )
-        });
-      }
-
-      return { previousRoom };
-    },
-    errorTitle: 'Failed to update todo'
-  });
-}
-
-export function useDeleteTodo(mutationFn = deleteTodo) {
-  const queryClient = useQueryClient();
-
-  return useMutateRoom({
-    mutationFn,
-    onMutate: async ({ todoId }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
-      await queryClient.cancelQueries('room');
-
-      // Snapshot the previous value.
-      const previousRoom = queryClient.getQueryData<BaseRoom>('room');
-
-      // Optimistically update to the new value.
-      if (previousRoom) {
-        const idx = previousRoom.todos.findIndex((el) => el._id === todoId);
-
-        queryClient.setQueryData<BaseRoom>('room', {
-          ...previousRoom,
-          todos: replaceArrayElementAtIndex(previousRoom.todos, idx, undefined)
-        });
-      }
-
-      return { previousRoom };
-    },
-    errorTitle: 'Failed to delete todo'
   });
 }

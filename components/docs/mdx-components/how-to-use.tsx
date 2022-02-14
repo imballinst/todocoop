@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { BaseTodo } from '../../../lib/models/types';
 import { ActionsMenu } from '../../RoomDetail/ActionsMenu';
-import { AddTodoButtons } from '../../RoomDetail/AddTodoButtons';
 import { RoomForm } from '../../RoomForm';
 
 const onSuccessfulAccess = () => {};
@@ -26,10 +25,6 @@ export function HowToUseRoomAccess() {
 }
 
 const stubFn = () => {};
-
-export function HowToUseAddTodoButtons() {
-  return <AddTodoButtons onBulkAdd={stubFn} onSingleAdd={stubFn} />;
-}
 
 const ROOM_OBJECT = {
   name: 'Test Room',
