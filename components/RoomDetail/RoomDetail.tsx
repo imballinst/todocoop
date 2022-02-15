@@ -1,44 +1,35 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Flex, Heading } from '@chakra-ui/layout';
 import { Button } from '@chakra-ui/button';
 import { Table, Tbody, Tr } from '@chakra-ui/table';
-import { useFieldArray, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 
 import { useSyncRoom } from '../../lib/ui/hooks';
-import { BaseRoom, BaseTodo, UiTodo } from '../../lib/models/types';
+import { UiRoom, BaseTodo } from '../../lib/models/types';
 import { TodoForm, TodoFormPlaceholder } from './TodoForm';
 import { ActionsMenu } from './ActionsMenu';
+import { useTodos } from './todos';
 import { RoomFormState } from './types';
 
 interface RoomProps {
-  room: BaseRoom;
+  room: UiRoom;
 }
 
 export function RoomDetail({ room }: RoomProps) {
   const { name, todos: roomTodos } = room;
 
   const queryClient = useQueryClient();
-  const { control, handleSubmit, setFocus, reset } = useForm<RoomFormState>({
-    mode: 'onBlur',
-    defaultValues: {
-      todos: roomTodos
-    }
-  });
-  const {
-    fields: todos,
-    remove: fieldArrayRemove,
-    insert,
-    update
-  } = useFieldArray({ control, name: 'todos' });
   const submitButtonRef = useRef<HTMLButtonElement>();
-  const removedTodosRef = useRef<UiTodo[]>([]);
-  const lastIndexRef = useRef(todos.length);
 
-  useEffect(() => {
-    reset({ todos: roomTodos });
-    lastIndexRef.current = roomTodos.length - 1;
-  }, [reset, roomTodos]);
+  const {
+    control,
+    handleSubmit,
+    fieldArrayActions,
+    lastIndexRef,
+    removedTodosRef,
+    reset,
+    todos
+  } = useTodos({ roomTodos });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -52,15 +43,7 @@ export function RoomDetail({ room }: RoomProps) {
       // When it's changed, the previous interval is cleared.
       clearInterval(interval);
     };
-  }, [todos]);
-
-  const remove = useCallback(
-    (todo: UiTodo, index: number) => {
-      removedTodosRef.current.push(todo);
-      fieldArrayRemove(index);
-    },
-    [fieldArrayRemove]
-  );
+  }, [lastIndexRef, todos]);
 
   const syncMutations = useSyncRoom({
     onSettled: (room) => {
@@ -105,8 +88,6 @@ export function RoomDetail({ room }: RoomProps) {
     }
   }
 
-  const fieldArrayActions = { remove, insert, setFocus, update };
-
   return (
     <>
       <form onSubmit={handleSubmit(onDataValid)}>
@@ -121,7 +102,11 @@ export function RoomDetail({ room }: RoomProps) {
             {name}
           </Heading>
           <Box position="relative">
-            <ActionsMenu room={room} currentTodos={todos} />
+            <ActionsMenu
+              room={room}
+              currentTodos={todos}
+              append={fieldArrayActions.append}
+            />
           </Box>
         </Flex>
         <Box mt={4}>
@@ -141,7 +126,7 @@ export function RoomDetail({ room }: RoomProps) {
 
               {todos.length === 0 && (
                 <Tr>
-                  <TodoFormPlaceholder insert={insert} />
+                  <TodoFormPlaceholder insert={fieldArrayActions.insert} />
                 </Tr>
               )}
             </Tbody>
