@@ -7,9 +7,13 @@ export interface BaseTodo extends MongoToObjectFields {
   // Mongo fields.
   title: string;
   isChecked: boolean;
-  // UI fields.
-  isPersisted?: boolean;
-  localId?: string;
+  indexOrder: number;
+  updatedAt: string;
+  localId: string;
+}
+
+export interface UiTodo extends BaseTodo {
+  state: 'added' | 'modified' | 'unmodified';
 }
 
 // Room.
@@ -17,4 +21,10 @@ export interface BaseRoom extends MongoToObjectFields {
   name: string;
   password: string;
   todos: BaseTodo[];
+}
+
+export interface UiRoom extends MongoToObjectFields {
+  name: string;
+  password: string;
+  todos: UiTodo[];
 }

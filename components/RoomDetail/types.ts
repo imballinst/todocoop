@@ -1,5 +1,5 @@
-import { BaseTodo } from '../../lib/models/types';
+import { UiTodo } from '../../lib/models/types';
 
 export interface RoomFormState {
-  todos: BaseTodo[];
+  todos: UiTodo[];
 }

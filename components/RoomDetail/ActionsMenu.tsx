@@ -24,11 +24,11 @@ import { MdMoreVert } from 'react-icons/md';
 
 import { copyTextToClipboard, getErrorMessage } from '../../lib/utils';
 import { leaveRoom } from '../../lib/ui/query/rooms';
-import { BaseRoom, BaseTodo } from '../../lib/models/types';
+import { BaseRoom, UiTodo } from '../../lib/models/types';
 import { useQueryClient } from 'react-query';
 
 interface Props {
-  currentTodos: BaseTodo[];
+  currentTodos: UiTodo[];
   room: BaseRoom;
   // For demo purposes.
   onLeaveRoom?: () => void;

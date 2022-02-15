@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { MutableRefObject, ReactNode } from 'react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -14,30 +14,36 @@ import {
   Control,
   useController,
   UseFieldArrayInsert,
-  UseFieldArrayRemove,
+  UseFieldArrayReturn,
   UseFormSetFocus
 } from 'react-hook-form';
 import { generateHash } from '../../lib/utils';
-import { BaseTodo } from '../../lib/models/types';
+import { UiTodo } from '../../lib/models/types';
 import { RoomFormState } from './types';
 
 interface TodoFormBaseProps {
-  todo: BaseTodo;
+  todo: UiTodo;
   index: number;
-  control: Control<{ todos: BaseTodo[] }, object>;
-  setFocus: UseFormSetFocus<RoomFormState>;
+  control: Control<{ todos: UiTodo[] }, object>;
+  lastIndexRef: MutableRefObject<number>;
   // Field array actions.
-  remove: UseFieldArrayRemove;
+  setFocus: UseFormSetFocus<RoomFormState>;
+  remove: (todo: UiTodo, index: number) => void;
+  // TODO(imballinst): update this after https://github.com/react-hook-form/react-hook-form/issues/7821
+  // is responded.
+  update: UseFieldArrayReturn<RoomFormState, 'todos', 'id'>['update'];
   insert: UseFieldArrayInsert<RoomFormState, 'todos'>;
 }
 
 export function TodoForm({
   todo,
   index,
-  setFocus,
   control,
+  lastIndexRef,
+  setFocus,
   remove,
-  insert
+  insert,
+  update
 }: TodoFormBaseProps) {
   const checkboxController = useController({
     control,
@@ -60,6 +66,15 @@ export function TodoForm({
             isChecked={checkboxController.field.value}
             value={todo.localId}
             autoFocus={false}
+            onChange={(e) => {
+              checkboxController.field.onChange(e);
+              update(index, {
+                ...todo,
+                isChecked: e.target.checked,
+                updatedAt: new Date().toISOString(),
+                state: todo.state === 'added' ? 'added' : 'modified'
+              });
+            }}
           />
 
           <FormControl ml={2}>
@@ -79,6 +94,12 @@ export function TodoForm({
               }}
               onChange={(e) => {
                 textareaController.field.onChange(e);
+                update(index, {
+                  ...todo,
+                  title: e.target.value,
+                  updatedAt: new Date().toISOString(),
+                  state: todo.state === 'added' ? 'added' : 'modified'
+                });
 
                 // Make the height scale.
                 e.target.style.overflow = 'hidden';
@@ -87,6 +108,24 @@ export function TodoForm({
               }}
               onKeyDown={(e) => {
                 if (
+                  e.key === 'ArrowUp' &&
+                  e.currentTarget.selectionStart === 0
+                ) {
+                  // Arrow up and start of the text area, go to the previous text input.
+                  if (index > 0) {
+                    e.preventDefault();
+                    setFocus(`todos.${index - 1}.title`);
+                  }
+                } else if (
+                  e.key === 'ArrowDown' &&
+                  e.currentTarget.selectionStart === todo.title.length
+                ) {
+                  // Arrow down and at the end of the text area, go to the next text input.
+                  if (index + 1 < lastIndexRef.current) {
+                    e.preventDefault();
+                    setFocus(`todos.${index + 1}.title`);
+                  }
+                } else if (
                   textareaController.field.value === '' &&
                   e.key === 'Backspace' &&
                   !e.shiftKey
@@ -94,24 +133,25 @@ export function TodoForm({
                   e.preventDefault();
 
                   if (index > 0) {
-                    remove(index);
+                    remove(todo, index);
                     // Only set focus to the previous input if exists.
                     setFocus(`todos.${index - 1}.title`);
                   }
                 } else if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
 
-                  insert(index + 1, {
-                    localId: generateHash(),
-                    isPersisted: false,
-                    isChecked: false,
-                    title: ''
-                  });
-
-                  setTimeout(() => {
-                    // Wait until the next input mounts.
-                    setFocus(`todos.${index + 1}.title`);
-                  }, 100);
+                  insert(
+                    index + 1,
+                    {
+                      localId: generateHash(),
+                      state: 'added',
+                      isChecked: false,
+                      title: ''
+                    },
+                    {
+                      focusName: `todos.${index + 1}.title`
+                    }
+                  );
                 }
               }}
             />
@@ -131,13 +171,68 @@ export function TodoForm({
           height="var(--chakra-sizes-6)"
           variant="ghost"
           colorScheme="teal"
-          onClick={() => remove(index)}
+          onClick={() => remove(todo, index)}
           aria-label="Edit"
           icon={<DeleteIcon />}
           // Hide the first button for screen readers.
           aria-hidden={index === 0}
           // Visually hide the first button for non-screen readers.
           visibility={index > 0 ? 'unset' : 'hidden'}
+        />
+      </TableColumn>
+    </>
+  );
+}
+
+export function TodoFormPlaceholder({
+  insert
+}: Pick<TodoFormBaseProps, 'insert'>) {
+  return (
+    <>
+      <TableColumn colSpan={2}>
+        <Box display="flex">
+          <Checkbox aria-hidden={true} visibility="hidden" />
+
+          <FormControl ml={2}>
+            <Textarea
+              onFocus={() => {
+                insert(
+                  0,
+                  {
+                    indexOrder: 0,
+                    isChecked: false,
+                    localId: generateHash(),
+                    state: 'added',
+                    title: '',
+                    updatedAt: new Date().toISOString()
+                  },
+                  {
+                    focusName: `todos.0.title`
+                  }
+                );
+              }}
+              rows={1}
+              ref={(node) => {
+                if (node) {
+                  // Make the height scale.
+                  node.style.overflow = 'hidden';
+                  node.style.height = '0';
+                  node.style.height = node.scrollHeight + 'px';
+                }
+              }}
+            />
+          </FormControl>
+        </Box>
+      </TableColumn>
+
+      <TableColumn width={1}>
+        <IconButton
+          minWidth="var(--chakra-sizes-6)"
+          height="var(--chakra-sizes-6)"
+          aria-label="Edit"
+          icon={<DeleteIcon />}
+          aria-hidden={true}
+          visibility="hidden"
         />
       </TableColumn>
     </>

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { BaseTodo } from '../../../lib/models/types';
+import { UiTodo } from '../../../lib/models/types';
 import { ActionsMenu } from '../../RoomDetail/ActionsMenu';
 import { RoomForm } from '../../RoomForm';
 
@@ -41,10 +41,8 @@ const ROOM_OBJECT = {
 };
 
 export function HowToUseEditTodo() {
-  const localIdToEditedListElementMap = useRef<Record<string, BaseTodo>>({});
-  const [currentTodos, setCurrentTodos] = useState<BaseTodo[]>(
-    ROOM_OBJECT.todos
-  );
+  const localIdToEditedListElementMap = useRef<Record<string, UiTodo>>({});
+  const [currentTodos, setCurrentTodos] = useState<UiTodo[]>(ROOM_OBJECT.todos);
 
   return null;
 }

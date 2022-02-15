@@ -5,18 +5,13 @@ import {
   ApiResponse,
   ExtendedNextApiRequest
 } from '../../../../lib/server/types';
+import { BaseTodo } from '../../../../lib/models/types';
 
-// TODO(imballinst): I think this is lost cause.
-// We need to track which todos are added, modified, and removed in the client.
-// Then, we pass it to this API, then this API resolves it.
 async function syncTodosHandler(
   req: ExtendedNextApiRequest,
   res: NextApiResponse
 ) {
-  let response: ApiResponse<{
-    room: Room;
-    conflictingTodos: Todo[];
-  }> = {};
+  let response: ApiResponse<Room> = {};
 
   try {
     if (req.method !== 'POST') {
@@ -32,53 +27,53 @@ async function syncTodosHandler(
       throw new Error('Invalid room information.');
     }
 
-    response.data = { room: roomObject, conflictingTodos: [] };
+    const { added, modified, removed } = req.body as {
+      added: BaseTodo[];
+      modified: Todo[];
+      removed: Todo[];
+    };
+    const removedLocalIds = removed.map((todo) => todo.localId);
+    let resolvedTodos = roomObject.todos;
 
-    const clientTodos: Todo[] = req.body.todos;
-    const serverTodos = roomObject.todos;
-    const resolvedTodos: Todo[] = [];
-    const conflictingTodos: Todo[] = [];
+    // Remove deleted todos.
+    resolvedTodos = resolvedTodos.filter(
+      (todo) => !removedLocalIds.includes(todo.localId)
+    );
 
-    for (let i = 0; i < clientTodos.length; i++) {
-      const clientTodo = clientTodos[i];
-
-      const serverTodoIndex = serverTodos.findIndex(
-        (todo) => todo.localId === clientTodo.localId
+    // Modify modified todos.
+    for (const todo of modified) {
+      const serverTodo = resolvedTodos.find(
+        (el) => el.localId === todo.localId
       );
-      if (serverTodoIndex > -1) {
-        // Found.
-        const serverTodo = serverTodos[serverTodoIndex];
 
-        if (clientTodo.localId === serverTodo.localId) {
-          if (clientTodo.__v === serverTodo.__v) {
-            // If same, check the version.
-            resolvedTodos.push(clientTodo);
-          } else {
-            // Assuming server will always be updated, then
-            // the only option here is that the client is out-of-date.
-            conflictingTodos.push(clientTodo);
-          }
-        }
-      } else {
-        // Not found.
-        // Doesn't exist in server, but exists in client.
-        // Check if the client doesn't have `_id` just yet, because models are created in the server.
-        // If it exists, then it has been deleted in the server. Do nothing.
-        if (clientTodo._id === undefined) {
-          resolvedTodos.push(new TodoModel(clientTodo));
+      if (serverTodo) {
+        const serverUpdatedAt = new Date(serverTodo.updatedAt).getTime();
+        const clientUpdatedAt = new Date(todo.updatedAt).getTime();
+
+        if (clientUpdatedAt > serverUpdatedAt) {
+          serverTodo.set(todo);
         }
       }
-
-      // Iterate over the server todos
     }
 
-    const todoModels = todos.map((todo) => new TodoModel(todo));
+    // Add added todos.
+    const addedTodoModels = added.map((todo) => new TodoModel(todo));
+    resolvedTodos = resolvedTodos
+      .concat(addedTodoModels)
+      .sort((a, b) => a.indexOrder - b.indexOrder)
+      .map(
+        (todo, idx) =>
+          ({
+            ...todo,
+            indexOrder: idx + 1
+          } as Todo)
+      );
 
-    roomObject.todos = [...roomObject.todos, ...todoModels];
+    roomObject.todos = resolvedTodos;
     await roomObject.save();
 
     res.status(200);
-    response.data = todoModels;
+    response.data = roomObject;
   } catch (err) {
     console.error(err);
     res.status(400);

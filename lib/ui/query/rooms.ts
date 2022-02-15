@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { ApiResponse } from '../../server/types';
-import { BaseRoom } from '../../models/types';
+import { BaseRoom, BaseTodo } from '../../models/types';
 import { Room } from '../../models';
 
 export interface CreateRoomParameters {
@@ -40,9 +40,17 @@ export async function getCurrentRoom(): Promise<ApiResponse<BaseRoom>> {
 
 // Todos.
 export interface SyncTodoParameters {
-  room: Room;
+  name: string;
+  todos: {
+    added: BaseTodo[];
+    modified: BaseTodo[];
+    removed: BaseTodo[];
+  };
 }
 
-export async function syncTodos({ room }): Promise<ApiResponse<Room>> {
-  return axios.post(`/api/rooms/${room.name}/sync-todos`, room);
+export async function syncTodos({
+  name,
+  todos
+}: SyncTodoParameters): Promise<ApiResponse<Room>> {
+  return axios.post(`/api/rooms/${name}/sync-todos`, todos);
 }

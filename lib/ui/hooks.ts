@@ -12,14 +12,13 @@ import { AxiosError } from 'axios';
 import { useToast } from '@chakra-ui/react';
 
 import { getCurrentRoom, syncTodos } from './query/rooms';
-import { Room } from '../models';
-import { BaseTodo } from '../models/types';
+import { UiRoom } from '../models/types';
 import { getErrorMessage } from '../utils';
 
 interface Params {
   redirectToIfOutsideRoom?: string;
   redirectToIfInsideRoom?: string;
-  queryOptions?: UseQueryOptions<Room, unknown, Room, 'room'>;
+  queryOptions?: UseQueryOptions<UiRoom, unknown, UiRoom, 'room'>;
 }
 
 type PickedUseQueryFields = Pick<
@@ -28,7 +27,7 @@ type PickedUseQueryFields = Pick<
 >;
 
 type UseCurrentRoomType = {
-  room: Room | undefined;
+  room: UiRoom | undefined;
   refetchRoom: PickedUseQueryFields['refetch'];
   isFetching: PickedUseQueryFields['isFetching'];
 };
@@ -63,12 +62,10 @@ export function useCurrentRoom({
           name: data.name,
           password: data.password,
           todos: data.todos.map((todo) => ({
-            _id: todo._id,
-            localId: todo.localId,
-            isChecked: todo.isChecked,
-            title: todo.title
+            ...todo,
+            state: 'unmodified'
           }))
-        } as Room;
+        } as UiRoom;
       } catch (err) {
         console.error(err);
 
