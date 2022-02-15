@@ -35,7 +35,7 @@ export function RoomDetail({ room }: RoomProps) {
     const interval = setInterval(() => {
       // Every 10 seconds, if it's idle, then sync.
       submitButtonRef.current.click();
-    }, 10000);
+    }, 5000);
 
     lastIndexRef.current = todos.length - 1;
 
