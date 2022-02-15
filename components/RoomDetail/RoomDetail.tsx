@@ -3,6 +3,7 @@ import { Box, Flex, Heading } from '@chakra-ui/layout';
 import { Button } from '@chakra-ui/button';
 import { Table, Tbody, Tr } from '@chakra-ui/table';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useQueryClient } from 'react-query';
 
 import { useSyncRoom } from '../../lib/ui/hooks';
 import { BaseRoom, BaseTodo, UiTodo } from '../../lib/models/types';
@@ -16,7 +17,9 @@ interface RoomProps {
 
 export function RoomDetail({ room }: RoomProps) {
   const { name, todos: roomTodos } = room;
-  const { control, handleSubmit, setFocus } = useForm<RoomFormState>({
+
+  const queryClient = useQueryClient();
+  const { control, handleSubmit, setFocus, reset } = useForm<RoomFormState>({
     mode: 'onBlur',
     defaultValues: {
       todos: roomTodos
@@ -33,13 +36,17 @@ export function RoomDetail({ room }: RoomProps) {
   const lastIndexRef = useRef(todos.length);
 
   useEffect(() => {
+    reset({ todos: roomTodos });
+    lastIndexRef.current = roomTodos.length - 1;
+  }, [reset, roomTodos]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       // Every 10 seconds, if it's idle, then sync.
-      // submitButtonRef.current.click();
-      console.log('xd');
+      submitButtonRef.current.click();
     }, 10000);
 
-    lastIndexRef.current = todos.length;
+    lastIndexRef.current = todos.length - 1;
 
     return () => {
       // When it's changed, the previous interval is cleared.
@@ -56,7 +63,8 @@ export function RoomDetail({ room }: RoomProps) {
   );
 
   const syncMutations = useSyncRoom({
-    onSettled: () => {
+    onSettled: (room) => {
+      reset({ todos: room.todos });
       removedTodosRef.current = [];
     }
   });
@@ -81,14 +89,20 @@ export function RoomDetail({ room }: RoomProps) {
       }
     }
 
-    await syncMutations.mutateAsync({
-      name,
-      todos: {
-        added,
-        removed,
-        modified
-      }
-    });
+    if (added.length || modified.length || removed.length) {
+      await syncMutations.mutateAsync({
+        name,
+        todos: {
+          added,
+          removed,
+          modified
+        }
+      });
+    } else {
+      // If nothing is modified, then just invalidate the room query.
+      // So that we can refetch.
+      queryClient.invalidateQueries('room');
+    }
   }
 
   const fieldArrayActions = { remove, insert, setFocus, update };
@@ -114,7 +128,7 @@ export function RoomDetail({ room }: RoomProps) {
           <Table variant="simple" width="100%">
             <Tbody>
               {todos.map((todo, index) => (
-                <Tr key={todo.localId}>
+                <Tr key={`${todo.localId}-${index}`}>
                   <TodoForm
                     index={index}
                     todo={todo}

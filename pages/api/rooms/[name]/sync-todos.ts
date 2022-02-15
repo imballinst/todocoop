@@ -6,6 +6,7 @@ import {
   ExtendedNextApiRequest
 } from '../../../../lib/server/types';
 import { BaseTodo } from '../../../../lib/models/types';
+import { mergeTodos } from '../../../../lib/todos';
 
 async function syncTodosHandler(
   req: ExtendedNextApiRequest,
@@ -29,8 +30,8 @@ async function syncTodosHandler(
 
     const { added, modified, removed } = req.body as {
       added: BaseTodo[];
-      modified: Todo[];
-      removed: Todo[];
+      modified: BaseTodo[];
+      removed: BaseTodo[];
     };
     const removedLocalIds = removed.map((todo) => todo.localId);
     let resolvedTodos = roomObject.todos;
@@ -51,25 +52,25 @@ async function syncTodosHandler(
         const clientUpdatedAt = new Date(todo.updatedAt).getTime();
 
         if (clientUpdatedAt > serverUpdatedAt) {
-          serverTodo.set(todo);
+          for (const key in todo) {
+            serverTodo[key] = todo[key];
+          }
         }
       }
     }
 
     // Add added todos.
     const addedTodoModels = added.map((todo) => new TodoModel(todo));
-    resolvedTodos = resolvedTodos
-      .concat(addedTodoModels)
-      .sort((a, b) => a.indexOrder - b.indexOrder)
-      .map(
-        (todo, idx) =>
-          ({
-            ...todo,
-            indexOrder: idx + 1
-          } as Todo)
-      );
-
-    roomObject.todos = resolvedTodos;
+    roomObject.todos = mergeTodos({
+      added: addedTodoModels,
+      removed,
+      modified,
+      base: resolvedTodos
+    });
+    // Fix the order of the todos.
+    for (let i = 0; i < roomObject.todos.length; i++) {
+      roomObject.todos[i].indexOrder = i;
+    }
     await roomObject.save();
 
     res.status(200);

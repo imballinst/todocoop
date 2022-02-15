@@ -8,12 +8,14 @@ import {
   useQueryClient,
   UseQueryOptions
 } from 'react-query';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useToast } from '@chakra-ui/react';
 
-import { getCurrentRoom, syncTodos } from './query/rooms';
-import { UiRoom } from '../models/types';
+import { getCurrentRoom, SyncTodoParameters, syncTodos } from './query/rooms';
+import { BaseRoom, UiRoom, UiTodo } from '../models/types';
 import { getErrorMessage } from '../utils';
+import { mergeTodos } from '../todos';
+import { ApiResponse } from '../server/types';
 
 interface Params {
   redirectToIfOutsideRoom?: string;
@@ -54,7 +56,7 @@ export function useCurrentRoom({
     async () => {
       try {
         const json = await getCurrentRoom();
-        const data = json.data;
+        const data = json.data.data;
 
         return {
           _id: data._id,
@@ -97,7 +99,7 @@ export function useCurrentRoom({
 // Mutations for react-query.
 interface UseSyncRoomParameters {
   mutationFn?: typeof syncTodos;
-  onSettled?: () => void;
+  onSettled?: (data: BaseRoom) => void;
 }
 
 export function useSyncRoom(
@@ -109,7 +111,32 @@ export function useSyncRoom(
   const toast = useToast();
 
   return useMutation(mutationFn, {
-    onMutate: mutationFn,
+    onMutate: async ({ todos }: SyncTodoParameters) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
+      await queryClient.cancelQueries('room');
+
+      // Snapshot the previous value.
+      const previousRoom = queryClient.getQueryData<UiRoom>('room');
+
+      // Optimistically update to the new value.
+      queryClient.setQueryData<UiRoom>('room', {
+        ...previousRoom,
+        todos: mergeTodos({
+          base: previousRoom.todos,
+          added: todos.added,
+          modified: todos.modified,
+          removed: todos.removed
+        }).map(
+          (todo, idx): UiTodo => ({
+            ...todo,
+            indexOrder: idx,
+            state: 'unmodified'
+          })
+        )
+      });
+
+      return { previousRoom };
+    },
     // If the mutation fails, use the context returned from onMutate to roll back.
     onError: async (err: AxiosError, _variables, context) => {
       const error = getErrorMessage(err);
@@ -119,14 +146,14 @@ export function useSyncRoom(
         status: 'error'
       });
 
-      if (context?.data !== undefined) {
-        queryClient.setQueryData('room', context.data);
+      if (context?.previousRoom !== undefined) {
+        queryClient.setQueryData('room', context.previousRoom);
       }
     },
     // Always refetch after error or success.
-    onSettled: () => {
-      if (onSettled) {
-        onSettled();
+    onSettled: (data) => {
+      if (onSettled && data) {
+        onSettled(data?.data?.data);
       }
 
       queryClient.invalidateQueries('room');

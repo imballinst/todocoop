@@ -1,6 +1,6 @@
 import { extendTheme, withDefaultColorScheme } from '@chakra-ui/react';
 
-import customInputTheme from './theme/input';
+import customInputTheme, { getInputFieldStyle } from './theme/input';
 import customLinkTheme from './theme/link';
 
 export const appTheme = extendTheme(
@@ -33,6 +33,14 @@ export const appTheme = extendTheme(
           text: {
             marginTop: 'var(--chakra-space-1)'
           }
+        }
+      },
+      Textarea: {
+        variants: {
+          outline: (props) => getInputFieldStyle(props)
+        },
+        defaultProps: {
+          variant: 'outline'
         }
       },
       Input: {

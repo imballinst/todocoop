@@ -4,7 +4,7 @@ import {
   Box,
   Checkbox,
   FormControl,
-  FormHelperText,
+  FormErrorMessage,
   IconButton,
   Textarea,
   TableCellProps,
@@ -53,7 +53,7 @@ export function TodoForm({
     control,
     name: `todos.${index}.title`,
     rules: {
-      required: true
+      required: 'This field is required'
     }
   });
 
@@ -77,10 +77,14 @@ export function TodoForm({
             }}
           />
 
-          <FormControl ml={2}>
+          <FormControl
+            ml={2}
+            isInvalid={textareaController.fieldState.error !== undefined}
+          >
             <Textarea
               {...textareaController.field}
               resize="none"
+              // isInvalid={textareaController.fieldState.error !== undefined}
               rows={1}
               ref={(node) => {
                 textareaController.field.ref(node);
@@ -121,7 +125,7 @@ export function TodoForm({
                   e.currentTarget.selectionStart === todo.title.length
                 ) {
                   // Arrow down and at the end of the text area, go to the next text input.
-                  if (index + 1 < lastIndexRef.current) {
+                  if (index < lastIndexRef.current) {
                     e.preventDefault();
                     setFocus(`todos.${index + 1}.title`);
                   }
@@ -146,6 +150,7 @@ export function TodoForm({
                       localId: generateHash(),
                       state: 'added',
                       isChecked: false,
+                      indexOrder: index + 1,
                       title: ''
                     },
                     {
@@ -157,9 +162,9 @@ export function TodoForm({
             />
 
             {textareaController.fieldState.error && (
-              <FormHelperText>
+              <FormErrorMessage>
                 {textareaController.fieldState.error.message}
-              </FormHelperText>
+              </FormErrorMessage>
             )}
           </FormControl>
         </Box>
@@ -240,5 +245,13 @@ export function TodoFormPlaceholder({
 }
 
 function TableColumn(props: { children: ReactNode } & TableCellProps) {
-  return <Td {...props} paddingInline={3} py={2} />;
+  return (
+    <Td
+      {...props}
+      paddingInline={3}
+      py={2}
+      borderBottom="0"
+      borderColor="transparent"
+    />
+  );
 }

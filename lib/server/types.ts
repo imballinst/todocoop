@@ -1,14 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IronSession } from 'iron-session';
+import { ErrorObject } from '../types';
 
 export interface ApiResponse<T> {
   data?: T;
   errors?: ErrorObject[];
-}
-
-export interface ErrorObject {
-  code: string;
-  message: string;
 }
 
 export interface ExtendedNextApiRequest extends NextApiRequest {

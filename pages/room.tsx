@@ -6,11 +6,6 @@ import { useEffect } from 'react';
 
 export default function RoomPage() {
   const { room, isFetching } = useCurrentRoom({
-    queryOptions: {
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: true,
-      refetchInterval: 10000
-    },
     redirectToIfOutsideRoom: '/'
   });
   const { setIsAccessingRoom } = useClientState();

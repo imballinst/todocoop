@@ -66,6 +66,8 @@ export function parseRawTodoText(str: string): BaseTodo {
   return {
     isChecked,
     title,
+    indexOrder: 0,
+    updatedAt: new Date().toISOString(),
     localId: generateHash()
   };
 }
