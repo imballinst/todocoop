@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
-import { RoomModel } from '../models';
+import { RoomModel } from '../lib/models';
 
 const configPath = path.resolve(__dirname, '../.env.development.local');
 if (fs.existsSync(configPath)) {
@@ -35,12 +35,7 @@ const URI = `mongodb+srv://${MONGODB_ADMIN}:${MONGODB_PASSWORD}@${MONGODB_CLUSTE
 
 (async () => {
   try {
-    await mongoose.connect(URI, {
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-      useCreateIndex: true
-    });
+    await mongoose.connect(URI);
 
     const response = await RoomModel.deleteMany({
       updatedAt: {

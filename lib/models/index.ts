@@ -1,6 +1,6 @@
 import { model, Schema, Document, Model, models } from 'mongoose';
 
-import { BaseRoom, BaseTodo } from '../types/models';
+import { BaseRoom, BaseTodo } from './types';
 
 // Todo.
 export interface Todo extends BaseTodo, Document {}
@@ -8,7 +8,7 @@ export interface Todo extends BaseTodo, Document {}
 const TodoSchema = new Schema<Todo>({
   title: {
     type: String,
-    required: true
+    required: [true, 'Todo title is required.']
   },
   localId: {
     type: String,
@@ -17,6 +17,12 @@ const TodoSchema = new Schema<Todo>({
   isChecked: {
     type: Boolean,
     default: false
+  },
+  updatedAt: {
+    type: String
+  },
+  indexOrder: {
+    type: Number
   }
 });
 

@@ -1,4 +1,4 @@
-import { useCurrentRoom } from '../lib/hooks';
+import { useCurrentRoom } from '../lib/ui/hooks';
 import { RoomDetail } from '../components/RoomDetail';
 import { Layout } from '../components/Layout';
 import { useClientState } from '../components/contexts/ClientStateContext';
@@ -6,11 +6,6 @@ import { useEffect } from 'react';
 
 export default function RoomPage() {
   const { room, isFetching } = useCurrentRoom({
-    queryOptions: {
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: true,
-      refetchInterval: 10000
-    },
     redirectToIfOutsideRoom: '/'
   });
   const { setIsAccessingRoom } = useClientState();

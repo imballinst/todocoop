@@ -30,12 +30,7 @@ export const withDB =
   async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
     if (mongoose.connections[0].readyState === 0) {
       // When the connection doesn't exist, create a new one.
-      await mongoose.connect(URI, {
-        useNewUrlParser: true,
-        useFindAndModify: false,
-        useUnifiedTopology: true,
-        useCreateIndex: true
-      });
+      await mongoose.connect(URI);
     }
 
     return handler(req, res);

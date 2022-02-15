@@ -6,11 +6,11 @@ import {
 } from '@chakra-ui/form-control';
 import { Input } from '@chakra-ui/input';
 import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
-import { useToast } from '@chakra-ui/react';
+import { ThemingProps, useToast } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { getErrorMessage } from '../lib/utils';
-import { createRoom, CreateRoomParameters } from '../query/rooms';
+import { createRoom, CreateRoomParameters } from '../lib/ui/query/rooms';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
   name: '',
@@ -20,7 +20,10 @@ const FORM_DEFAULT_VALUES: CreateRoomParameters = {
 interface Props {
   onSuccessfulAccess: () => void;
   request: typeof createRoom;
-  title: string;
+  title?: string;
+  titleTag?: 'h1' | 'h2';
+  titleSize?: ThemingProps['size'];
+  buttonTitle?: string;
   loadingButtonTitle: string;
 }
 
@@ -28,6 +31,9 @@ export function RoomForm({
   onSuccessfulAccess,
   request,
   title,
+  titleTag = 'h1',
+  titleSize = 'lg',
+  buttonTitle = title,
   loadingButtonTitle
 }: Props) {
   const {
@@ -44,7 +50,8 @@ export function RoomForm({
     try {
       setIsSubmitting(true);
 
-      const { data, errors } = await request(formData);
+      const { data: responseData } = await request(formData);
+      const { data, errors } = responseData;
       if (!data) throw new Error(errors?.join(', '));
 
       onSuccessfulAccess();
@@ -52,7 +59,7 @@ export function RoomForm({
       console.error(err);
       toast({
         title: 'Failed to access room.',
-        description: await getErrorMessage(err),
+        description: getErrorMessage(err),
         status: 'error'
       });
     } finally {
@@ -61,24 +68,16 @@ export function RoomForm({
   }
 
   return (
-    <Flex
-      justifyContent="center"
-      alignItems="center"
-      width="100%"
-      height="100%"
-    >
+    <Flex justifyContent="center" alignItems="center">
       <Box
-        width={320}
-        height={344}
-        p={4}
+        width={['100%', 320]}
         as="form"
         onSubmit={handleSubmit(onSubmit)}
         display="flex"
         flexDirection="column"
-        justifyContent="space-between"
         autoComplete="off"
       >
-        <Heading as="h1" size="lg">
+        <Heading as={titleTag} size={titleSize} textAlign="center" mb={8}>
           {title}
         </Heading>
 
@@ -116,7 +115,7 @@ export function RoomForm({
         </VStack>
 
         <Button mt={2} isFullWidth type="submit" isDisabled={isSubmitting}>
-          {isSubmitting ? loadingButtonTitle : title}
+          {isSubmitting ? loadingButtonTitle : buttonTitle}
         </Button>
       </Box>
     </Flex>

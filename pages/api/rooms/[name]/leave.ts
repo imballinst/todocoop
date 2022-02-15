@@ -1,7 +1,10 @@
 import { NextApiResponse } from 'next';
-import { withDB, withSession } from '../../../../middlewares';
-import { Room } from '../../../../models';
-import { ApiResponse, ExtendedNextApiRequest } from '../../../../types';
+import { withDB, withSession } from '../../../../lib/server/middlewares';
+import { Room } from '../../../../lib/models';
+import {
+  ApiResponse,
+  ExtendedNextApiRequest
+} from '../../../../lib/server/types';
 
 async function roomLeaveHandler(
   req: ExtendedNextApiRequest,

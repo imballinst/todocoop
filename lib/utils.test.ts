@@ -1,4 +1,4 @@
-import { parseRawTodoText } from '../utils';
+import { parseRawTodoText } from './utils';
 
 describe('parseRawTodoText', () => {
   it('normal line', () => {

@@ -1,3 +1,5 @@
+# How to Use
+
 TodoCoop is a web application that you can use to create a temporary checklists without
 having to create an account. All that you need is a room name and a password, then you
 can share it so that others can collaborate with you on that room.
@@ -22,32 +24,25 @@ an existing room, it will create a new room (if the same room name doesn't exist
 After getting through either form, you will be redirected to a new page. This new page has
 some important elements, which will be explained in the sections below.
 
-## Add, updating, and delete todo(s)
+## Adding, updating, and deleting todo(s)
 
-To add a single todo or multiple todos, you can use the 2 buttons below:
+To add a single todo or multiple todos, you can try use the demo component below.
 
 <Demo>
-  <HowToUseAddTodoButtons />
+  <HowToModifyTodos />
 </Demo>
 
-When the "Add todo" button is clicked, it will add a single todo. You can then update the checked status
-as well as the todo text. If you want to cancel the creation, you can click on the "Cancel" button
-(the one with the "x" icon). If you want to submit the todo, you can click on the "Submit" button (the one
-with the checklist icon).
+When there is no to-dos, then you will need to click the text input. This will create your first to-do. The
+input is a textarea, so you can use Shift+Enter to create a new line. On the other hand, if you only use "Enter",
+it will create a new to-do instead.
 
 <Warning>
   It is not recommended to store sensitive information in the to-do list.
 </Warning>
 
-To check or uncheck a todo, you can click on the checkbox. Alternatively, you can also click on the text instead.
-This is intended because sometimes the checkbox can be hard to click or tap (in smaller devices).
-
-To update the todo, you can click on the "Edit" button (the one with the pencil icon). This will change the todo text
-to an input field, which we can use to change the todo text. We can also tick the checkbox here. Similar to the creation process,
-to cancel the update, click on the "Cancel" button (the one with the "x" icon) and to submit the update,
-you can click on the "Submit" button (the one with the checklist icon).
-
-Lastly, if you want to delete a todo, you can click on the "Delete" button (the one with the bin icon).
+To tick or untick the to-do, click on the checkbox, to the left of the text input. To remove a to-do, you can either
+use the delete button on the right (with the "Trash" icon). Alternatively, you can also use "Backspace" on an empty to-do
+and it will delete that to-do, unless if it is the first one.
 
 <Warning>
   When you click the "Delete" button, it will delete the button at once (without
@@ -55,8 +50,26 @@ Lastly, if you want to delete a todo, you can click on the "Delete" button (the 
   delete a todo.
 </Warning>
 
-To add multiple todos, click the "Add bulk todos". This will open a modal with a big text input, which you can use
-to input multiple todos. To input multiple todos, you can simply create a list, such as:
+## Actions
+
+The actions menu is located on the top-right of the section, which looks like this:
+
+<Demo>
+  <HowToUseActionsMenu />
+</Demo>
+
+It has 3 menu items:
+
+1. **Room information**: this will open a modal with the room name and password, which you can use to share them to others.
+2. **Copy list to clipboard**: this will add the current list of todos to our clipboard, which we can paste anywhere after.
+3. **Add bulk to-dos**: this will open a new modal, which will be explained in the next subsection.
+4. **Leave room**: this will make you leave the room.
+
+### Add bulk to-dos
+
+To add multiple todos, say, if you are copying to-dos from another room, click the "Add bulk todos" menu item from
+the "Actions" menu. This will open a modal with a big text input, which you can use to input multiple todos. To input
+multiple todos, you can create a list like the following:
 
 ```
 Sample input todo 1
@@ -83,17 +96,3 @@ All of these variations above will result in new unchecked todos. If you want to
 - [x] Sample input todo 2
 - [x] Sample input todo 3
 ```
-
-## Actions
-
-The actions menu is located on the top-right of the section, which looks like this:
-
-<Demo>
-  <HowToUseActionsMenu />
-</Demo>
-
-It has 3 menu items:
-
-1. **Room information**: this will open a modal with the room name and password, which you can use to share them to others.
-2. **Copy list to clipboard**: this will add the current list of todos to our clipboard, which we can paste anywhere after.
-3. **Leave room**: this will make you leave the room.

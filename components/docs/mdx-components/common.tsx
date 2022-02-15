@@ -21,7 +21,7 @@ export function AdmonitionTip({ children }: BoxProps) {
 }
 
 export function AdmonitionWarning({ children }: BoxProps) {
-  const bg = useColorModeValue('orange.500', 'orange.200');
+  const bg = useColorModeValue('orange.500', 'orange.300');
   const color = useColorModeValue('white', 'black');
 
   return (
@@ -33,7 +33,7 @@ export function AdmonitionWarning({ children }: BoxProps) {
 
 function Admonition({ children, bg, color, title, Icon }: AdmonitionProps) {
   return (
-    <Box my={4} p={4} bg={bg} rounded="md" color={color}>
+    <Box my={6} borderWidth="thin" borderColor={bg} rounded="md">
       <Box
         mb={2}
         display="flex"
@@ -41,12 +41,18 @@ function Admonition({ children, bg, color, title, Icon }: AdmonitionProps) {
         alignItems="center"
         textTransform="uppercase"
         fontWeight={700}
+        bg={bg}
+        color={color}
+        py={2}
+        px={4}
       >
         <Icon mr={1} />
         {title}
       </Box>
 
-      <Box fontSize="0.875rem">{children}</Box>
+      <Box py={2} px={4} fontSize="0.875rem">
+        {children}
+      </Box>
     </Box>
   );
 }

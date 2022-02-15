@@ -5,8 +5,37 @@ import Head from 'next/head';
 
 import HowToUseMdx from '../docs/how-to-use.mdx';
 
-const Heading2 = (props) => <Box as="h2" {...props} fontSize="1.5rem" my={4} />;
-const Paragraph = (props) => <Box as="p" {...props} mb={2} />;
+const Heading1 = (props) => (
+  <Box
+    as="h1"
+    {...props}
+    fontWeight={700}
+    fontSize="1.625rem"
+    mb={4}
+    id={props.children.toString().toLowerCase().replace(/\s+/g, '-')}
+  />
+);
+const Heading2 = (props) => (
+  <Box
+    as="h2"
+    {...props}
+    fontWeight={700}
+    fontSize="1.5rem"
+    my={4}
+    id={props.children.toString().toLowerCase().replace(/\s+/g, '-')}
+  />
+);
+const Heading3 = (props) => (
+  <Box
+    as="h3"
+    {...props}
+    fontWeight={700}
+    fontSize="1.25rem"
+    my={4}
+    id={props.children.toString().toLowerCase().replace(/\s+/g, '-')}
+  />
+);
+const Paragraph = (props) => <Box as="p" {...props} mb={3} />;
 const Pre = (props) => <Demo as="pre" {...props} p={6} fontSize="0.875rem" />;
 const Ol = (props) => <Box as="ol" {...props} ml={9} />;
 
@@ -28,19 +57,16 @@ const components = {
       (all) => all.HowToUseActionsMenu
     )
   ),
-  HowToUseAddTodoButtons: dynamic(() =>
+  HowToModifyTodos: dynamic(() =>
     import('../docs/mdx-components/how-to-use').then(
-      (all) => all.HowToUseAddTodoButtons
-    )
-  ),
-  HowToUseEditTodo: dynamic(() =>
-    import('../docs/mdx-components/how-to-use').then(
-      (all) => all.HowToUseEditTodo
+      (all) => all.HowToModifyTodos
     )
   ),
   Demo,
   Head,
+  h1: Heading1,
   h2: Heading2,
+  h3: Heading3,
   p: Paragraph,
   pre: Pre,
   ol: Ol,
@@ -55,7 +81,7 @@ const components = {
 
 export function HowToUse() {
   return (
-    <Box px={3} py={2} component="article">
+    <Box px={3} py={2} as="article">
       <HowToUseMdx components={components} />
     </Box>
   );

@@ -1,7 +1,7 @@
 import { Layout } from '../components/Layout';
-import { createRoom } from '../query/rooms';
+import { createRoom } from '../lib/ui/query/rooms';
 import { RoomForm } from '../components/RoomForm';
-import { useCurrentRoom } from '../lib/hooks';
+import { useCurrentRoom } from '../lib/ui/hooks';
 
 export default function CreateRoom() {
   const { isFetching, room, refetchRoom } = useCurrentRoom({
@@ -12,10 +12,6 @@ export default function CreateRoom() {
     redirectToIfInsideRoom: '/room'
   });
 
-  function onSuccessfulAccess() {
-    refetchRoom();
-  }
-
   return (
     <Layout
       isFetching={isFetching}
@@ -24,7 +20,7 @@ export default function CreateRoom() {
     >
       <RoomForm
         request={createRoom}
-        onSuccessfulAccess={onSuccessfulAccess}
+        onSuccessfulAccess={refetchRoom}
         title="Create room"
         loadingButtonTitle="Creating room..."
       />

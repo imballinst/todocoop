@@ -3,35 +3,8 @@ import { StyleObjectOrFn } from '@chakra-ui/styled-system';
 
 // Mostly copied from https://github.com/chakra-ui/chakra-ui/blob/main/packages/theme/src/components/input.ts.
 const variantOutline: StyleObjectOrFn = (props) => {
-  const { theme } = props;
-  const { focusBorderColor: fc, errorBorderColor: ec } = getDefaults(props);
-
   return {
-    field: {
-      border: '1px solid',
-      borderColor: mode('gray.200', 'whiteAlpha.300')(props),
-      bg: 'transparent',
-      _hover: {
-        borderColor: mode('gray.300', 'whiteAlpha.400')(props)
-      },
-      _readOnly: {
-        boxShadow: 'none !important',
-        userSelect: 'all'
-      },
-      _disabled: {
-        opacity: 0.4,
-        cursor: 'not-allowed'
-      },
-      _invalid: {
-        borderColor: getColor(theme, ec),
-        boxShadow: `0 0 0 1px ${getColor(theme, ec)}`
-      },
-      _focus: {
-        zIndex: 1,
-        borderColor: getColor(theme, fc),
-        boxShadow: `0 0 0 1px ${getColor(theme, fc)}`
-      }
-    },
+    field: getInputFieldStyle(props),
     addon: {
       border: '1px solid',
       borderColor: mode('inherit', 'whiteAlpha.50')(props),
@@ -54,6 +27,38 @@ const customInputTheme = {
   defaultProps
 };
 
+// Exported for other inputs, e.g. text area.
+export function getInputFieldStyle(props: any) {
+  const { theme } = props;
+  const { focusBorderColor: fc, errorBorderColor: ec } = getDefaults(props);
+
+  return {
+    border: '1px solid',
+    borderColor: mode('gray.200', 'whiteAlpha.300')(props),
+    bg: 'transparent',
+    _hover: {
+      borderColor: mode('gray.300', 'whiteAlpha.400')(props)
+    },
+    _readOnly: {
+      boxShadow: 'none !important',
+      userSelect: 'all'
+    },
+    _disabled: {
+      opacity: 0.4,
+      cursor: 'not-allowed'
+    },
+    _invalid: {
+      borderColor: getColor(theme, ec),
+      boxShadow: `0 0 0 1px ${getColor(theme, ec)}`
+    },
+    _focus: {
+      zIndex: 1,
+      borderColor: getColor(theme, fc),
+      boxShadow: `0 0 0 1px ${getColor(theme, fc)}`
+    }
+  };
+}
+// Default input theme.
 export default customInputTheme;
 
 function getDefaults(props: Record<string, any>) {

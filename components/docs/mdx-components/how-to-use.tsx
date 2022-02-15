@@ -1,27 +1,45 @@
-import { useRef, useState } from 'react';
-import { useRoomMutations } from '../../../lib/hooks';
-import { Dictionary } from '../../../types';
-import { BaseTodo } from '../../../types/models';
+import { Table, Tbody, Tr } from '@chakra-ui/react';
+import { AxiosResponse } from 'axios';
+import { useEffect } from 'react';
+
+import { BaseRoom, UiRoom } from '../../../lib/models/types';
+import { ApiResponse } from '../../../lib/server/types';
 import { ActionsMenu } from '../../RoomDetail/ActionsMenu';
-import { AddTodoButtons } from '../../RoomDetail/AddTodoButtons';
-import { TodoFormRaw } from '../../RoomDetail/TodoForm';
+import { TodoForm, TodoFormPlaceholder } from '../../RoomDetail/TodoForm';
+import { useTodos } from '../../RoomDetail/todos';
 import { RoomForm } from '../../RoomForm';
 
 const onSuccessfulAccess = () => {};
 const request = async () => {
   // Simulate request roundtrip.
-  return new Promise((res) => {
+  await new Promise((res) => {
     setTimeout(() => {
-      res({ data: {} });
+      res(undefined);
     }, 1000);
   });
+
+  const response: AxiosResponse<ApiResponse<BaseRoom>> = {
+    config: {},
+    data: {
+      data: {
+        name: 'test',
+        password: 'test',
+        todos: []
+      }
+    },
+    status: 200,
+    statusText: 'hello',
+    headers: {}
+  };
+
+  return response;
 };
 
 export function HowToUseRoomAccess() {
   return (
     <RoomForm
       onSuccessfulAccess={onSuccessfulAccess}
-      loadingButtonTitle="Access room"
+      loadingButtonTitle="Accessing room..."
       request={request}
       title="Access room"
     />
@@ -30,11 +48,7 @@ export function HowToUseRoomAccess() {
 
 const stubFn = () => {};
 
-export function HowToUseAddTodoButtons() {
-  return <AddTodoButtons onBulkAdd={stubFn} onSingleAdd={stubFn} />;
-}
-
-const ROOM_OBJECT = {
+const ROOM_OBJECT: UiRoom = {
   name: 'Test Room',
   password: 'Test Password',
   todos: [
@@ -42,45 +56,63 @@ const ROOM_OBJECT = {
       isChecked: false,
       title: 'hello world',
       _id: 'test-id',
-      isPersisted: true,
+      indexOrder: 0,
+      state: 'unmodified',
+      updatedAt: new Date().toISOString(),
       localId: 'test-id'
     }
   ]
 };
 
-export function HowToUseEditTodo() {
-  const localIdToEditedListElementMap = useRef<Dictionary<BaseTodo>>({});
-  const [currentTodos, setCurrentTodos] = useState<BaseTodo[]>(
-    ROOM_OBJECT.todos
-  );
+const INITIAL_STATE = [];
 
-  const { addTodoMutation, deleteTodoMutation, updateTodoMutation } =
-    useRoomMutations({
-      onCreateTodo: async () => ({}),
-      onDeleteTodo: async () => ({}),
-      onUpdateTodo: async () => ({})
-    });
+export function HowToModifyTodos() {
+  const { control, fieldArrayActions, lastIndexRef, todos } = useTodos({
+    roomTodos: INITIAL_STATE,
+    limit: 5
+  });
+
+  useEffect(() => {
+    lastIndexRef.current = todos.length - 1;
+  }, [lastIndexRef, todos]);
 
   return (
-    <TodoFormRaw
-      index={0}
-      roomName="test"
-      todo={currentTodos[0]}
-      setCurrentTodos={setCurrentTodos}
-      localIdToEditedListElementMap={localIdToEditedListElementMap}
-      addTodoMutation={addTodoMutation}
-      deleteTodoMutation={deleteTodoMutation}
-      updateTodoMutation={updateTodoMutation}
-    />
+    <Table variant="simple" width="100%">
+      <Tbody>
+        {todos.map((todo, index) => (
+          <Tr key={`${todo.localId}-${index}`}>
+            <TodoForm
+              index={index}
+              todo={todo}
+              control={control}
+              lastIndexRef={lastIndexRef}
+              {...fieldArrayActions}
+            />
+          </Tr>
+        ))}
+
+        {todos.length === 0 && (
+          <Tr>
+            <TodoFormPlaceholder insert={fieldArrayActions.insert} />
+          </Tr>
+        )}
+      </Tbody>
+    </Table>
   );
 }
 
 export function HowToUseActionsMenu() {
+  const { fieldArrayActions } = useTodos({
+    roomTodos: ROOM_OBJECT.todos,
+    limit: 5
+  });
+
   return (
     <ActionsMenu
       room={ROOM_OBJECT}
       currentTodos={ROOM_OBJECT.todos}
       onLeaveRoom={stubFn}
+      append={fieldArrayActions.append}
     />
   );
 }

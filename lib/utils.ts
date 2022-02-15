@@ -1,5 +1,6 @@
+import { AxiosError } from 'axios';
 import { useEffect } from 'react';
-import { BaseTodo } from '../types/models';
+import { BaseTodo } from './models/types';
 
 export function generateHash(length = 5) {
   const timestampHash = Date.now().toString(36);
@@ -31,7 +32,7 @@ export function useDebugEffect<T>(name: string, val: T) {
   }, [val]);
 }
 
-export async function getErrorMessage(error: any) {
+export function getErrorMessage(error: AxiosError) {
   if (error?.response) {
     if (error.response.data.errors) {
       return error.response.data.errors.map((el) => el.message).join('; ');
@@ -65,6 +66,8 @@ export function parseRawTodoText(str: string): BaseTodo {
   return {
     isChecked,
     title,
+    indexOrder: 0,
+    updatedAt: new Date().toISOString(),
     localId: generateHash()
   };
 }

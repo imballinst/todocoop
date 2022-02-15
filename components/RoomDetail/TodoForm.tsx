@@ -1,284 +1,259 @@
-import {
-  ChangeEvent,
-  Dispatch,
-  memo,
-  MutableRefObject,
-  ReactNode,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
-import {
-  CheckIcon,
-  DeleteIcon,
-  EditIcon,
-  SmallCloseIcon
-} from '@chakra-ui/icons';
+import { MutableRefObject, ReactNode } from 'react';
+import { DeleteIcon } from '@chakra-ui/icons';
 import {
   Box,
   Checkbox,
   FormControl,
-  FormHelperText,
-  HStack,
+  FormErrorMessage,
   IconButton,
-  Input,
+  Textarea,
   TableCellProps,
   Td
 } from '@chakra-ui/react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useRoomMutations } from '../../lib/hooks';
-import { replaceArrayElementAtIndex } from '../../lib/utils';
-import { Dictionary } from '../../types';
-import { BaseTodo } from '../../types/models';
+import {
+  Control,
+  useController,
+  UseFieldArrayInsert,
+  UseFieldArrayReturn,
+  UseFormSetFocus
+} from 'react-hook-form';
+import { generateHash } from '../../lib/utils';
+import { UiTodo } from '../../lib/models/types';
+import { RoomFormState } from './types';
 
-export const TodoForm = memo(
-  (props: {
-    roomName: string;
-    todo: BaseTodo;
-    index: number;
-    localIdToEditedListElementMap: MutableRefObject<Dictionary<BaseTodo>>;
-    setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
-  }) => {
-    const hooks = useRoomMutations();
+interface TodoFormBaseProps {
+  todo: UiTodo;
+  index: number;
+  control: Control<{ todos: UiTodo[] }, object>;
+  lastIndexRef: MutableRefObject<number>;
+  // Field array actions.
+  setFocus: UseFormSetFocus<RoomFormState>;
+  remove: (todo: UiTodo, index: number) => void;
+  // TODO(imballinst): update this after https://github.com/react-hook-form/react-hook-form/issues/7821
+  // is responded.
+  update: UseFieldArrayReturn<RoomFormState, 'todos', 'id'>['update'];
+  insert: UseFieldArrayInsert<RoomFormState, 'todos'>;
+}
 
-    return <TodoFormRaw {...props} {...hooks} />;
-  }
-);
-
-type UseRoomMutationType = ReturnType<typeof useRoomMutations>;
-
-export function TodoFormRaw({
-  roomName,
+export function TodoForm({
   todo,
   index,
-  localIdToEditedListElementMap,
-  setCurrentTodos,
-  addTodoMutation,
-  updateTodoMutation,
-  deleteTodoMutation
-}: {
-  roomName: string;
-  todo: BaseTodo;
-  index: number;
-  localIdToEditedListElementMap: MutableRefObject<Dictionary<BaseTodo>>;
-  setCurrentTodos: Dispatch<SetStateAction<BaseTodo[]>>;
-  // These are from `useRoomMutations`.
-  addTodoMutation: UseRoomMutationType['addTodoMutation'];
-  updateTodoMutation: UseRoomMutationType['updateTodoMutation'];
-  deleteTodoMutation: UseRoomMutationType['deleteTodoMutation'];
-}) {
-  const {
+  control,
+  lastIndexRef,
+  setFocus,
+  remove,
+  insert,
+  update
+}: TodoFormBaseProps) {
+  const checkboxController = useController({
     control,
-    formState: { errors },
-    reset
-  } = useForm({
-    defaultValues: todo
+    name: `todos.${index}.isChecked`
+  });
+  const textareaController = useController({
+    control,
+    name: `todos.${index}.title`,
+    rules: {
+      required: 'This field is required'
+    }
   });
 
-  const {
-    isPersisted,
-    _id: todoId,
-    localId,
-    title,
-    isChecked
-  } = useWatch({ control });
-
-  const [isEditing, setIsEditing] = useState(!isPersisted);
-  const previousValue = useRef<BaseTodo>(todo);
-
-  useEffect(() => {
-    if (!isEditing) {
-      previousValue.current = todo;
-      reset(todo);
-    }
-  }, [isEditing, todo, reset]);
-
-  useEffect(() => {
-    if (isEditing) {
-      localIdToEditedListElementMap.current[localId] = {
-        isPersisted,
-        _id: todoId,
-        localId,
-        title,
-        isChecked
-      };
-    }
-  }, [
-    localIdToEditedListElementMap,
-    localId,
-    isEditing,
-    isPersisted,
-    todoId,
-    isChecked,
-    title
-  ]);
-
-  function onSave() {
-    // Finish save happens when the text field is blurred, or when
-    // the checkbox tick is changed.
-    if (!isPersisted) {
-      addTodoMutation.mutate({
-        name: roomName,
-        todo: {
-          title,
-          localId,
-          isChecked,
-          isPersisted: true
-        }
-      });
-    } else {
-      updateTodoMutation.mutate({
-        name: roomName,
-        todo: {
-          _id: todoId,
-          localId,
-          isPersisted: true,
-          title,
-          isChecked
-        }
-      });
-    }
-
-    previousValue.current = todo;
-    setIsEditing(false);
-  }
-
-  function onChangeTick(e: ChangeEvent<HTMLInputElement>) {
-    previousValue.current = todo;
-    updateTodoMutation.mutate({
-      name: roomName,
-      todo: {
-        _id: todoId,
-        localId,
-        isPersisted: true,
-        title,
-        isChecked: e.target.checked
-      }
-    });
-  }
-
-  function onDelete() {
-    deleteTodoMutation.mutate({ name: roomName, todoId: todo._id });
-  }
-
-  return isEditing ? (
+  return (
     <>
       <TableColumn colSpan={2}>
         <Box display="flex">
-          <Controller
-            render={({ field }) => (
-              <Checkbox
-                name={field.name}
-                onBlur={field.onBlur}
-                onChange={field.onChange}
-                isChecked={field.value}
-                ref={field.ref}
-              />
-            )}
-            name="isChecked"
-            control={control}
+          <Checkbox
+            {...checkboxController.field}
+            isChecked={checkboxController.field.value}
+            value={todo.localId}
+            autoFocus={false}
+            onChange={(e) => {
+              checkboxController.field.onChange(e);
+              update(index, {
+                ...todo,
+                isChecked: e.target.checked,
+                updatedAt: new Date().toISOString(),
+                state: todo.state === 'added' ? 'added' : 'modified'
+              });
+            }}
           />
 
-          <FormControl ml={2}>
-            <Controller
-              render={({ field }) => <Input {...field} />}
-              name="title"
-              control={control}
+          <FormControl
+            ml={2}
+            isInvalid={textareaController.fieldState.error !== undefined}
+          >
+            <Textarea
+              {...textareaController.field}
+              resize="none"
+              // isInvalid={textareaController.fieldState.error !== undefined}
+              rows={1}
+              ref={(node) => {
+                textareaController.field.ref(node);
+
+                if (node) {
+                  // Make the height scale.
+                  node.style.overflow = 'hidden';
+                  node.style.height = '0';
+                  node.style.height = node.scrollHeight + 'px';
+                }
+              }}
+              onChange={(e) => {
+                textareaController.field.onChange(e);
+                update(index, {
+                  ...todo,
+                  title: e.target.value,
+                  updatedAt: new Date().toISOString(),
+                  state: todo.state === 'added' ? 'added' : 'modified'
+                });
+
+                // Make the height scale.
+                e.target.style.overflow = 'hidden';
+                e.target.style.height = '0';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }}
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'ArrowUp' &&
+                  e.currentTarget.selectionStart === 0
+                ) {
+                  // Arrow up and start of the text area, go to the previous text input.
+                  if (index > 0) {
+                    e.preventDefault();
+                    setFocus(`todos.${index - 1}.title`);
+                  }
+                } else if (
+                  e.key === 'ArrowDown' &&
+                  e.currentTarget.selectionStart === todo.title.length
+                ) {
+                  // Arrow down and at the end of the text area, go to the next text input.
+                  if (index < lastIndexRef.current) {
+                    e.preventDefault();
+                    setFocus(`todos.${index + 1}.title`);
+                  }
+                } else if (
+                  textareaController.field.value === '' &&
+                  e.key === 'Backspace' &&
+                  !e.shiftKey
+                ) {
+                  e.preventDefault();
+
+                  if (index > 0) {
+                    remove(todo, index);
+                    // Only set focus to the previous input if exists.
+                    setFocus(`todos.${index - 1}.title`);
+                  }
+                } else if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+
+                  insert(
+                    index + 1,
+                    {
+                      localId: generateHash(),
+                      state: 'added',
+                      isChecked: false,
+                      // Instead of adding this by 1, add by 0.01 instead.
+                      // The intention is that, the other devices will always see the same order. Perhpas.
+                      indexOrder: index + 0.01,
+                      title: ''
+                    },
+                    {
+                      focusName: `todos.${index + 1}.title`
+                    }
+                  );
+                }
+              }}
             />
 
-            {errors[index]?.title && (
-              <FormHelperText>{errors[index]?.title}</FormHelperText>
+            {textareaController.fieldState.error && (
+              <FormErrorMessage>
+                {textareaController.fieldState.error.message}
+              </FormErrorMessage>
             )}
           </FormControl>
         </Box>
       </TableColumn>
 
       <TableColumn width={1}>
-        <HStack spacing={2} direction="row" justifyContent="flex-end">
-          <IconButton
-            minWidth="var(--chakra-sizes-6)"
-            height="var(--chakra-sizes-6)"
-            variant="ghost"
-            colorScheme="teal"
-            onClick={() => {
-              localIdToEditedListElementMap.current[localId] = undefined;
-
-              if (todo.isPersisted) {
-                setIsEditing(false);
-              } else {
-                setCurrentTodos((oldState) => {
-                  const idxToDelete = oldState.findIndex(
-                    (el) => el.localId === todo.localId
-                  );
-                  return replaceArrayElementAtIndex(oldState, idxToDelete);
-                });
-              }
-            }}
-            aria-label="Cancel"
-            icon={<SmallCloseIcon />}
-          />
-          <IconButton
-            minWidth="var(--chakra-sizes-6)"
-            height="var(--chakra-sizes-6)"
-            variant="ghost"
-            colorScheme="teal"
-            onClick={onSave}
-            aria-label="Save"
-            icon={<CheckIcon />}
-          />
-        </HStack>
-      </TableColumn>
-    </>
-  ) : (
-    <>
-      <TableColumn colSpan={2}>
-        <Controller
-          render={({ field }) => (
-            <Checkbox
-              name={field.name}
-              onBlur={field.onBlur}
-              isChecked={field.value}
-              ref={field.ref}
-              onChange={(e) => {
-                field.onChange(e);
-                onChangeTick(e);
-              }}
-              colorScheme="teal"
-            >
-              {todo.title || title}
-            </Checkbox>
-          )}
-          name="isChecked"
-          control={control}
+        <IconButton
+          minWidth="var(--chakra-sizes-6)"
+          height="var(--chakra-sizes-6)"
+          variant="ghost"
+          colorScheme="teal"
+          onClick={() => remove(todo, index)}
+          aria-label="Edit"
+          icon={<DeleteIcon />}
+          // Hide the first button for screen readers.
+          aria-hidden={index === 0}
+          // Visually hide the first button for non-screen readers.
+          visibility={index > 0 ? 'unset' : 'hidden'}
         />
       </TableColumn>
+    </>
+  );
+}
+
+export function TodoFormPlaceholder({
+  insert
+}: Pick<TodoFormBaseProps, 'insert'>) {
+  return (
+    <>
+      <TableColumn colSpan={2}>
+        <Box display="flex">
+          <Checkbox aria-hidden={true} visibility="hidden" />
+
+          <FormControl ml={2}>
+            <Textarea
+              onFocus={() => {
+                insert(
+                  0,
+                  {
+                    indexOrder: 0,
+                    isChecked: false,
+                    localId: generateHash(),
+                    state: 'added',
+                    title: '',
+                    updatedAt: new Date().toISOString()
+                  },
+                  {
+                    focusName: `todos.0.title`
+                  }
+                );
+              }}
+              rows={1}
+              ref={(node) => {
+                if (node) {
+                  // Make the height scale.
+                  node.style.overflow = 'hidden';
+                  node.style.height = '0';
+                  node.style.height = node.scrollHeight + 'px';
+                }
+              }}
+            />
+          </FormControl>
+        </Box>
+      </TableColumn>
+
       <TableColumn width={1}>
-        <HStack spacing={2} direction="row" justifyContent="flex-end">
-          <IconButton
-            minWidth="var(--chakra-sizes-6)"
-            height="var(--chakra-sizes-6)"
-            variant="ghost"
-            colorScheme="teal"
-            onClick={() => setIsEditing(true)}
-            aria-label="Edit"
-            icon={<EditIcon />}
-          />
-          <IconButton
-            minWidth="var(--chakra-sizes-6)"
-            height="var(--chakra-sizes-6)"
-            variant="ghost"
-            colorScheme="teal"
-            onClick={onDelete}
-            aria-label="Edit"
-            icon={<DeleteIcon />}
-          />
-        </HStack>
+        <IconButton
+          minWidth="var(--chakra-sizes-6)"
+          height="var(--chakra-sizes-6)"
+          aria-label="Edit"
+          icon={<DeleteIcon />}
+          aria-hidden={true}
+          visibility="hidden"
+        />
       </TableColumn>
     </>
   );
 }
 
 function TableColumn(props: { children: ReactNode } & TableCellProps) {
-  return <Td {...props} paddingInline={3} py={2} />;
+  return (
+    <Td
+      {...props}
+      paddingInline={3}
+      py={2}
+      borderBottom="0"
+      borderColor="transparent"
+    />
+  );
 }
