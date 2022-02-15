@@ -50,7 +50,8 @@ export function RoomForm({
     try {
       setIsSubmitting(true);
 
-      const { data, errors } = await request(formData);
+      const { data: responseData } = await request(formData);
+      const { data, errors } = responseData;
       if (!data) throw new Error(errors?.join(', '));
 
       onSuccessfulAccess();
