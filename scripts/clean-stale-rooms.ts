@@ -35,12 +35,7 @@ const URI = `mongodb+srv://${MONGODB_ADMIN}:${MONGODB_PASSWORD}@${MONGODB_CLUSTE
 
 (async () => {
   try {
-    await mongoose.connect(URI, {
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-      useCreateIndex: true
-    });
+    await mongoose.connect(URI);
 
     const response = await RoomModel.deleteMany({
       updatedAt: {
