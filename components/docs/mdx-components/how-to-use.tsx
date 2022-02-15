@@ -102,11 +102,17 @@ export function HowToModifyTodos() {
 }
 
 export function HowToUseActionsMenu() {
+  const { fieldArrayActions } = useTodos({
+    roomTodos: ROOM_OBJECT.todos,
+    limit: 5
+  });
+
   return (
     <ActionsMenu
       room={ROOM_OBJECT}
       currentTodos={ROOM_OBJECT.todos}
       onLeaveRoom={stubFn}
+      append={fieldArrayActions.append}
     />
   );
 }
