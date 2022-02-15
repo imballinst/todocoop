@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   cleanup:
     docker:
-      - image: cimg/node:16
+      - image: cimg/node:16.14
     steps:
       - checkout
       - restore_cache:
