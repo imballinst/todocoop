@@ -150,7 +150,9 @@ export function TodoForm({
                       localId: generateHash(),
                       state: 'added',
                       isChecked: false,
-                      indexOrder: index + 1,
+                      // Instead of adding this by 1, add by 0.01 instead.
+                      // The intention is that, the other devices will always see the same order. Perhpas.
+                      indexOrder: index + 0.01,
                       title: ''
                     },
                     {
