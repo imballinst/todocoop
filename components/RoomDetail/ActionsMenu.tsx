@@ -10,7 +10,8 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  Textarea
+  Textarea,
+  Portal
 } from '@chakra-ui/react';
 import { Box, Flex, HStack } from '@chakra-ui/layout';
 import { ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons';
@@ -179,28 +180,30 @@ export function ActionsMenu({
       <Menu>
         {menuButton}
 
-        <MenuList>
-          <MenuItem
-            onClick={() => {
-              onOpen();
-              setModalMode('roomInfo');
-            }}
-          >
-            Room information
-          </MenuItem>
-          <MenuItem onClick={copyListToClipboard}>
-            Copy list to clipboard
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              onOpen();
-              setModalMode('todoImport');
-            }}
-          >
-            Add bulk to-dos
-          </MenuItem>
-          <MenuItem onClick={onLeaveRoomClick}>Leave room</MenuItem>
-        </MenuList>
+        <Portal>
+          <MenuList>
+            <MenuItem
+              onClick={() => {
+                onOpen();
+                setModalMode('roomInfo');
+              }}
+            >
+              Room information
+            </MenuItem>
+            <MenuItem onClick={copyListToClipboard}>
+              Copy list to clipboard
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                onOpen();
+                setModalMode('todoImport');
+              }}
+            >
+              Add bulk to-dos
+            </MenuItem>
+            <MenuItem onClick={onLeaveRoomClick}>Leave room</MenuItem>
+          </MenuList>
+        </Portal>
       </Menu>
 
       <Modal isOpen={isOpen} onClose={onClose}>
