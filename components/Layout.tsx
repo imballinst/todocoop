@@ -1,12 +1,12 @@
 import { ReactNode } from 'react';
 import Head from 'next/head';
 import { Spinner } from '@chakra-ui/spinner';
-import { useColorModeValue } from '@chakra-ui/react';
+import { useColorModeValue, Text } from '@chakra-ui/react';
 
 import { useColorMode } from '@chakra-ui/color-mode';
 import { IconButton } from '@chakra-ui/button';
 import { Box, Flex, HStack } from '@chakra-ui/layout';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { ExternalLinkIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 
 import { AppLink } from './AppLink';
 import { EFFECTIVE_WIDTHS } from '../lib/ui/constants';
@@ -30,7 +30,7 @@ export function Layout({
   const bg = useColorModeValue('white', 'gray.800');
 
   return (
-    <div>
+    <Box display="flex" flexDirection="column" height="100vh">
       <Head>
         <title>{title ? `${title} - ` : ''}TodoCoop</title>
         <meta charSet="utf-8" />
@@ -76,8 +76,8 @@ export function Layout({
       </Box>
 
       <Box
-        height="calc(100vh - 56px)"
         display="flex"
+        flex="1"
         flexDirection="row"
         justifyContent="center"
         mt="56px"
@@ -98,6 +98,17 @@ export function Layout({
           ) : null}
         </Box>
       </Box>
-    </div>
+
+      <Box textAlign="center" fontWeight={700} mt={12} py={2}>
+        <Text as="small" display="block">
+          Copyright © 2020-{new Date().getFullYear()}, Try Ajitiono
+        </Text>
+        <Text as="small" display="block">
+          <AppLink href="https://github.com/imballinst/todocoop" isExternal>
+            View this project on GitHub <ExternalLinkIcon mx="2px" />
+          </AppLink>
+        </Text>
+      </Box>
+    </Box>
   );
 }

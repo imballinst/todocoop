@@ -12,7 +12,7 @@ import {
   FormLabel,
   Textarea
 } from '@chakra-ui/react';
-import { Box, Flex, HStack, Link } from '@chakra-ui/layout';
+import { Box, Flex, HStack } from '@chakra-ui/layout';
 import { ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons';
 import { Button, IconButton } from '@chakra-ui/button';
 import { useDisclosure } from '@chakra-ui/hooks';
@@ -36,6 +36,7 @@ import {
 import { leaveRoom } from '../../lib/ui/query/rooms';
 import { BaseRoom, UiTodo } from '../../lib/models/types';
 import { RoomFormState } from './types';
+import { AppLink } from '../AppLink';
 
 interface Props {
   currentTodos: UiTodo[];
@@ -245,9 +246,9 @@ export function ActionsMenu({
                   <FormHelperText>
                     By default, each line will be added as a new unchecked entry
                     unless specified as checked. For more information, see the{' '}
-                    <Link href="/how-to-use#add-bulk-to-dos" isExternal>
+                    <AppLink href="/how-to-use#add-bulk-to-dos" isExternal>
                       how to use section <ExternalLinkIcon mx="2px" />
-                    </Link>
+                    </AppLink>
                     .
                   </FormHelperText>
                 </FormControl>

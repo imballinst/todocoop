@@ -12,7 +12,11 @@ export function AppLink({
 
   return (
     <NextLink passHref href={href}>
-      <Link {...rest} fontWeight={router.pathname === href ? 700 : 400}>
+      <Link
+        {...rest}
+        fontWeight={router.pathname === href ? 700 : 400}
+        display="inline-flex"
+      >
         {children}
       </Link>
     </NextLink>

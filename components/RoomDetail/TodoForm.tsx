@@ -84,7 +84,6 @@ export function TodoForm({
             <Textarea
               {...textareaController.field}
               resize="none"
-              // isInvalid={textareaController.fieldState.error !== undefined}
               rows={1}
               ref={(node) => {
                 textareaController.field.ref(node);
@@ -95,6 +94,9 @@ export function TodoForm({
                   node.style.height = '0';
                   node.style.height = node.scrollHeight + 'px';
                 }
+              }}
+              onFocus={(e) => {
+                e.currentTarget.selectionStart = e.currentTarget.value.length;
               }}
               onChange={(e) => {
                 textareaController.field.onChange(e);
@@ -202,6 +204,7 @@ export function TodoFormPlaceholder({
 
           <FormControl ml={2}>
             <Textarea
+              resize="none"
               onFocus={() => {
                 insert(
                   0,

@@ -33,7 +33,7 @@ export function RoomDetail({ room }: RoomProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Every 10 seconds, if it's idle, then sync.
+      // Every 5 seconds, if it's idle, then sync.
       submitButtonRef.current.click();
     }, 5000);
 
