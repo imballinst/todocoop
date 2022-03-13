@@ -1,0 +1,49 @@
+{
+  "name": "todocoop",
+  "version": "1.0.0",
+  "description": "Todocoop is a collaborative to-do list web application, without needing to create an account. All anonymous!",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "build": "remix build",
+    "dev": "cross-env NODE_ENV=development netlify dev",
+    "postinstall": "remix setup node",
+    "start": "cross-env NODE_ENV=production netlify dev"
+  },
+  "dependencies": {
+    "@chakra-ui/icons": "1.1.7",
+    "@chakra-ui/react": "1.8.6",
+    "@emotion/react": "11.8.2",
+    "@emotion/styled": "11.8.1",
+    "@fontsource/montserrat": "4.5.5",
+    "@netlify/functions": "0.10.0",
+    "@remix-run/netlify": "1.2.3",
+    "@remix-run/react": "1.2.3",
+    "framer-motion": "6.2.8",
+    "iron-session": "6.0.5",
+    "mongodb-client-encryption": "2.0.0",
+    "mongoose": "6.2.6",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-hook-form": "7.28.0",
+    "react-icons": "4.3.1",
+    "remix": "1.2.3"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "1.2.3",
+    "@remix-run/eslint-config": "1.2.3",
+    "@types/jest": "27.4.1",
+    "@types/react": "17.0.24",
+    "@types/react-dom": "17.0.9",
+    "cross-env": "7.0.3",
+    "eslint": "8.9.0",
+    "jest": "27.5.1",
+    "prettier": "2.5.1",
+    "ts-node": "10.7.0",
+    "typescript": "4.5.5"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
