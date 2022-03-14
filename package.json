@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Todocoop is a collaborative to-do list web application, without needing to create an account. All anonymous!",
   "license": "MIT",
-  "type": "module",
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
@@ -15,6 +14,7 @@
     "@chakra-ui/icons": "1.1.7",
     "@chakra-ui/react": "1.8.6",
     "@emotion/react": "11.8.2",
+    "@emotion/server": "11.4.0",
     "@emotion/styled": "11.8.1",
     "@fontsource/montserrat": "4.5.5",
     "@netlify/functions": "0.10.0",

@@ -37,7 +37,7 @@ export const appTheme = extendTheme(
       },
       Textarea: {
         variants: {
-          outline: (props) => getInputFieldStyle(props)
+          outline: getInputFieldStyle
         },
         defaultProps: {
           variant: 'outline'
