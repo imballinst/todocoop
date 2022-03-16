@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@chakra-ui/button';
 import {
   FormControl,
@@ -7,10 +8,10 @@ import {
 import { Input } from '@chakra-ui/input';
 import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
 import { ThemingProps, useToast } from '@chakra-ui/react';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { getErrorMessage } from '../lib/utils';
-import { createRoom, CreateRoomParameters } from '../lib/ui/query/rooms';
+
+import { createRoom, CreateRoomParameters } from '~/lib/ui/fetch';
+import { sleep } from '~/lib/utils';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
   name: '',
@@ -43,27 +44,28 @@ export function RoomForm({
   } = useForm({
     defaultValues: FORM_DEFAULT_VALUES
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitState, setSubmitState] = useState<
+    'idle' | 'submitting' | 'submitted'
+  >('idle');
   const toast = useToast();
 
   async function onSubmit(formData: CreateRoomParameters) {
     try {
-      setIsSubmitting(true);
-
-      const { data: responseData } = await request(formData);
-      const { data, errors } = responseData;
-      if (!data) throw new Error(errors?.join(', '));
+      setSubmitState('submitting');
+      request(formData);
 
       onSuccessfulAccess();
-    } catch (err) {
+      setSubmitState('submitted');
+      await sleep();
+    } catch (err: any) {
       console.error(err);
       toast({
         title: 'Failed to access room.',
-        description: getErrorMessage(err),
+        description: err.message,
         status: 'error'
       });
     } finally {
-      setIsSubmitting(false);
+      setSubmitState('idle');
     }
   }
 
@@ -114,8 +116,13 @@ export function RoomForm({
           </FormControl>
         </VStack>
 
-        <Button mt={2} isFullWidth type="submit" isDisabled={isSubmitting}>
-          {isSubmitting ? loadingButtonTitle : buttonTitle}
+        <Button
+          mt={2}
+          isFullWidth
+          type="submit"
+          isDisabled={submitState === 'submitting'}
+        >
+          {submitState === 'submitting' ? loadingButtonTitle : buttonTitle}
         </Button>
       </Box>
     </Flex>

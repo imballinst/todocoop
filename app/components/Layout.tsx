@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import Head from 'next/head';
 import { Spinner } from '@chakra-ui/spinner';
 import { useColorModeValue, Text } from '@chakra-ui/react';
 
@@ -15,14 +14,12 @@ import { useClientState } from './contexts/ClientStateContext';
 interface LayoutProps {
   children: ReactNode;
   isLoggedInToARoom: boolean;
-  title?: string;
   isFetching: boolean;
 }
 
 export function Layout({
   children,
   isLoggedInToARoom,
-  title,
   isFetching
 }: LayoutProps) {
   const { isAccessingRoom } = useClientState();
@@ -30,12 +27,7 @@ export function Layout({
   const bg = useColorModeValue('white', 'gray.800');
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh">
-      <Head>
-        <title>{title ? `${title} - ` : ''}TodoCoop</title>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
+    <>
       <Box
         as="header"
         boxShadow="sm"
@@ -109,6 +101,6 @@ export function Layout({
           </AppLink>
         </Text>
       </Box>
-    </Box>
+    </>
   );
 }

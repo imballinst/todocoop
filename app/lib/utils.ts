@@ -63,6 +63,14 @@ export function deepClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
+export function sleep(ms = 1000) {
+  return new Promise((res) => {
+    setTimeout(() => {
+      res(undefined);
+    }, ms);
+  });
+}
+
 // Copied from https://stackoverflow.com/a/30810322.
 // Not using document.execCommand('copy') because it's obsolete.
 export async function copyTextToClipboard(text: string) {

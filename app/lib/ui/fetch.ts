@@ -1,5 +1,6 @@
 import { ApiResponse } from '../server/types';
 import { BaseRoom, BaseTodo } from '../models/types';
+import { ErrorObject } from '../types';
 
 export interface CreateRoomParameters {
   name: string;
@@ -65,7 +66,7 @@ async function doFetch<T>(url: RequestInfo, init?: RequestInit): Promise<T> {
 async function getResponseErrorMessage(response: Response) {
   if (response.headers.get('content-type') === 'application/json') {
     const json = await response.json();
-    return json.errors.map((el: any) => el.message).join('; ');
+    return json.errors.map((el: ErrorObject) => el.message).join('; ');
   }
 
   return response.statusText;
