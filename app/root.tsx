@@ -12,6 +12,7 @@ import {
 
 import { ServerStyleContext, ClientStyleContext } from './context';
 import { appTheme } from './theme';
+import { ClientStateProvider } from './components/contexts/ClientStateContext';
 
 interface DocumentProps {
   children: React.ReactNode;
@@ -72,7 +73,9 @@ export default function App() {
   return (
     <Document>
       <ChakraProvider theme={appTheme}>
-        <Outlet />
+        <ClientStateProvider>
+          <Outlet />
+        </ClientStateProvider>
       </ChakraProvider>
     </Document>
   );

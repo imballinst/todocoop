@@ -1,5 +1,4 @@
 import { Table, Tbody, Tr } from '@chakra-ui/react';
-import { AxiosResponse } from 'axios';
 import { useEffect } from 'react';
 
 import { BaseRoom, UiRoom } from '../../../lib/models/types';
@@ -18,18 +17,12 @@ const request = async () => {
     }, 1000);
   });
 
-  const response: AxiosResponse<ApiResponse<BaseRoom>> = {
-    config: {},
+  const response: ApiResponse<BaseRoom> = {
     data: {
-      data: {
-        name: 'test',
-        password: 'test',
-        todos: []
-      }
-    },
-    status: 200,
-    statusText: 'hello',
-    headers: {}
+      name: 'test',
+      password: 'test',
+      todos: []
+    }
   };
 
   return response;
@@ -64,7 +57,7 @@ const ROOM_OBJECT: UiRoom = {
   ]
 };
 
-const INITIAL_STATE = [];
+const INITIAL_STATE: UiRoom['todos'] = [];
 
 export function HowToModifyTodos() {
   const { control, fieldArrayActions, lastIndexRef, todos } = useTodos({
