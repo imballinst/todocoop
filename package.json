@@ -21,7 +21,6 @@
     "@remix-run/netlify": "1.2.3",
     "@remix-run/react": "1.2.3",
     "framer-motion": "6.2.8",
-    "iron-session": "6.0.5",
     "mongodb-client-encryption": "2.0.0",
     "mongoose": "6.2.6",
     "react": "17.0.2",

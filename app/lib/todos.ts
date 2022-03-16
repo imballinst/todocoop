@@ -28,9 +28,11 @@ export function mergeTodos<TModelTodo extends BaseTodo>({
       const clientUpdatedAt = new Date(todo.updatedAt).getTime();
 
       if (clientUpdatedAt > serverUpdatedAt) {
-        for (const key in todo) {
-          serverTodo[key] = todo[key];
-        }
+        serverTodo.title = todo.title;
+        serverTodo.isChecked = todo.isChecked;
+        serverTodo.indexOrder = todo.indexOrder;
+        serverTodo.updatedAt = todo.updatedAt;
+        serverTodo.localId = todo.localId;
       }
     }
   }

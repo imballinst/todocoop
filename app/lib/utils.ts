@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { useEffect } from 'react';
 import { BaseTodo } from './models/types';
 
@@ -30,18 +29,6 @@ export function useDebugEffect<T>(name: string, val: T) {
     console.debug('-----');
     console.debug(`${name} changed: ${val}`);
   }, [val]);
-}
-
-export function getErrorMessage(error: AxiosError) {
-  if (error?.response) {
-    if (error.response.data.errors) {
-      return error.response.data.errors.map((el) => el.message).join('; ');
-    }
-
-    return error.response.statusText;
-  }
-
-  return 'Unexpected error occurred. Please check your connection and try again.';
 }
 
 export function parseRawTodoText(str: string): BaseTodo {
