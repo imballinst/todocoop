@@ -2,14 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import { Box, Flex, Heading } from '@chakra-ui/layout';
 import { Button } from '@chakra-ui/button';
 import { Table, Tbody, Tr } from '@chakra-ui/table';
-import { useQueryClient } from 'react-query';
 
-import { useSyncRoom } from '../../lib/ui/hooks';
 import { UiRoom, BaseTodo } from '../../lib/models/types';
 import { TodoForm, TodoFormPlaceholder } from './TodoForm';
 import { ActionsMenu } from './ActionsMenu';
 import { useTodos } from './todos';
 import { RoomFormState } from './types';
+import { useFetcher } from 'remix';
 
 interface RoomProps {
   room: UiRoom;
@@ -18,8 +17,8 @@ interface RoomProps {
 export function RoomDetail({ room }: RoomProps) {
   const { name, todos: roomTodos } = room;
 
-  const queryClient = useQueryClient();
-  const submitButtonRef = useRef<HTMLButtonElement>();
+  const submitButtonRef = useRef<HTMLButtonElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const {
     control,
@@ -33,8 +32,10 @@ export function RoomDetail({ room }: RoomProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Every 5 seconds, if it's idle, then sync.
-      submitButtonRef.current.click();
+      if (submitButtonRef.current) {
+        // Every 5 seconds, if it's idle, then sync.
+        submitButtonRef.current.click();
+      }
     }, 5000);
 
     lastIndexRef.current = todos.length - 1;
@@ -45,12 +46,14 @@ export function RoomDetail({ room }: RoomProps) {
     };
   }, [lastIndexRef, todos]);
 
-  const syncMutations = useSyncRoom({
-    onSettled: (room) => {
-      reset({ todos: room.todos });
+  const todosFetcher = useFetcher();
+
+  useEffect(() => {
+    if (todosFetcher.type === 'done' && todosFetcher.data.todos) {
+      reset({ todos: todosFetcher.data.todos });
       removedTodosRef.current = [];
     }
-  });
+  }, [reset, todosFetcher]);
 
   async function onDataValid(data: RoomFormState) {
     const added: BaseTodo[] = [];
@@ -73,24 +76,24 @@ export function RoomDetail({ room }: RoomProps) {
     }
 
     if (added.length || modified.length || removed.length) {
-      await syncMutations.mutateAsync({
-        name,
-        todos: {
+      todosFetcher.submit({
+        data: JSON.stringify({
           added,
           removed,
           modified
-        }
+        })
       });
-    } else {
-      // If nothing is modified, then just invalidate the room query.
-      // So that we can refetch.
-      queryClient.invalidateQueries('room');
     }
   }
 
   return (
     <>
-      <form onSubmit={handleSubmit(onDataValid)}>
+      <todosFetcher.Form
+        ref={formRef}
+        onSubmit={handleSubmit(onDataValid)}
+        method="put"
+        action={`/api/rooms/${room._id}`}
+      >
         <Flex px={3} flexDirection="row" justifyContent="space-between">
           <Heading
             as="h1"
@@ -134,7 +137,7 @@ export function RoomDetail({ room }: RoomProps) {
 
           <Button hidden type="submit" ref={submitButtonRef} />
         </Box>
-      </form>
+      </todosFetcher.Form>
     </>
   );
 }

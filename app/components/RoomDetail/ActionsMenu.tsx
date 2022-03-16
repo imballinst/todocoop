@@ -26,18 +26,13 @@ import {
   ModalOverlay
 } from '@chakra-ui/modal';
 import { MdMoreVert } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
 import { UseFieldArrayAppend } from 'react-hook-form';
 
-import {
-  copyTextToClipboard,
-  getErrorMessage,
-  parseRawTodoText
-} from '../../lib/utils';
-import { leaveRoom } from '../../lib/ui/query/rooms';
-import { BaseRoom, UiTodo } from '../../lib/models/types';
+import { copyTextToClipboard, parseRawTodoText } from '~/lib/utils';
+import { BaseRoom, UiTodo } from '~/lib/models/types';
 import { RoomFormState } from './types';
 import { AppLink } from '../AppLink';
+import { useFetcher } from 'remix';
 
 interface Props {
   currentTodos: UiTodo[];
@@ -80,7 +75,6 @@ export function ActionsMenu({
   onLeaveRoom: onLeaveRoomProp,
   append
 }: Props) {
-  const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
@@ -108,11 +102,11 @@ export function ActionsMenu({
         description: 'Copied all todos to clipboard.',
         status: 'success'
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       toast({
         title: 'Failed to copy to clipboard.',
-        description: getErrorMessage(err),
+        description: err.message,
         status: 'error'
       });
     }
@@ -127,20 +121,24 @@ export function ActionsMenu({
         description: 'Copied room information to clipboard.',
         status: 'success'
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       toast({
         title: 'Failed to copy to clipboard.',
-        description: getErrorMessage(err),
+        description: err.message,
         status: 'error'
       });
     }
   }
 
+  const leaveRoomFether = useFetcher();
+
   async function onLeaveRoom() {
     try {
-      await leaveRoom({ name: room.name });
-      queryClient.invalidateQueries('room');
+      leaveRoomFether.submit(
+        { body: JSON.stringify({ name: room.name }) },
+        { method: 'post' }
+      );
     } catch (err) {
       console.error(err);
     }
@@ -163,11 +161,11 @@ export function ActionsMenu({
       );
       onClose();
       setBulkEntries('');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       toast({
         title: 'Failed to create bulk todos.',
-        description: await getErrorMessage(err),
+        description: err.message,
         status: 'error'
       });
     }
