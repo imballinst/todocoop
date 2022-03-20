@@ -29,12 +29,54 @@ export function Layout({
   const { colorMode, toggleColorMode } = useColorMode();
   const bg = useColorModeValue('white', 'gray.800');
 
+  const url =
+    process.env.CONTEXT === 'production'
+      ? process.env.URL
+      : process.env.DEPLOY_URL;
+
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       <Head>
         <title>{title ? `${title} - ` : ''}TodoCoop</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+
+        {/* Primary Meta Tags. */}
+        <title>TodoCoop - Anonymous & Collaborative To-do List</title>
+        <meta
+          name="title"
+          content="TodoCoop - Anonymous & Collaborative To-do List"
+        />
+        <meta
+          name="description"
+          content="TodoCoop is a minimal web application for you to create and collaborate on to-do lists anonymously."
+        />
+
+        {/* Open Graph / Facebook. */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={url} />
+        <meta
+          property="og:title"
+          content="TodoCoop - Anonymous & Collaborative To-do List"
+        />
+        <meta
+          property="og:description"
+          content="TodoCoop is a minimal web application for you to create and collaborate on to-do lists anonymously."
+        />
+        <meta property="og:image" content={`${url}/seo/todocoop.jpg`} />
+
+        {/* Twitter. */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={url} />
+        <meta
+          property="twitter:title"
+          content="TodoCoop - Anonymous & Collaborative To-do List"
+        />
+        <meta
+          property="twitter:description"
+          content="TodoCoop is a minimal web application for you to create and collaborate on to-do lists anonymously."
+        />
+        <meta property="twitter:image" content={`${url}/seo/todocoop.jpg`} />
       </Head>
       <Box
         as="header"
