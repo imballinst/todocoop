@@ -1,9 +1,9 @@
-import { Table, Tbody, Tr } from '@chakra-ui/react';
-import { AxiosResponse } from 'axios';
+import { Table } from '@chakra-ui/react';
 import { useEffect } from 'react';
+import type { AxiosResponse } from 'axios';
 
-import { BaseRoom, UiRoom } from '../../../lib/models/types';
-import { ApiResponse } from '../../../lib/server/types';
+import type { BaseRoom, UiRoom } from '../../../lib/models/types';
+import type { ApiResponse } from '../../../lib/server/api';
 import { ActionsMenu } from '../../RoomDetail/ActionsMenu';
 import { TodoForm, TodoFormPlaceholder } from '../../RoomDetail/TodoForm';
 import { useTodos } from '../../RoomDetail/todos';
@@ -30,7 +30,7 @@ const request = async () => {
     status: 200,
     statusText: 'hello',
     headers: {}
-  };
+  } as AxiosResponse<ApiResponse<BaseRoom>>;
 
   return response;
 };
@@ -77,10 +77,10 @@ export function HowToModifyTodos() {
   }, [lastIndexRef, todos]);
 
   return (
-    <Table variant="simple" width="100%">
-      <Tbody>
+    <Table.Root variant="line" width="100%">
+      <Table.Body>
         {todos.map((todo, index) => (
-          <Tr key={`${todo.localId}-${index}`}>
+          <Table.Row key={`${todo.localId}-${index}`}>
             <TodoForm
               index={index}
               todo={todo}
@@ -88,16 +88,16 @@ export function HowToModifyTodos() {
               lastIndexRef={lastIndexRef}
               {...fieldArrayActions}
             />
-          </Tr>
+          </Table.Row>
         ))}
 
         {todos.length === 0 && (
-          <Tr>
+          <Table.Row>
             <TodoFormPlaceholder insert={fieldArrayActions.insert} />
-          </Tr>
+          </Table.Row>
         )}
-      </Tbody>
-    </Table>
+      </Table.Body>
+    </Table.Root>
   );
 }
 

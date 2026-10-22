@@ -1,4 +1,4 @@
-import subMinutes from 'date-fns/subMinutes';
+import { subMinutes } from 'date-fns';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import fs from 'fs';
@@ -6,7 +6,7 @@ import path from 'path';
 
 import { RoomModel } from '../lib/models';
 
-const configPath = path.resolve(__dirname, '../.env.development.local');
+const configPath = path.resolve(import.meta.dirname, '../.env.development.local');
 if (fs.existsSync(configPath)) {
   dotenv.config({
     path: configPath
@@ -47,9 +47,6 @@ const URI = `mongodb+srv://${MONGODB_ADMIN}:${MONGODB_PASSWORD}@${MONGODB_CLUSTE
   } catch (err) {
     console.error(err);
   } finally {
-    mongoose.connection.close();
+    await mongoose.connection.close();
   }
 })();
-
-// Resolve isolatedModules error. Source: https://stackoverflow.com/questions/56577201/why-is-isolatedmodules-error-fixed-by-any-import/56577324.
-export {};

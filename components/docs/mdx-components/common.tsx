@@ -1,12 +1,16 @@
-import { useColorModeValue } from '@chakra-ui/color-mode';
-import { InfoOutlineIcon, IconProps, WarningTwoIcon } from '@chakra-ui/icons';
-import { Box, BoxProps } from '@chakra-ui/layout';
-import { ComponentWithAs } from '@chakra-ui/system';
+import type { ReactNode } from 'react';
+import { Box, type BoxProps } from '@chakra-ui/react';
+import { MdInfoOutline, MdWarningAmber } from 'react-icons/md';
+
+import { useColorModeValue } from '../../../lib/ui/color-mode';
 
 // Admonitions.
-type AdmonitionProps = BoxProps & {
+type AdmonitionProps = {
   title: 'Tip' | 'Warning';
-  Icon: ComponentWithAs<'svg', IconProps>;
+  Icon: typeof MdInfoOutline;
+  bg: string;
+  color: string;
+  children?: ReactNode;
 };
 
 export function AdmonitionTip({ children }: BoxProps) {
@@ -14,7 +18,7 @@ export function AdmonitionTip({ children }: BoxProps) {
   const color = useColorModeValue('white', 'black');
 
   return (
-    <Admonition bg={bg} color={color} title="Tip" Icon={InfoOutlineIcon}>
+    <Admonition bg={bg} color={color} title="Tip" Icon={MdInfoOutline}>
       {children}
     </Admonition>
   );
@@ -25,7 +29,7 @@ export function AdmonitionWarning({ children }: BoxProps) {
   const color = useColorModeValue('white', 'black');
 
   return (
-    <Admonition bg={bg} color={color} title="Warning" Icon={WarningTwoIcon}>
+    <Admonition bg={bg} color={color} title="Warning" Icon={MdWarningAmber}>
       {children}
     </Admonition>
   );
@@ -46,7 +50,7 @@ function Admonition({ children, bg, color, title, Icon }: AdmonitionProps) {
         py={2}
         px={4}
       >
-        <Icon mr={1} />
+        <Icon style={{ marginRight: 4 }} />
         {title}
       </Box>
 

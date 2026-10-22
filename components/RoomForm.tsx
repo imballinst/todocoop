@@ -1,16 +1,17 @@
-import { Button } from '@chakra-ui/button';
 import {
-  FormControl,
-  FormErrorMessage,
-  FormLabel
-} from '@chakra-ui/form-control';
-import { Input } from '@chakra-ui/input';
-import { Box, Flex, Heading, VStack } from '@chakra-ui/layout';
-import { ThemingProps, useToast } from '@chakra-ui/react';
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Input,
+  Stack,
+  Field
+} from '@chakra-ui/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { getErrorMessage } from '../lib/utils';
-import { createRoom, CreateRoomParameters } from '../lib/ui/query/rooms';
+import { createRoom, type CreateRoomParameters } from '../lib/ui/query/rooms';
+import { toaster } from './Toaster';
 
 const FORM_DEFAULT_VALUES: CreateRoomParameters = {
   name: '',
@@ -22,7 +23,7 @@ interface Props {
   request: typeof createRoom;
   title?: string;
   titleTag?: 'h1' | 'h2';
-  titleSize?: ThemingProps['size'];
+  titleSize?: 'sm' | 'md' | 'lg' | 'xl';
   buttonTitle?: string;
   loadingButtonTitle: string;
 }
@@ -44,7 +45,6 @@ export function RoomForm({
     defaultValues: FORM_DEFAULT_VALUES
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const toast = useToast();
 
   async function onSubmit(formData: CreateRoomParameters) {
     try {
@@ -52,15 +52,15 @@ export function RoomForm({
 
       const { data: responseData } = await request(formData);
       const { data, errors } = responseData;
-      if (!data) throw new Error(errors?.join(', '));
+      if (!data) throw new Error(errors?.map((el) => el.message).join(', '));
 
       onSuccessfulAccess();
     } catch (err) {
       console.error(err);
-      toast({
+      toaster.create({
         title: 'Failed to access room.',
         description: getErrorMessage(err),
-        status: 'error'
+        type: 'error'
       });
     } finally {
       setIsSubmitting(false);
@@ -75,17 +75,23 @@ export function RoomForm({
         onSubmit={handleSubmit(onSubmit)}
         display="flex"
         flexDirection="column"
-        autoComplete="off"
       >
         <Heading as={titleTag} size={titleSize} textAlign="center" mb={8}>
           {title}
         </Heading>
 
-        <VStack spacing={2}>
-          <FormControl isInvalid={errors.name !== undefined}>
-            <FormLabel htmlFor="name">Room name</FormLabel>
+        <Stack gap={2}>
+          <Field.Root invalid={errors.name !== undefined}>
+            <Field.Label htmlFor="name">Room name</Field.Label>
             <Controller
-              render={({ field }) => <Input {...field} type="text" />}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="name"
+                  type="text"
+                  autoComplete="off"
+                />
+              )}
               name="name"
               control={control}
               rules={{
@@ -94,14 +100,21 @@ export function RoomForm({
             />
 
             <Box height={21} mt={1}>
-              <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+              <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
             </Box>
-          </FormControl>
+          </Field.Root>
 
-          <FormControl isInvalid={errors.password !== undefined}>
-            <FormLabel htmlFor="password">Password</FormLabel>
+          <Field.Root invalid={errors.password !== undefined}>
+            <Field.Label htmlFor="password">Password</Field.Label>
             <Controller
-              render={({ field }) => <Input {...field} type="password" />}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                />
+              )}
               name="password"
               control={control}
               rules={{
@@ -109,12 +122,18 @@ export function RoomForm({
               }}
             />
             <Box height={21} mt={1}>
-              <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+              <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
             </Box>
-          </FormControl>
-        </VStack>
+          </Field.Root>
+        </Stack>
 
-        <Button mt={2} isFullWidth type="submit" isDisabled={isSubmitting}>
+        <Button
+          mt={2}
+          width="full"
+          type="submit"
+          loading={isSubmitting}
+          disabled={isSubmitting}
+        >
           {isSubmitting ? loadingButtonTitle : buttonTitle}
         </Button>
       </Box>

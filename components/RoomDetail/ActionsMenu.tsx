@@ -1,33 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
-  Text,
+  Box,
+  Button,
+  Dialog,
+  Field,
+  Flex,
+  HStack,
+  IconButton,
   Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  useToast,
-  useMediaQuery,
-  FormControl,
-  FormHelperText,
-  FormLabel,
+  Portal,
+  Text,
   Textarea,
-  Portal
+  useMediaQuery
 } from '@chakra-ui/react';
-import { Box, Flex, HStack } from '@chakra-ui/layout';
-import { ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons';
-import { Button, IconButton } from '@chakra-ui/button';
-import { useDisclosure } from '@chakra-ui/hooks';
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay
-} from '@chakra-ui/modal';
-import { MdMoreVert } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
-import { UseFieldArrayAppend } from 'react-hook-form';
+import { MdExpandMore, MdMoreVert, MdOpenInNew } from 'react-icons/md';
+import { useQueryClient } from '@tanstack/react-query';
+import type { UseFieldArrayAppend } from 'react-hook-form';
 
 import {
   copyTextToClipboard,
@@ -35,9 +23,10 @@ import {
   parseRawTodoText
 } from '../../lib/utils';
 import { leaveRoom } from '../../lib/ui/query/rooms';
-import { BaseRoom, UiTodo } from '../../lib/models/types';
-import { RoomFormState } from './types';
+import type { BaseRoom, UiTodo } from '../../lib/models/types';
+import type { RoomFormState } from './types';
 import { AppLink } from '../AppLink';
+import { toaster } from '../Toaster';
 
 interface Props {
   currentTodos: UiTodo[];
@@ -46,20 +35,6 @@ interface Props {
   onLeaveRoom?: () => void;
   append: UseFieldArrayAppend<RoomFormState, 'todos'>;
 }
-
-const MENU_BUTTON_MD = (
-  <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-    Actions
-  </MenuButton>
-);
-const MENU_BUTTON_SM = (
-  <MenuButton
-    as={IconButton}
-    aria-label="Actions"
-    icon={<MdMoreVert />}
-    variant="ghost"
-  />
-);
 
 const MODAL_CAPTIONS: {
   [index in 'roomInfo' | 'todoImport']: {
@@ -81,22 +56,12 @@ export function ActionsMenu({
   append
 }: Props) {
   const queryClient = useQueryClient();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
-
+  const [isOpen, setIsOpen] = useState(false);
   const [modalMode, setModalMode] = useState<
     'roomInfo' | 'todoImport' | undefined
   >();
   const [bulkEntries, setBulkEntries] = useState('');
   const [isLargerThan768] = useMediaQuery(['(min-width: 768px)']);
-
-  // Need to store the button in a state, because otherwise there will be styling
-  // mismatch(es). Read more about it here: https://github.com/vercel/next.js/discussions/17443#discussioncomment-87097.
-  const [menuButton, setMenuButton] = useState(MENU_BUTTON_MD);
-
-  useEffect(() => {
-    setMenuButton(isLargerThan768 ? MENU_BUTTON_MD : MENU_BUTTON_SM);
-  }, [isLargerThan768]);
 
   async function copyListToClipboard() {
     const currentTodosText = currentTodos
@@ -104,16 +69,16 @@ export function ActionsMenu({
       .join('\n');
     try {
       await copyTextToClipboard(currentTodosText);
-      toast({
+      toaster.create({
         description: 'Copied all todos to clipboard.',
-        status: 'success'
+        type: 'success'
       });
     } catch (err) {
       console.error(err);
-      toast({
+      toaster.create({
         title: 'Failed to copy to clipboard.',
         description: getErrorMessage(err),
-        status: 'error'
+        type: 'error'
       });
     }
   }
@@ -123,16 +88,16 @@ export function ActionsMenu({
 
     try {
       await copyTextToClipboard(currentTodosText);
-      toast({
+      toaster.create({
         description: 'Copied room information to clipboard.',
-        status: 'success'
+        type: 'success'
       });
     } catch (err) {
       console.error(err);
-      toast({
+      toaster.create({
         title: 'Failed to copy to clipboard.',
         description: getErrorMessage(err),
-        status: 'error'
+        type: 'error'
       });
     }
   }
@@ -140,7 +105,7 @@ export function ActionsMenu({
   async function onLeaveRoom() {
     try {
       await leaveRoom({ name: room.name });
-      queryClient.invalidateQueries('room');
+      queryClient.invalidateQueries({ queryKey: ['room'] });
     } catch (err) {
       console.error(err);
     }
@@ -161,111 +126,146 @@ export function ActionsMenu({
           state: 'added'
         }))
       );
-      onClose();
+      setIsOpen(false);
       setBulkEntries('');
     } catch (err) {
       console.error(err);
-      toast({
+      toaster.create({
         title: 'Failed to create bulk todos.',
-        description: await getErrorMessage(err),
-        status: 'error'
+        description: getErrorMessage(err),
+        type: 'error'
       });
     }
   }
 
   const onLeaveRoomClick = onLeaveRoomProp || onLeaveRoom;
 
+  function openModal(mode: 'roomInfo' | 'todoImport') {
+    setModalMode(mode);
+    setIsOpen(true);
+  }
+
   return (
     <>
-      <Menu>
-        {menuButton}
+      <Menu.Root>
+        <Menu.Trigger asChild>
+          {isLargerThan768 ? (
+            <Button variant="outline">
+              Actions <MdExpandMore />
+            </Button>
+          ) : (
+            <IconButton aria-label="Actions" variant="ghost">
+              <MdMoreVert />
+            </IconButton>
+          )}
+        </Menu.Trigger>
 
         <Portal>
-          <MenuList>
-            <MenuItem
-              onClick={() => {
-                onOpen();
-                setModalMode('roomInfo');
-              }}
-            >
-              Room information
-            </MenuItem>
-            <MenuItem onClick={copyListToClipboard}>
-              Copy list to clipboard
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                onOpen();
-                setModalMode('todoImport');
-              }}
-            >
-              Add bulk to-dos
-            </MenuItem>
-            <MenuItem onClick={onLeaveRoomClick}>Leave room</MenuItem>
-          </MenuList>
+          <Menu.Positioner>
+            <Menu.Content>
+              <Menu.Item
+                value="room-info"
+                onClick={() => openModal('roomInfo')}
+              >
+                Room information
+              </Menu.Item>
+              <Menu.Item value="copy-list" onClick={copyListToClipboard}>
+                Copy list to clipboard
+              </Menu.Item>
+              <Menu.Item
+                value="bulk-todos"
+                onClick={() => openModal('todoImport')}
+              >
+                Add bulk to-dos
+              </Menu.Item>
+              <Menu.Item value="leave-room" onClick={onLeaveRoomClick}>
+                Leave room
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
         </Portal>
-      </Menu>
+      </Menu.Root>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            {modalMode !== undefined && MODAL_CAPTIONS[modalMode].title}
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody py={4} px={6}>
-            {modalMode === 'roomInfo' ? (
-              <>
-                <Box display="flex">
-                  <Text mr={2} fontWeight={700}>
-                    Room name:
-                  </Text>{' '}
-                  {room.name}
-                </Box>
-                <Box display="flex">
-                  <Text mr={2} fontWeight={700}>
-                    Room password:
-                  </Text>{' '}
-                  {room.password}
-                </Box>
-                <HStack mt={4} display="flex" spacing={2}>
-                  <Button
-                    variant="solid"
-                    onClick={copyRoomInformationToClipboard}
-                  >
-                    Copy to clipboard
-                  </Button>
-                </HStack>
-              </>
-            ) : (
-              <Box flex="1">
-                <FormControl>
-                  <FormLabel htmlFor="name">Entries to Add</FormLabel>
-                  <Textarea
-                    placeholder="- [x] Do something"
-                    onChange={(e) => setBulkEntries(e.target.value)}
-                    value={bulkEntries}
-                  />
-                  <FormHelperText>
-                    By default, each line will be added as a new unchecked entry
-                    unless specified as checked. For more information, see the{' '}
-                    <AppLink href="/how-to-use#add-bulk-to-dos" isExternal>
-                      how to use section <ExternalLinkIcon mx="2px" />
-                    </AppLink>
-                    .
-                  </FormHelperText>
-                </FormControl>
+      <Dialog.Root
+        open={isOpen}
+        onOpenChange={(details) => {
+          if (!details.open) setIsOpen(false);
+        }}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>
+                  {modalMode !== undefined &&
+                    MODAL_CAPTIONS[modalMode].title}
+                </Dialog.Title>
+              </Dialog.Header>
+              <Dialog.CloseTrigger />
+              <Dialog.Body py={4} px={6}>
+                {modalMode === 'roomInfo' ? (
+                  <>
+                    <Box display="flex">
+                      <Text mr={2} fontWeight={700}>
+                        Room name:
+                      </Text>{' '}
+                      {room.name}
+                    </Box>
+                    <Box display="flex">
+                      <Text mr={2} fontWeight={700}>
+                        Room password:
+                      </Text>{' '}
+                      {room.password}
+                    </Box>
+                    <HStack mt={4} display="flex" gap={2}>
+                      <Button
+                        variant="solid"
+                        onClick={copyRoomInformationToClipboard}
+                      >
+                        Copy to clipboard
+                      </Button>
+                    </HStack>
+                  </>
+                ) : (
+                  <Box flex="1">
+                    <Field.Root>
+                      <Field.Label htmlFor="bulk-entries">
+                        Entries to Add
+                      </Field.Label>
+                      <Textarea
+                        id="bulk-entries"
+                        placeholder="- [x] Do something"
+                        onChange={(e) => setBulkEntries(e.target.value)}
+                        value={bulkEntries}
+                      />
+                      <Field.HelperText>
+                        By default, each line will be added as a new unchecked
+                        entry unless specified as checked. For more information,
+                        see the{' '}
+                        <AppLink
+                          href="/how-to-use#add-bulk-to-dos"
+                          isExternal
+                        >
+                          how to use section{' '}
+                          <MdOpenInNew style={{ display: 'inline' }} />
+                        </AppLink>
+                        .
+                      </Field.HelperText>
+                    </Field.Root>
 
-                <Flex flexDirection="row" justifyContent="flex-end">
-                  <Button onClick={onCreateBulk} mt={4}>
-                    Add Bulk List
-                  </Button>
-                </Flex>
-              </Box>
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+                    <Flex flexDirection="row" justifyContent="flex-end">
+                      <Button onClick={onCreateBulk} mt={4}>
+                        Add Bulk List
+                      </Button>
+                    </Flex>
+                  </Box>
+                )}
+              </Dialog.Body>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </>
   );
 }

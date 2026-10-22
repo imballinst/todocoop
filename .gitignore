@@ -26,4 +26,6 @@ node_modules/
 # OSX stuff.
 .DS_Store
 
-.next/
+# Build output.
+build/
+.react-router/

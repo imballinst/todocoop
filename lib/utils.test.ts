@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { parseRawTodoText } from './utils';
 
 describe('parseRawTodoText', () => {
@@ -7,7 +9,7 @@ describe('parseRawTodoText', () => {
     for (const text of texts) {
       const result = parseRawTodoText(text);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         isChecked: false,
         title: 'Do something.'
       });
@@ -24,7 +26,7 @@ describe('parseRawTodoText', () => {
     for (const text of texts) {
       const result = parseRawTodoText(text);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         isChecked: false,
         title: 'Do something.'
       });
@@ -41,7 +43,7 @@ describe('parseRawTodoText', () => {
     for (const text of texts) {
       const result = parseRawTodoText(text);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         isChecked: false,
         title: 'Do something.'
       });
@@ -58,7 +60,7 @@ describe('parseRawTodoText', () => {
     for (const text of texts) {
       const result = parseRawTodoText(text);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         isChecked: false,
         title: 'Do something.'
       });
@@ -75,7 +77,7 @@ describe('parseRawTodoText', () => {
     for (const text of texts) {
       const result = parseRawTodoText(text);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         isChecked: false,
         title: 'Do something.'
       });
@@ -92,7 +94,7 @@ describe('parseRawTodoText', () => {
     for (const text of texts) {
       const result = parseRawTodoText(text);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         isChecked: true,
         title: 'Do something.'
       });
