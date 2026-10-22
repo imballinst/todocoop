@@ -1,11 +1,12 @@
-import { model, Schema, Document, Model, models } from 'mongoose';
+import mongoose from 'mongoose';
+import type { Model } from 'mongoose';
 
-import { BaseRoom, BaseTodo } from './types';
+import type { BaseRoom, BaseTodo } from './types';
+
+const { model, models, Schema } = mongoose;
 
 // Todo.
-export interface Todo extends BaseTodo, Document {}
-
-const TodoSchema = new Schema<Todo>({
+const TodoSchema = new Schema<BaseTodo>({
   title: {
     type: String,
     required: [true, 'Todo title is required.']
@@ -27,11 +28,7 @@ const TodoSchema = new Schema<Todo>({
 });
 
 // Room.
-export interface Room extends BaseRoom, Document {
-  todos: Todo[];
-}
-
-const RoomSchema = new Schema<Room>(
+const RoomSchema = new Schema<BaseRoom>(
   {
     name: {
       type: String,
@@ -53,7 +50,7 @@ const RoomSchema = new Schema<Room>(
   }
 );
 
-export const TodoModel: Model<Todo, {}> =
-  models.Todo || model<Todo>('Todo', TodoSchema);
-export const RoomModel: Model<Room, {}> =
-  models.Room || model<Room>('Room', RoomSchema);
+export const TodoModel: Model<BaseTodo> =
+  (models.Todo as Model<BaseTodo>) || model<BaseTodo>('Todo', TodoSchema);
+export const RoomModel: Model<BaseRoom> =
+  (models.Room as Model<BaseRoom>) || model<BaseRoom>('Room', RoomSchema);

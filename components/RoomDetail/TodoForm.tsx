@@ -1,25 +1,24 @@
-import { MutableRefObject, ReactNode } from 'react';
-import { DeleteIcon } from '@chakra-ui/icons';
+import type { MutableRefObject, ReactNode } from 'react';
 import {
   Box,
   Checkbox,
-  FormControl,
-  FormErrorMessage,
+  Field,
   IconButton,
+  Table,
   Textarea,
-  TableCellProps,
-  Td
+  type TableCellProps
 } from '@chakra-ui/react';
+import { MdDelete } from 'react-icons/md';
 import {
-  Control,
+  type Control,
   useController,
-  UseFieldArrayInsert,
-  UseFieldArrayReturn,
-  UseFormSetFocus
+  type UseFieldArrayInsert,
+  type UseFieldArrayReturn,
+  type UseFormSetFocus
 } from 'react-hook-form';
 import { generateHash } from '../../lib/utils';
-import { UiTodo } from '../../lib/models/types';
-import { RoomFormState } from './types';
+import type { UiTodo } from '../../lib/models/types';
+import type { RoomFormState } from './types';
 
 interface TodoFormBaseProps {
   todo: UiTodo;
@@ -29,8 +28,6 @@ interface TodoFormBaseProps {
   // Field array actions.
   setFocus: UseFormSetFocus<RoomFormState>;
   remove: (todo: UiTodo, index: number) => void;
-  // TODO(imballinst): update this after https://github.com/react-hook-form/react-hook-form/issues/7821
-  // is responded.
   update: UseFieldArrayReturn<RoomFormState, 'todos', 'id'>['update'];
   insert: UseFieldArrayInsert<RoomFormState, 'todos'>;
 }
@@ -60,26 +57,29 @@ export function TodoForm({
   return (
     <>
       <TableColumn colSpan={2}>
-        <Box display="flex">
-          <Checkbox
-            {...checkboxController.field}
-            isChecked={checkboxController.field.value}
-            value={todo.localId}
-            autoFocus={false}
-            onChange={(e) => {
-              checkboxController.field.onChange(e);
+        <Box display="flex" alignItems="center">
+          <Checkbox.Root
+            checked={checkboxController.field.value}
+            name={checkboxController.field.name}
+            onCheckedChange={(details) => {
+              const isChecked = details.checked === true;
+
+              checkboxController.field.onChange(isChecked);
               update(index, {
                 ...todo,
-                isChecked: e.target.checked,
+                isChecked,
                 updatedAt: new Date().toISOString(),
                 state: todo.state === 'added' ? 'added' : 'modified'
               });
             }}
-          />
+          >
+            <Checkbox.HiddenInput ref={checkboxController.field.ref} />
+            <Checkbox.Control />
+          </Checkbox.Root>
 
-          <FormControl
+          <Field.Root
             ml={2}
-            isInvalid={textareaController.fieldState.error !== undefined}
+            invalid={textareaController.fieldState.error !== undefined}
           >
             <Textarea
               {...textareaController.field}
@@ -155,7 +155,8 @@ export function TodoForm({
                       // Instead of adding this by 1, add by 0.01 instead.
                       // The intention is that, the other devices will always see the same order. Perhpas.
                       indexOrder: index + 0.01,
-                      title: ''
+                      title: '',
+                      updatedAt: new Date().toISOString()
                     },
                     {
                       focusName: `todos.${index + 1}.title`
@@ -166,28 +167,29 @@ export function TodoForm({
             />
 
             {textareaController.fieldState.error && (
-              <FormErrorMessage>
+              <Field.ErrorText>
                 {textareaController.fieldState.error.message}
-              </FormErrorMessage>
+              </Field.ErrorText>
             )}
-          </FormControl>
+          </Field.Root>
         </Box>
       </TableColumn>
 
       <TableColumn width={1}>
         <IconButton
-          minWidth="var(--chakra-sizes-6)"
-          height="var(--chakra-sizes-6)"
+          minWidth={6}
+          height={6}
           variant="ghost"
-          colorScheme="teal"
+          colorPalette="teal"
           onClick={() => remove(todo, index)}
-          aria-label="Edit"
-          icon={<DeleteIcon />}
+          aria-label="Delete"
           // Hide the first button for screen readers.
           aria-hidden={index === 0}
           // Visually hide the first button for non-screen readers.
           visibility={index > 0 ? 'unset' : 'hidden'}
-        />
+        >
+          <MdDelete />
+        </IconButton>
       </TableColumn>
     </>
   );
@@ -199,10 +201,12 @@ export function TodoFormPlaceholder({
   return (
     <>
       <TableColumn colSpan={2}>
-        <Box display="flex">
-          <Checkbox aria-hidden={true} visibility="hidden" />
+        <Box display="flex" alignItems="center">
+          <Checkbox.Root aria-hidden={true} visibility="hidden" tabIndex={-1}>
+            <Checkbox.Control />
+          </Checkbox.Root>
 
-          <FormControl ml={2}>
+          <Field.Root ml={2}>
             <Textarea
               resize="none"
               onFocus={() => {
@@ -231,19 +235,20 @@ export function TodoFormPlaceholder({
                 }
               }}
             />
-          </FormControl>
+          </Field.Root>
         </Box>
       </TableColumn>
 
       <TableColumn width={1}>
         <IconButton
-          minWidth="var(--chakra-sizes-6)"
-          height="var(--chakra-sizes-6)"
-          aria-label="Edit"
-          icon={<DeleteIcon />}
+          minWidth={6}
+          height={6}
+          aria-label="Delete"
           aria-hidden={true}
           visibility="hidden"
-        />
+        >
+          <MdDelete />
+        </IconButton>
       </TableColumn>
     </>
   );
@@ -251,7 +256,7 @@ export function TodoFormPlaceholder({
 
 function TableColumn(props: { children: ReactNode } & TableCellProps) {
   return (
-    <Td
+    <Table.Cell
       {...props}
       paddingInline={3}
       py={2}

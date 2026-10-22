@@ -1,15 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { Box, Flex, Heading } from '@chakra-ui/layout';
-import { Button } from '@chakra-ui/button';
-import { Table, Tbody, Tr } from '@chakra-ui/table';
-import { useQueryClient } from 'react-query';
+import { useEffect, useRef } from 'react';
+import { Box, Button, Flex, Heading, Table } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useSyncRoom } from '../../lib/ui/hooks';
-import { UiRoom, BaseTodo } from '../../lib/models/types';
+import type { BaseTodo, UiRoom } from '../../lib/models/types';
 import { TodoForm, TodoFormPlaceholder } from './TodoForm';
 import { ActionsMenu } from './ActionsMenu';
 import { useTodos } from './todos';
-import { RoomFormState } from './types';
+import type { RoomFormState } from './types';
 
 interface RoomProps {
   room: UiRoom;
@@ -19,7 +17,7 @@ export function RoomDetail({ room }: RoomProps) {
   const { name, todos: roomTodos } = room;
 
   const queryClient = useQueryClient();
-  const submitButtonRef = useRef<HTMLButtonElement>();
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     control,
@@ -34,7 +32,7 @@ export function RoomDetail({ room }: RoomProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       // Every 5 seconds, if it's idle, then sync.
-      submitButtonRef.current.click();
+      submitButtonRef.current?.click();
     }, 5000);
 
     lastIndexRef.current = todos.length - 1;
@@ -84,58 +82,56 @@ export function RoomDetail({ room }: RoomProps) {
     } else {
       // If nothing is modified, then just invalidate the room query.
       // So that we can refetch.
-      queryClient.invalidateQueries('room');
+      queryClient.invalidateQueries({ queryKey: ['room'] });
     }
   }
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onDataValid)}>
-        <Flex px={3} flexDirection="row" justifyContent="space-between">
-          <Heading
-            as="h1"
-            size="md"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-          >
-            {name}
-          </Heading>
-          <Box position="relative">
-            <ActionsMenu
-              room={room}
-              currentTodos={todos}
-              append={fieldArrayActions.append}
-            />
-          </Box>
-        </Flex>
-        <Box mt={4}>
-          <Table variant="simple" width="100%">
-            <Tbody>
-              {todos.map((todo, index) => (
-                <Tr key={`${todo.localId}-${index}`}>
-                  <TodoForm
-                    index={index}
-                    todo={todo}
-                    control={control}
-                    lastIndexRef={lastIndexRef}
-                    {...fieldArrayActions}
-                  />
-                </Tr>
-              ))}
-
-              {todos.length === 0 && (
-                <Tr>
-                  <TodoFormPlaceholder insert={fieldArrayActions.insert} />
-                </Tr>
-              )}
-            </Tbody>
-          </Table>
-
-          <Button hidden type="submit" ref={submitButtonRef} />
+    <form onSubmit={handleSubmit(onDataValid)}>
+      <Flex px={3} flexDirection="row" justifyContent="space-between">
+        <Heading
+          as="h1"
+          size="md"
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+        >
+          {name}
+        </Heading>
+        <Box position="relative">
+          <ActionsMenu
+            room={room}
+            currentTodos={todos}
+            append={fieldArrayActions.append}
+          />
         </Box>
-      </form>
-    </>
+      </Flex>
+      <Box mt={4}>
+        <Table.Root variant="line" width="100%">
+          <Table.Body>
+            {todos.map((todo, index) => (
+              <Table.Row key={`${todo.localId}-${index}`}>
+                <TodoForm
+                  index={index}
+                  todo={todo}
+                  control={control}
+                  lastIndexRef={lastIndexRef}
+                  {...fieldArrayActions}
+                />
+              </Table.Row>
+            ))}
+
+            {todos.length === 0 && (
+              <Table.Row>
+                <TodoFormPlaceholder insert={fieldArrayActions.insert} />
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>
+
+        <Button hidden type="submit" ref={submitButtonRef} />
+      </Box>
+    </form>
   );
 }
 

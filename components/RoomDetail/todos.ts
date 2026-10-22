@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useFieldArray, UseFieldArrayInsert, useForm } from 'react-hook-form';
-import { UiRoom, UiTodo } from '../../lib/models/types';
+import { UiTodo } from '../../lib/models/types';
 import { RoomFormState } from './types';
 
 interface UseTodoParams {
@@ -38,13 +38,13 @@ export function useTodos({ roomTodos, limit }: UseTodoParams) {
     [fieldArrayRemove]
   );
 
-  const insert = useCallback<UseFieldArrayInsert<UiRoom>>(
+  const insert = useCallback<UseFieldArrayInsert<RoomFormState, 'todos'>>(
     (...args) => {
       if (limit === undefined || lastIndexRef.current + 1 < limit) {
         fieldArrayInsert(...args);
       }
     },
-    [limit, fieldArrayRemove]
+    [limit, fieldArrayInsert]
   );
 
   const fieldArrayActions = { remove, insert, setFocus, update, append };

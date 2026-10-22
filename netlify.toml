@@ -1,2 +1,18 @@
 [build]
-  publish = ".next"
+  command = "yarn build"
+  publish = "build/client"
+
+[functions]
+  directory = "netlify/functions"
+
+# Keep the existing /api surface and forward it to the function.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# SPA fallback.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

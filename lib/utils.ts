@@ -1,6 +1,7 @@
-import { AxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import { useEffect } from 'react';
-import { BaseTodo } from './models/types';
+import type { BaseTodo } from './models/types';
+import type { ApiResponse } from './server/api';
 
 export function generateHash(length = 5) {
   const timestampHash = Date.now().toString(36);
@@ -29,16 +30,21 @@ export function useDebugEffect<T>(name: string, val: T) {
   useEffect(() => {
     console.debug('-----');
     console.debug(`${name} changed: ${val}`);
-  }, [val]);
+  }, [name, val]);
 }
 
-export function getErrorMessage(error: AxiosError) {
-  if (error?.response) {
-    if (error.response.data.errors) {
-      return error.response.data.errors.map((el) => el.message).join('; ');
+export function getErrorMessage(error: unknown) {
+  if (isAxiosError(error) && error.response) {
+    const data = error.response.data as ApiResponse<unknown> | undefined;
+
+    if (data?.errors?.length) {
+      return data.errors.map((el) => el.message).join('; ');
     }
 
-    return error.response.statusText;
+    return (
+      error.response.statusText ||
+      'Unexpected error occurred. Please check your connection and try again.'
+    );
   }
 
   return 'Unexpected error occurred. Please check your connection and try again.';

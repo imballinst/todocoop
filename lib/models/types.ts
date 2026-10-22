@@ -1,10 +1,7 @@
-import { Document } from 'mongoose';
-
-type MongoToObjectFields = Pick<Document, '_id' | '__v'>;
-
-// Todo.
-export interface BaseTodo extends MongoToObjectFields {
+export interface BaseTodo {
   // Mongo fields.
+  _id?: string;
+  __v?: number;
   title: string;
   isChecked: boolean;
   indexOrder: number;
@@ -17,13 +14,17 @@ export interface UiTodo extends BaseTodo {
 }
 
 // Room.
-export interface BaseRoom extends MongoToObjectFields {
+export interface BaseRoom {
+  _id?: string;
+  __v?: number;
   name: string;
   password: string;
   todos: BaseTodo[];
 }
 
-export interface UiRoom extends MongoToObjectFields {
+export interface UiRoom {
+  _id?: string;
+  __v?: number;
   name: string;
   password: string;
   todos: UiTodo[];

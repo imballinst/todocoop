@@ -1,12 +1,23 @@
-import { Box, Button, Flex, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 
-import { AppLink } from '../components/AppLink';
-import { Layout } from '../components/Layout';
-import { RoomForm } from '../components/RoomForm';
-import { useCurrentRoom } from '../lib/ui/hooks';
-import { accessRoom } from '../lib/ui/query/rooms';
+import { AppLink } from '../../components/AppLink';
+import { Layout } from '../../components/Layout';
+import { RoomForm } from '../../components/RoomForm';
+import { useCurrentRoom } from '../../lib/ui/hooks';
+import { accessRoom } from '../../lib/ui/query/rooms';
 
-export default function IndexPage() {
+export function meta() {
+  return [
+    { title: 'TodoCoop - Anonymous & Collaborative To-do List' },
+    {
+      name: 'description',
+      content:
+        'TodoCoop is a minimal web application for you to create and collaborate on to-do lists anonymously.'
+    }
+  ];
+}
+
+export default function HomeRoute() {
   const { room, isFetching, refetchRoom } = useCurrentRoom({
     queryOptions: {
       refetchIntervalInBackground: false,
@@ -23,7 +34,7 @@ export default function IndexPage() {
             <Heading as="h1" size="xl">
               TodoCoop
             </Heading>
-            <Text as="p" size="sm" textAlign="center">
+            <Text as="p" fontSize="sm" textAlign="center">
               Synchronize tasks in a room. No account needed!
             </Text>
           </Flex>
@@ -38,9 +49,9 @@ export default function IndexPage() {
             titleTag="h2"
           />
 
-          <Text mt={8} as="p" size="sm" textAlign="center">
+          <Text mt={8} as="p" fontSize="sm" textAlign="center">
             Haven't created a room yet? Create one{' '}
-            <AppLink href="/create" colorScheme="teal">
+            <AppLink href="/create" colorPalette="teal">
               in this page
             </AppLink>
             .

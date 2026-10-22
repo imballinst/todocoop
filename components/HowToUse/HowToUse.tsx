@@ -1,9 +1,17 @@
-import { useColorModeValue } from '@chakra-ui/color-mode';
-import { Box, BoxProps } from '@chakra-ui/layout';
-import dynamic from 'next/dynamic';
-import Head from 'next/head';
+import type { ComponentType, ReactNode } from 'react';
+import { Box, type BoxProps } from '@chakra-ui/react';
 
 import HowToUseMdx from '../docs/how-to-use.mdx';
+import {
+  HowToUseActionsMenu,
+  HowToModifyTodos,
+  HowToUseRoomAccess
+} from '../docs/mdx-components/how-to-use';
+import {
+  AdmonitionTip,
+  AdmonitionWarning
+} from '../docs/mdx-components/common';
+import { useColorModeValue } from '../../lib/ui/color-mode';
 
 const Heading1 = (props) => (
   <Box
@@ -12,7 +20,7 @@ const Heading1 = (props) => (
     fontWeight={700}
     fontSize="1.625rem"
     mb={4}
-    id={props.children.toString().toLowerCase().replace(/\s+/g, '-')}
+    id={String(props.children).toLowerCase().replace(/\s+/g, '-')}
   />
 );
 const Heading2 = (props) => (
@@ -22,7 +30,7 @@ const Heading2 = (props) => (
     fontWeight={700}
     fontSize="1.5rem"
     my={4}
-    id={props.children.toString().toLowerCase().replace(/\s+/g, '-')}
+    id={String(props.children).toLowerCase().replace(/\s+/g, '-')}
   />
 );
 const Heading3 = (props) => (
@@ -32,7 +40,7 @@ const Heading3 = (props) => (
     fontWeight={700}
     fontSize="1.25rem"
     my={4}
-    id={props.children.toString().toLowerCase().replace(/\s+/g, '-')}
+    id={String(props.children).toLowerCase().replace(/\s+/g, '-')}
   />
 );
 const Paragraph = (props) => <Box as="p" {...props} mb={3} />;
@@ -40,43 +48,19 @@ const Pre = (props) => <Demo as="pre" {...props} p={6} fontSize="0.875rem" />;
 const Ol = (props) => <Box as="ol" {...props} ml={9} />;
 
 // Custom components/renderers to pass to MDX.
-// Since the MDX files aren't loaded by webpack, they have no knowledge of how
-// to handle import statements. Instead, you must include components in scope
-// here.
-const components = {
-  // It also works with dynamically-imported components, which is especially
-  // useful for conditionally loading components for certain routes.
-  // See the notes in README.md for more details.
-  HowToUseRoomAccess: dynamic(() =>
-    import('../docs/mdx-components/how-to-use').then(
-      (all) => all.HowToUseRoomAccess
-    )
-  ),
-  HowToUseActionsMenu: dynamic(() =>
-    import('../docs/mdx-components/how-to-use').then(
-      (all) => all.HowToUseActionsMenu
-    )
-  ),
-  HowToModifyTodos: dynamic(() =>
-    import('../docs/mdx-components/how-to-use').then(
-      (all) => all.HowToModifyTodos
-    )
-  ),
+const components: Record<string, ComponentType<any>> = {
+  HowToUseRoomAccess,
+  HowToUseActionsMenu,
+  HowToModifyTodos,
   Demo,
-  Head,
   h1: Heading1,
   h2: Heading2,
   h3: Heading3,
   p: Paragraph,
   pre: Pre,
   ol: Ol,
-  // Admonitions.
-  Tip: dynamic(() =>
-    import('../docs/mdx-components/common').then((all) => all.AdmonitionTip)
-  ),
-  Warning: dynamic(() =>
-    import('../docs/mdx-components/common').then((all) => all.AdmonitionWarning)
-  )
+  Tip: AdmonitionTip,
+  Warning: AdmonitionWarning
 };
 
 export function HowToUse() {
@@ -88,7 +72,7 @@ export function HowToUse() {
 }
 
 // Components.
-function Demo({ children, ...props }: BoxProps) {
+function Demo({ children, ...props }: BoxProps & { children?: ReactNode }) {
   const borderColor = useColorModeValue('gray.800', 'gray.600');
 
   return (
